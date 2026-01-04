@@ -89,10 +89,15 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
             - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
             - AUCUN texte, commentaire, ou markdown (comme \`\`\`json) ne doit être présent en dehors de l'objet JSON principal.
-            - Si tu ne peux pas générer une analyse valide, retourne EXACTEMENT ce JSON d'erreur : \`{"error": "Analyse impossible, données insuffisantes pour ce match."}\`.
+            - Si tu ne peux pas générer une analyse valide, retourne EXACTEMENT ce JSON d'erreur : \`{"error": "Analyse impossible, aucun match futur officiellement programmé n'a été trouvé pour ces équipes."}\`.
     
             OBJECTIF :
-            Analyser le match de ${sport} entre ${team1} et ${team2} pour le pari "${betType}", en utilisant Google Search pour des données à jour.
+            Analyser le **prochain match officiel à venir** entre ${team1} et ${team2} pour le sport ${sport} et le pari "${betType}".
+    
+            CONTRAINTE CRITIQUE DE VÉRACITÉ :
+            - Tu dois **IMPÉRATIVEMENT** utiliser tes outils de recherche (Google Search) pour trouver la date et l'heure du **PROCHAIN** match **OFFICIELLEMENT PROGRAMMÉ** entre ces deux équipes/joueurs.
+            - Si aucun match futur n'est programmé entre eux, tu DOIS retourner le JSON d'erreur spécifié ci-dessus.
+            - **NE PAS INVENTER de match ou utiliser la date d'un match déjà joué.** L'exactitude de la date est la priorité absolue.
     
             FORMAT JSON OBLIGATOIRE :
             La réponse doit être un objet JSON unique avec les champs suivants :
@@ -101,7 +106,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - "keyData": Tableau de 3-4 points statistiques clés (array of strings)
             - "recommendedBet": Suggestion de pari basée sur l'analyse globale (string)
             - "recommendationReason": Justification de cette suggestion (string)
-            - "matchDateTimeUTC": Date et heure OFFICIELLE du match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE. Vérifie la source pour l'heure de coup d'envoi locale et convertis-la précisément en UTC.
+            - "matchDateTimeUTC": Date et heure **VÉRIFIÉE et OFFICIELLE** du prochain match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             `;
             
             const ai = getAiClient();

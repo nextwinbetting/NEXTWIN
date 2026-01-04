@@ -6,7 +6,7 @@ import { GoogleGenAI } from "@google/genai";
 
 // --- AI LOGIC MOVED HERE FOR AI STUDIO COMPATIBILITY ---
 const extractJson = (rawText: string): string => {
-    const match = rawText.match(/```json\s*([\s\S]*?)\s*```/);
+    const match = rawText.match(/```json\s*([\sS]*?)\s*```/);
     if (match && match[1]) {
         return match[1];
     }
@@ -109,12 +109,13 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             - Si tu ne peux pas générer une réponse valide, retourne EXACTEMENT : \`{"predictions": []}\`.
     
             OBJECTIF :
-            Générer 6 pronostics sportifs exclusifs pour des matchs AYANT LIEU DANS LE FUTUR à partir du ${currentDate}. Il doit y avoir EXACTEMENT 2 pronostics pour le Football, 2 pour le Basketball, et 2 pour le Tennis.
+            Générer 6 pronostics sportifs pour des matchs réels, officiellement programmés et non encore joués. Les matchs doivent avoir lieu aujourd'hui (${currentDate}) ou dans les 7 prochains jours. Il doit y avoir EXACTEMENT 2 pronostics pour le Football, 2 pour le Basketball, et 2 pour le Tennis.
 
-            CONTRAINTE CRITIQUE DE TEMPS :
+            CONTRAINTE CRITIQUE DE VÉRACITÉ ET DE TEMPS :
             - L'heure de référence actuelle est ${currentUTC}.
-            - Tu dois IMPÉRATIVEMENT sélectionner des matchs dont le coup d'envoi (matchDateTimeUTC) est POSTÉRIEUR à cette heure de référence.
-            - NE JAMAIS inclure de matchs déjà commencés ou terminés. Vérifie l'état du match ("Not Started", "Upcoming") via tes sources.
+            - Tu dois **IMPÉRATIVEMENT** utiliser tes outils de recherche (Google Search) pour vérifier que chaque match est **réel, confirmé** et a lieu dans le futur (après ${currentUTC}).
+            - **NE PAS UTILISER DE MATCHS HISTORIQUES OU ANNULÉS.** Si tu trouves un match passé, ne l'invente pas pour le futur. Cherche un autre match réellement programmé.
+            - La date du match doit être correcte. Par exemple, ne propose pas un match de 2024 avec une date en 2026.
     
             FORMAT JSON OBLIGATOIRE :
             La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 6 objets, chacun avec les champs suivants :
@@ -122,7 +123,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             - "league": Nom de la compétition (string)
             - "match": "Équipe A vs Équipe B" (string)
             - "betType": Le type de pari (string)
-            - "matchDateTimeUTC": Date et heure OFFICIELLE de chaque match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE. Vérifie la source pour l'heure de coup d'envoi locale et convertis-la précisément en UTC.
+            - "matchDateTimeUTC": Date et heure **OFFICIELLE et VÉRIFIÉE** du match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             - "probability": Indice de confiance (integer, ≥ 70)
             - "analysis": Analyse courte et factuelle (string)
             `;
