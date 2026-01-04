@@ -57,14 +57,16 @@ const mapStringToSport = (sport: string): Sport => {
  */
 export const getDailyPredictions = async (): Promise<{ predictions: Prediction[], sources: GroundingSource[] }> => {
     const currentDate = getCurrentDateFR();
-    const prompt = `Agis en tant qu'expert en analyse de données sportives pour mon service 'NEXTWIN Engine', destiné à un public français. La date d'aujourd'hui est le ${currentDate}. Ta mission est de fournir exactement 9 pronostics de paris sportifs en te basant sur des informations VÉRIFIÉES et à jour via Google Search.
-    Règles critiques et non négociables :
-    1. VÉRACITÉ DES MATCHS : Les matchs doivent être des événements RÉELS et CONFIRMÉS qui auront lieu à partir d'aujourd'hui. Ne jamais inventer un match.
-    2. RÈGLE D'OR - FUSEAU HORAIRE : C'est la règle la plus critique pour éviter les erreurs. Tu dois trouver la date et l'heure locale du match, puis la convertir et la retourner IMPÉRATIVEMENT sous forme de chaîne de caractères au format ISO 8601 en UTC.
-        - EXEMPLE : Un match à 19h00, heure de New York (EST), le 1er janvier 2026, doit être retourné comme '2026-01-02T00:00:00.000Z' (ou '2026-01-02T01:00:00.000Z' en fonction de l'heure d'été). Le calcul doit être exact. Ce format ISO 8601 UTC est la SEULE sortie acceptable pour l'heure.
-    3. PROBABILITÉ : La probabilité de succès doit être d'au moins 70%.
-    4. DIVERSITÉ : Les sports doivent être répartis entre Football, Basketball, et Tennis.
-    5. FORMAT : Réponds uniquement avec un objet JSON qui correspond au schéma fourni.`;
+    const prompt = `
+    Tâche : Fournir 9 pronostics sportifs pour le ${currentDate}. Utiliser Google Search pour des données à jour.
+    
+    Règles Impératives :
+    1.  **Format de Sortie** : Répondre UNIQUEMENT avec un objet JSON valide conforme au schéma. Aucun texte en dehors du JSON.
+    2.  **Contenu** : Exactement 9 pronostics, diversifiés entre Football, Basketball, et Tennis.
+    3.  **Fiabilité** : Probabilité de succès de chaque pronostic ≥ 70%.
+    4.  **Véracité** : Les matchs doivent être réels et confirmés pour aujourd'hui ou une date future proche.
+    5.  **CRITIQUE - Heure du Match** : Pour chaque match, trouver l'heure locale, la convertir en UTC, et la retourner en string au format ISO 8601 (ex: '2026-01-02T01:00:00.000Z'). C'est la règle la plus importante.
+    `;
 
     const responseSchema = {
         type: Type.OBJECT,
@@ -151,15 +153,15 @@ export const getDailyPredictions = async (): Promise<{ predictions: Prediction[]
  */
 export const analyzeMatch = async (sport: string, team1: string, team2: string, betType: string): Promise<AnalysisResult> => {
     const currentDate = getCurrentDateFR();
-    const prompt = `Agis en tant qu'expert en analyse de données sportives pour mon service 'NEXTWIN Engine', destiné à un public français. La date d'aujourd'hui est le ${currentDate}. En utilisant Google Search, analyse le PROCHAIN match à venir et VÉRIFIÉ de ${sport} entre ${team1} et ${team2} pour le type de pari "${betType}".
-
-    Règles critiques et non négociables :
-    1. VÉRACITÉ DU MATCH : Trouve le prochain match confirmé entre ces deux adversaires. Ne pas inventer un match.
-    2. RÈGLE D'OR - FUSEAU HORAIRE : C'est la règle la plus critique pour éviter les erreurs. Tu dois trouver la date et l'heure locale du match, puis la convertir et la retourner IMPÉRATIVEMENT sous forme de chaîne de caractères au format ISO 8601 en UTC.
-        - EXEMPLE : Un match à 19h00, heure de New York (EST), le 1er janvier 2026, doit être retourné comme '2026-01-02T00:00:00.000Z' (ou '2026-01-02T01:00:00.000Z' en fonction de l'heure d'été). Ce format ISO 8601 UTC est la SEULE sortie acceptable.
-    3. ANALYSE ET PROBABILITÉ : Fournis une analyse détaillée, les points de données clés, et la probabilité de succès pour le type de pari demandé ("${betType}").
-    4. RECOMMANDATION CLAIRE : Donne une recommandation principale de pari ("recommendedBet") qui te semble la plus pertinente pour ce match (cela peut être le pari demandé ou un autre si tu le juges meilleur) et explique brièvement pourquoi ("recommendationReason").
-    5. FORMAT : Réponds uniquement avec un objet JSON qui correspond au schéma fourni.`;
+    const prompt = `
+    Tâche : Analyser le prochain match de ${sport} entre ${team1} et ${team2} pour le pari "${betType}". Utiliser Google Search pour des données à jour.
+    
+    Règles Impératives :
+    1.  **Format de Sortie** : Répondre UNIQUEMENT avec un objet JSON valide conforme au schéma. Aucun texte en dehors du JSON.
+    2.  **CRITIQUE - Heure du Match** : Trouver l'heure locale du match, la convertir en UTC, et la retourner en string au format ISO 8601 (ex: '2026-01-02T01:00:00.000Z'). C'est la règle la plus importante.
+    3.  **Analyse** : Fournir une analyse détaillée, 3 points de données clés, et la probabilité de succès pour le pari demandé ("${betType}").
+    4.  **Recommandation** : Fournir une recommandation de pari principale ("recommendedBet") avec une justification concise ("recommendationReason").
+    `;
 
     const responseSchema = {
         type: Type.OBJECT,
