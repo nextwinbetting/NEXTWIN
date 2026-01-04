@@ -2,8 +2,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Prediction, Sport, GroundingSource, AnalysisResult } from '../types';
 
-// L'API Key est gérée via les variables d'environnement, conformément aux bonnes pratiques.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+/**
+ * Instancie et retourne un client GoogleGenAI configuré.
+ * Cette fonction est appelée "juste-à-temps" pour garantir que process.env.API_KEY 
+ * est disponible dans l'environnement d'exécution et pour permettre une gestion
+ * d'erreurs robuste si la clé est manquante.
+ * @returns Une instance de GoogleGenAI.
+ */
+const getAiClient = () => {
+    // Cette initialisation peut échouer si la clé API est manquante.
+    // En l'appelant à l'intérieur d'un bloc try/catch, nous évitons un crash de l'application.
+    return new GoogleGenAI({ apiKey: process.env.API_KEY });
+};
+
 
 /**
  * Récupère la date actuelle au format DD/MM/YYYY.
@@ -80,6 +91,7 @@ export const getDailyPredictions = async (): Promise<{ predictions: Prediction[]
     };
 
     try {
+        const ai = getAiClient(); // Initialisation juste-à-temps
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: prompt,
@@ -168,6 +180,7 @@ export const analyzeMatch = async (sport: string, team1: string, team2: string, 
     };
 
     try {
+        const ai = getAiClient(); // Initialisation juste-à-temps
         const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',
             contents: prompt,
