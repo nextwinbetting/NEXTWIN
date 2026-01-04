@@ -1,20 +1,23 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import HowItWorks from './pages/HowItWorks';
-import Bankroll from './pages/Bankroll';
-import Markets from './pages/Markets';
-import JoinUs from './pages/JoinUs';
-import FAQ from './pages/FAQ';
-import Login from './pages/Login';
-import Dashboard from './member/Dashboard';
-import Contact from './pages/Contact';
-import Legal from './pages/Legal';
-import CGV from './pages/CGV';
-import PrivacyPolicy from './pages/PrivacyPolicy';
 import { translations } from './translations';
+
+// --- Lazy Loading des Pages ---
+const Home = lazy(() => import('./pages/Home'));
+const HowItWorks = lazy(() => import('./pages/HowItWorks'));
+const Bankroll = lazy(() => import('./pages/Bankroll'));
+const Markets = lazy(() => import('./pages/Markets'));
+const JoinUs = lazy(() => import('./pages/JoinUs'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./member/Dashboard'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Legal = lazy(() => import('./pages/Legal'));
+const CGV = lazy(() => import('./pages/CGV'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+
 
 export enum Page {
   Home = 'ACCUEIL',
@@ -32,6 +35,12 @@ export enum Page {
 }
 
 export type Language = 'FR' | 'EN';
+
+const LoadingFallback: React.FC = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
+  </div>
+);
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.Home);
@@ -125,7 +134,9 @@ const App: React.FC = () => {
         setLanguage={setLanguage}
       />
       <main className="flex-grow">
-        {renderPage()}
+        <Suspense fallback={<LoadingFallback />}>
+          {renderPage()}
+        </Suspense>
       </main>
       <Footer onNavigate={handleNavigation} language={language} />
     </div>
