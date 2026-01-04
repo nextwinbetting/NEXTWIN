@@ -36,14 +36,8 @@ const App: React.FC = () => {
   }, [currentPage]);
 
   const handleNavigation = useCallback((page: Page) => {
-    if (!isLoggedIn && (page === Page.Dashboard)) {
-      setCurrentPage(Page.Login);
-    } else if (!isLoggedIn && (page === Page.JoinUs)) {
-      setCurrentPage(Page.JoinUs);
-    } else {
-      setCurrentPage(page);
-    }
-  }, [isLoggedIn]);
+    setCurrentPage(page);
+  }, []);
 
   const showLoginPage = () => {
     setCurrentPage(Page.Login);
@@ -58,13 +52,13 @@ const App: React.FC = () => {
     } else {
       setIsSubscribed(false); // Regular user is logged in but not subscribed yet
     }
-    setCurrentPage(Page.Dashboard);
+    handleNavigation(Page.Dashboard);
   };
   
   const handleLogout = () => {
       setIsLoggedIn(false);
       setIsSubscribed(false);
-      setCurrentPage(Page.Home);
+      handleNavigation(Page.Home);
   };
 
   const handleSubscribe = () => {
@@ -73,10 +67,11 @@ const App: React.FC = () => {
     }
   };
 
-  const renderPage = () => {
-    if (isLoggedIn) {
-        return <Dashboard language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} />;
+  const renderCurrentPage = () => {
+    if (currentPage === Page.Dashboard && !isLoggedIn) {
+        return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
     }
+
     switch (currentPage) {
       case Page.Home:
         return <Home onNavigate={handleNavigation} language={language} />;
@@ -100,6 +95,8 @@ const App: React.FC = () => {
         return <PrivacyPolicy language={language} onNavigate={handleNavigation} />;
       case Page.Login:
         return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
+      case Page.Dashboard:
+         return <Dashboard language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} />;
       default:
         return <Home onNavigate={handleNavigation} language={language}/>;
     }
@@ -118,7 +115,7 @@ const App: React.FC = () => {
       />
       <main className="flex-grow">
         <Suspense fallback={<LoadingFallback />}>
-          {renderPage()}
+          {renderCurrentPage()}
         </Suspense>
       </main>
       <Footer onNavigate={handleNavigation} language={language} />
