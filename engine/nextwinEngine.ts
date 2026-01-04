@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Prediction, Sport, GroundingSource, AnalysisResult } from '../types';
 
@@ -93,7 +92,7 @@ export const getDailyPredictions = async (): Promise<{ predictions: Prediction[]
     try {
         const ai = getAiClient(); // Initialisation juste-à-temps
         const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-3-pro-preview',
             contents: prompt,
             config: {
                 responseMimeType: 'application/json',
@@ -182,7 +181,7 @@ export const analyzeMatch = async (sport: string, team1: string, team2: string, 
     try {
         const ai = getAiClient(); // Initialisation juste-à-temps
         const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-3-pro-preview',
             contents: prompt,
             config: {
                 responseMimeType: 'application/json',
