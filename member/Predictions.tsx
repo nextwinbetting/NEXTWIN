@@ -1,9 +1,7 @@
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Prediction, Sport, GroundingSource, Language } from '../types';
 import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
-import { getDailyPredictions } from '../engine/nextwinEngine';
 
 interface PredictionsProps {
     language: Language;
@@ -57,10 +55,23 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
         setIsLoading(true);
         setError(null);
         try {
-            const { predictions: preds, sources: newSources } = await getDailyPredictions();
-            setPredictions(preds);
-            setSources(newSources);
+            // Appel à l'API Route interne, sécurisée et côté serveur.
+            const response = await fetch('/api/pronostics');
+            if (!response.ok) {
+                // Gérer les erreurs HTTP comme 500, 404, etc.
+                throw new Error(`Erreur du serveur: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+
+            // Gérer une réponse JSON qui contient une erreur applicative
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            setPredictions(data.predictions);
+            setSources(data.sources);
         } catch (err) {
+            console.error("Failed to fetch predictions from API route:", err);
             setError(err as Error);
         } finally {
             setIsLoading(false);
