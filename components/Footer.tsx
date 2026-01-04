@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Page, Language } from '../App';
+import { Page, Language } from '../types';
 import NextWinLogo from './NextWinLogo';
 import { translations } from '../translations';
 

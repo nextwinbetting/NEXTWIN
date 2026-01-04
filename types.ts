@@ -1,4 +1,21 @@
 
+export enum Page {
+  Home = 'ACCUEIL',
+  HowItWorks = 'COMMENT ÇA MARCHE ?',
+  Bankroll = 'BANKROLL',
+  Markets = 'SPORTS & MARCHÉS ANALYSÉS',
+  JoinUs = 'NOUS REJOINDRE',
+  FAQ = 'FAQ',
+  Contact = 'CONTACTEZ-NOUS',
+  Login = 'CONNEXION',
+  Dashboard = 'TABLEAU DE BORD',
+  Legal = 'MENTIONS LÉGALES',
+  CGV = 'CGV',
+  PrivacyPolicy = 'POLITIQUE DE CONFIDENTIALITÉ',
+}
+
+export type Language = 'FR' | 'EN';
+
 export enum Sport {
   Football = 'FOOTBALL',
   Basketball = 'BASKETBALL',

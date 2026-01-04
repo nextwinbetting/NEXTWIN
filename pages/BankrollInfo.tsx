@@ -1,6 +1,6 @@
-
 import React from 'react';
-import { Language, Page } from '../App';
+// FIX: The Language and Page types are exported from '../types', not '../App'.
+import { Language, Page } from '../types';
 import { translations } from '../translations';
 import { SportMarketIllustration } from '../components/SportMarketIllustration';
 

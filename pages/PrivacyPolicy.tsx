@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Language, Page } from '../App';
+import { Language, Page } from '../types';
 import { PrivacyIllustration } from '../components/PrivacyIllustration';
 
 interface PrivacyPolicyProps {

@@ -7,7 +7,7 @@ import Archives from './Archives';
 import Subscription from './Subscription';
 import Profile from './Profile';
 import LockedFeature from './LockedFeature';
-import { Language } from '../App';
+import { Language } from '../types';
 import { translations } from '../translations';
 import { ArchivedAnalysis, AnalysisResult } from '../types';
 

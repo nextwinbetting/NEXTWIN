@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Language } from '../App';
+import { Language } from '../types';
 import { translations } from '../translations';
 import { analyzeMatch } from '../engine/nextwinEngine';
 import { AnalysisResult } from '../types';

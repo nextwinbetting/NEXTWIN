@@ -1,8 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Prediction, Sport, GroundingSource } from '../types';
+import { Prediction, Sport, GroundingSource, Language } from '../types';
 import PredictionCard from '../components/PredictionCard';
-import { Language } from '../App';
 import { translations } from '../translations';
 import { getDailyPredictions } from '../engine/nextwinEngine';
 

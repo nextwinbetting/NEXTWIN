@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Language, Page } from '../App';
+import { Language, Page } from '../types';
 import { translations } from '../translations';
 import ContactIllustration from '../components/ContactIllustration';
 

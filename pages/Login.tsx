@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Page, Language } from '../App';
+import { Page, Language } from '../types';
 import NextWinLogo from '../components/NextWinLogo';
 import { translations } from '../translations';
 

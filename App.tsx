@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { translations } from './translations';
+import { Page, Language } from './types';
 
 // --- Lazy Loading des Pages ---
 const Home = lazy(() => import('./pages/Home'));
@@ -17,24 +18,6 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Legal = lazy(() => import('./pages/Legal'));
 const CGV = lazy(() => import('./pages/CGV'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-
-
-export enum Page {
-  Home = 'ACCUEIL',
-  HowItWorks = 'COMMENT ÇA MARCHE ?',
-  Bankroll = 'BANKROLL',
-  Markets = 'SPORTS & MARCHÉS ANALYSÉS',
-  JoinUs = 'NOUS REJOINDRE',
-  FAQ = 'FAQ',
-  Contact = 'CONTACTEZ-NOUS',
-  Login = 'CONNEXION',
-  Dashboard = 'TABLEAU DE BORD',
-  Legal = 'MENTIONS LÉGALES',
-  CGV = 'CGV',
-  PrivacyPolicy = 'POLITIQUE DE CONFIDENTIALITÉ',
-}
-
-export type Language = 'FR' | 'EN';
 
 const LoadingFallback: React.FC = () => (
   <div className="flex justify-center items-center h-screen">

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Page, Language } from '../App';
+import { Page, Language } from '../types';
 import { translations } from '../translations';
 import { PredictionIllustration, AnalyzerIllustration, BankrollIllustration, ArticleEngineIllustration, ArticleBankrollIllustration, ArticleMarketsIllustration } from '../components/HomeIllustrations';
 import { HeroIllustration } from '../components/HeroIllustration';

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Language } from '../App';
+import { Language } from '../types';
 import { translations } from '../translations';
 
 const FeatureGridItem: React.FC<{ icon: React.ReactNode; title: string; description: string; }> = ({ icon, title, description }) => (

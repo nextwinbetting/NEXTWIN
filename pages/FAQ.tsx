@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
-import { FaqItem } from '../types';
-import { Language } from '../App';
+import { FaqItem, Language } from '../types';
 import { translations } from '../translations';
 import { FAQIllustration } from '../components/FAQIllustration';
 
@@ -22,7 +21,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ item, isOpen, onClick }) 
             >
                 <span className="flex-1 pr-4">{item.question}</span>
                 <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-gray-800 rounded-full">
-                    <svg className={`w-4 h-4 shrink-0 transition-transform duration-300 text-gray-400 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <svg className={`w-4 h-4 shrink-0 transition-transform duration-300 text-gray-400 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
             </button>
         </h2>
