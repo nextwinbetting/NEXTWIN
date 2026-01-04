@@ -4,8 +4,7 @@ import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
 import { GoogleGenAI } from "@google/genai";
 
-// --- LOGIQUE IA DÉPLACÉE ICI ---
-
+// --- AI LOGIC MOVED HERE FOR AI STUDIO COMPATIBILITY ---
 const extractJson = (rawText: string): string => {
     const match = rawText.match(/```json\s*([\s\S]*?)\s*```/);
     if (match && match[1]) {
@@ -20,10 +19,10 @@ const extractJson = (rawText: string): string => {
 };
 
 const getAiClient = () => {
-    const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.API_KEY;
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
         console.error("API key not found in environment variables.");
-        throw new Error("La clé API n'est pas configurée côté serveur.");
+        throw new Error("La clé API n'est pas configurée dans l'environnement.");
     }
     return new GoogleGenAI({ apiKey });
 };
@@ -39,8 +38,7 @@ const mapStringToSport = (sport: string): Sport => {
     if (upperCaseSport.includes('TENNIS')) return Sport.Tennis;
     return Sport.Football;
 };
-
-// --- FIN DE LA LOGIQUE IA ---
+// --- END OF AI LOGIC ---
 
 interface PredictionsProps {
     language: Language;
@@ -106,10 +104,10 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             - Si tu ne peux pas générer une réponse valide, retourne EXACTEMENT : \`{"predictions": []}\`.
     
             OBJECTIF :
-            Générer 5 pronostics sportifs pour le ${currentDate} pour un site web automatisé.
+            Générer 6 pronostics sportifs exclusifs pour le ${currentDate}. Il doit y avoir EXACTEMENT 2 pronostics pour le Football, 2 pour le Basketball, et 2 pour le Tennis.
     
             FORMAT JSON OBLIGATOIRE :
-            La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 5 objets, chacun avec les champs suivants :
+            La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 6 objets, chacun avec les champs suivants :
             - "sport": "Football", "Basketball", ou "Tennis"
             - "league": Nom de la compétition (string)
             - "match": "Équipe A vs Équipe B" (string)

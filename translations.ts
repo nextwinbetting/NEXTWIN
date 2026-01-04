@@ -231,8 +231,8 @@ export const translations = {
     dash_nav_profile: "Profil",
     
     // Predictions page
-    predictions_title: "Les 5 Pronostics du Jour",
-    predictions_subtitle: "Les 5 meilleures opportunités (probabilité ≥ 70%) détectées par NEXTWIN Engine sur tous les sports.",
+    predictions_title: "Les 6 Pronostics du Jour",
+    predictions_subtitle: "Les 6 meilleures opportunités (probabilité ≥ 70%) détectées par NEXTWIN Engine : 2 Football, 2 Basketball & 2 Tennis.",
 
     // Locked Feature
     locked_title: "Accès Membre Pro Requis",
@@ -487,8 +487,8 @@ export const translations = {
     dash_nav_profile: "Profile",
 
     // Predictions page
-    predictions_title: "Today's 5 Predictions",
-    predictions_subtitle: "The 5 best opportunities (probability ≥ 70%) detected by NEXTWIN Engine across all sports.",
+    predictions_title: "Today's 6 Predictions",
+    predictions_subtitle: "The 6 best opportunities (probability ≥ 70%) detected by NEXTWIN Engine: 2 Football, 2 Basketball & 2 Tennis.",
 
     // Locked Feature
     locked_title: "Pro Member Access Required",

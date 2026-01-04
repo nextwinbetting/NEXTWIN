@@ -4,8 +4,7 @@ import { translations } from '../translations';
 import { AnalysisResult } from '../types';
 import { GoogleGenAI } from "@google/genai";
 
-// --- LOGIQUE IA DÉPLACÉE ICI ---
-
+// --- AI LOGIC MOVED HERE FOR AI STUDIO COMPATIBILITY ---
 const extractJson = (rawText: string): string => {
     const match = rawText.match(/```json\s*([\s\S]*?)\s*```/);
     if (match && match[1]) {
@@ -20,15 +19,14 @@ const extractJson = (rawText: string): string => {
 };
 
 const getAiClient = () => {
-    const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.API_KEY;
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
         console.error("API key not found in environment variables.");
-        throw new Error("La clé API n'est pas configurée côté serveur.");
+        throw new Error("La clé API n'est pas configurée dans l'environnement.");
     }
     return new GoogleGenAI({ apiKey });
 };
-
-// --- FIN DE LA LOGIQUE IA ---
+// --- END OF AI LOGIC ---
 
 
 enum AnalysisStatus {
