@@ -42,12 +42,26 @@ export async function GET() {
     try {
         const currentDate = getCurrentDateFR();
         const prompt = `
-        Tâche : Fournir 5 analyses de matchs sportifs pour le ${currentDate}. Ta réponse doit être un objet JSON avec une clé "predictions". Utilise Google Search pour des données à jour.
+        Tu es NEXTWIN AI ENGINE, un moteur automatisé de pronostics sportifs.
 
-        RÈGLES ABSOLUES :
-        1.  **FORMAT JSON STRICT**: Ta réponse doit être UNIQUEMENT un objet JSON valide. Elle doit commencer par \`{\` et se terminer par \`}\`. N'inclus AUCUN texte, AUCUNE explication, et AUCUNE balise markdown comme \`\`\`json avant ou après le JSON.
-        2.  **STRUCTURE**: Le JSON doit contenir une clé "predictions", un tableau de 5 objets. Chaque objet doit avoir: "sport" (string), "league" (string), "match" (string), "betType" (string), "matchDateTimeUTC" (string ISO 8601), "probability" (integer), "analysis" (string).
-        3.  **SI TU NE PEUX PAS RÉPONDRE**: Si tu ne peux pas trouver 5 matchs, retourne un JSON valide avec un tableau vide: \`{"predictions": []}\`. NE PAS retourner de message d'erreur en texte.
+        INSTRUCTIONS SYSTÈME (OBLIGATOIRES ET STRICTES) :
+        - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
+        - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
+        - AUCUN texte, commentaire, ou markdown (comme \`\`\`json) ne doit être présent en dehors de l'objet JSON principal.
+        - Si tu ne peux pas générer une réponse valide, retourne EXACTEMENT : \`{"predictions": []}\`.
+
+        OBJECTIF :
+        Générer 5 pronostics sportifs pour le ${currentDate} pour un site web automatisé.
+
+        FORMAT JSON OBLIGATOIRE :
+        La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 5 objets, chacun avec les champs suivants :
+        - "sport": "Football", "Basketball", ou "Tennis"
+        - "league": Nom de la compétition (string)
+        - "match": "Équipe A vs Équipe B" (string)
+        - "betType": Le type de pari (string)
+        - "matchDateTimeUTC": Date et heure du match en UTC, format ISO 8601 (string)
+        - "probability": Indice de confiance (integer, ≥ 70)
+        - "analysis": Analyse courte et factuelle (string)
         `;
 
         const ai = getAiClient();

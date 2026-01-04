@@ -2,6 +2,45 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Prediction, Sport, GroundingSource, Language } from '../types';
 import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
+import { GoogleGenAI } from "@google/genai";
+
+// --- LOGIQUE IA DÉPLACÉE ICI ---
+
+const extractJson = (rawText: string): string => {
+    const match = rawText.match(/```json\s*([\s\S]*?)\s*```/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    const startIndex = rawText.indexOf('{');
+    const endIndex = rawText.lastIndexOf('}');
+    if (startIndex > -1 && endIndex > -1) {
+        return rawText.substring(startIndex, endIndex + 1);
+    }
+    throw new Error("Aucun objet JSON valide n'a été trouvé dans la réponse de l'IA.");
+};
+
+const getAiClient = () => {
+    const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.API_KEY;
+    if (!apiKey) {
+        console.error("API key not found in environment variables.");
+        throw new Error("La clé API n'est pas configurée côté serveur.");
+    }
+    return new GoogleGenAI({ apiKey });
+};
+
+const getCurrentDateFR = (): string => {
+    const today = new Date();
+    return today.toLocaleDateString('fr-FR');
+};
+
+const mapStringToSport = (sport: string): Sport => {
+    const upperCaseSport = sport.toUpperCase();
+    if (upperCaseSport.includes('BASKET')) return Sport.Basketball;
+    if (upperCaseSport.includes('TENNIS')) return Sport.Tennis;
+    return Sport.Football;
+};
+
+// --- FIN DE LA LOGIQUE IA ---
 
 interface PredictionsProps {
     language: Language;
@@ -56,21 +95,89 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/pronostics');
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.details || data.error || `Erreur du serveur: ${response.status}`);
+            const currentDate = getCurrentDateFR();
+            const prompt = `
+            Tu es NEXTWIN AI ENGINE, un moteur automatisé de pronostics sportifs.
+    
+            INSTRUCTIONS SYSTÈME (OBLIGATOIRES ET STRICTES) :
+            - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
+            - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
+            - AUCUN texte, commentaire, ou markdown (comme \`\`\`json) ne doit être présent en dehors de l'objet JSON principal.
+            - Si tu ne peux pas générer une réponse valide, retourne EXACTEMENT : \`{"predictions": []}\`.
+    
+            OBJECTIF :
+            Générer 5 pronostics sportifs pour le ${currentDate} pour un site web automatisé.
+    
+            FORMAT JSON OBLIGATOIRE :
+            La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 5 objets, chacun avec les champs suivants :
+            - "sport": "Football", "Basketball", ou "Tennis"
+            - "league": Nom de la compétition (string)
+            - "match": "Équipe A vs Équipe B" (string)
+            - "betType": Le type de pari (string)
+            - "matchDateTimeUTC": Date et heure du match en UTC, format ISO 8601 (string)
+            - "probability": Indice de confiance (integer, ≥ 70)
+            - "analysis": Analyse courte et factuelle (string)
+            `;
+    
+            const ai = getAiClient();
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-pro-preview',
+                contents: prompt,
+                config: {
+                    tools: [{googleSearch: {}}],
+                },
+            });
+    
+            const rawText = response.text?.trim();
+            if (!rawText) {
+                throw new Error("La réponse de NEXTWIN Engine est vide.");
             }
+    
+            const jsonText = extractJson(rawText);
             
-            if (!data.predictions) {
-                throw new Error("La réponse du serveur ne contient pas de pronostics.");
+            let parsed;
+            try {
+                parsed = JSON.parse(jsonText);
+            } catch (e) {
+                console.error("Erreur de parsing JSON. Texte reçu de l'IA:", jsonText);
+                throw new Error(`Le format de la réponse de l'IA est invalide. Contenu : "${jsonText.slice(0, 200)}..."`);
             }
+    
+            if (!parsed.predictions || !Array.isArray(parsed.predictions)) {
+                throw new Error("La réponse JSON de l'IA n'a pas le format attendu (tableau 'predictions' manquant).");
+            }
+    
+            const newSources: GroundingSource[] = [];
+            const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+            if (groundingChunks) {
+                for (const chunk of groundingChunks) {
+                    if (chunk.web) {
+                        newSources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
+                    }
+                }
+            }
+    
+            const newPredictions: Prediction[] = parsed.predictions.map((p: any, index: number) => {
+                const matchDate = new Date(p.matchDateTimeUTC);
+                const dateFR = matchDate.toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' });
+                const timeFR = matchDate.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' });
+    
+                return {
+                    id: `${p.match.replace(/\s/g, '-')}-${index}-${Date.now()}`,
+                    sport: mapStringToSport(p.sport),
+                    match: p.match,
+                    betType: p.betType,
+                    date: dateFR,
+                    time: timeFR,
+                    probability: p.probability,
+                    analysis: `[${p.league}] ${p.analysis}`,
+                };
+            });
 
-            setPredictions(data.predictions);
-            setSources(data.sources || []);
+            setPredictions(newPredictions);
+            setSources(newSources);
         } catch (err) {
-            console.error("Failed to fetch predictions from API route:", err);
+            console.error("Failed to fetch predictions directly from AI:", err);
             setError((err as Error).message);
         } finally {
             setIsLoading(false);

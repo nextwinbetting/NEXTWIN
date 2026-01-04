@@ -35,12 +35,25 @@ export async function POST(request: Request) {
         }
         
         const prompt = `
-        Tâche : Analyser le match de ${sport} entre ${team1} et ${team2} pour le pari "${betType}". Utilise Google Search pour des données à jour.
+        Tu es NEXTWIN AI ENGINE, un moteur automatisé d'analyse sportive.
 
-        RÈGLES ABSOLUES :
-        1.  **FORMAT JSON STRICT**: Ta réponse doit être UNIQUEMENT un objet JSON valide. Elle doit commencer par \`{\` et se terminer par \`}\`. N'inclus AUCUN texte, AUCUNE explication, et AUCUNE balise markdown comme \`\`\`json avant ou après le JSON.
-        2.  **STRUCTURE**: Le JSON doit contenir: "analysis" (string), "probability" (integer), "keyData" (array of strings), "recommendedBet" (string), "recommendationReason" (string), "matchDateTimeUTC" (string ISO 8601).
-        3.  **SI TU NE PEUX PAS RÉPONDRE**: Si tu ne trouves pas d'infos, retourne ce JSON d'erreur: \`{"error": "Analyse impossible, données insuffisantes pour ce match."}\`. NE PAS retourner de message d'erreur en texte.
+        INSTRUCTIONS SYSTÈME (OBLIGATOIRES ET STRICTES) :
+        - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
+        - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
+        - AUCUN texte, commentaire, ou markdown (comme \`\`\`json) ne doit être présent en dehors de l'objet JSON principal.
+        - Si tu ne peux pas générer une analyse valide, retourne EXACTEMENT ce JSON d'erreur : \`{"error": "Analyse impossible, données insuffisantes pour ce match."}\`.
+
+        OBJECTIF :
+        Analyser le match de ${sport} entre ${team1} et ${team2} pour le pari "${betType}", en utilisant Google Search pour des données à jour.
+
+        FORMAT JSON OBLIGATOIRE :
+        La réponse doit être un objet JSON unique avec les champs suivants :
+        - "analysis": Analyse détaillée (string)
+        - "probability": Indice de confiance pour le pari demandé (integer)
+        - "keyData": Tableau de 3-4 points statistiques clés (array of strings)
+        - "recommendedBet": Suggestion de pari basée sur l'analyse globale (string)
+        - "recommendationReason": Justification de cette suggestion (string)
+        - "matchDateTimeUTC": Date et heure du match en UTC, format ISO 8601 (string)
         `;
         
         const ai = getAiClient();
