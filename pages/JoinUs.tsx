@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
@@ -67,7 +66,7 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
     ];
 
     const CheckIcon: React.FC = () => (
-        <svg className="h-6 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <svg className="h-6 w-5 text-green-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
         </svg>
     );
@@ -96,7 +95,9 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
 
                             <ul className="text-left mt-8 space-y-3">
                                 <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_1}</span></li>
-                                <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_2}</span></li>
+                                <li className="flex items-start"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_2}
+                                <br/><span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-brand">(2 Football, 2 Basket, 2 Tennis)</span>
+                                </span></li>
                                 <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_3}</span></li>
                             </ul>
 

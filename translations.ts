@@ -16,13 +16,14 @@ export const translations = {
     home_badge: 'NEXTWIN Engine V7.0 ACTIF',
     home_title1: 'La puissance de l’IA pour ',
     home_title2: 'vos analyses sportives',
-    home_subtitle: 'Bénéficiez chaque jour de 5 pronostics exclusifs et analysez l’ensemble de vos paris en un seul clic grâce à notre intelligence artificielle avancée.',
+    home_subtitle: 'Accédez chaque jour à 6 pronostics exclusifs (2 Football, 2 Basket, 2 Tennis) et analysez tous vos paris en un seul clic grâce à notre IA avancée.',
     home_cta_main: 'Accéder aux pronostics',
     home_cta_secondary: 'Fonctionnement',
     home_feature1_title: 'Des Pronostics Quotidiens, une Fiabilité Inégalée.',
     home_feature1_desc: 'Notre IA ne dort jamais. Elle scanne en permanence les marchés pour vous livrer chaque matin les opportunités les plus prometteuses, avec un seuil de probabilité rigoureux pour ne garder que le meilleur.',
     home_feature1_items: [
-      "5 pronostics exclusifs (Football, Basket, Tennis)",
+      "6 pronostics exclusifs par jour",
+      "Répartition équilibrée : 2 Football, 2 Basket, 2 Tennis",
       "Seuil de confiance minimum de 70%",
       "Analyse Flash pour chaque pronostic"
     ],
@@ -124,7 +125,7 @@ export const translations = {
     join_price: "/ MENSUEL",
     join_commitment: "SANS ENGAGEMENT",
     join_grid_title1: "Pronostics IA Quotidiens",
-    join_grid_desc1: "Recevez chaque jour 5 opportunités (≥ 70%) détectées par notre moteur sur Football, Basket et Tennis.",
+    join_grid_desc1: "Recevez chaque jour 6 opportunités (2 Football, 2 Basket, 2 Tennis) détectées par notre moteur.",
     join_grid_title2: "Analyseur Expert Illimité",
     join_grid_desc2: "Analysez n'importe quel match, n'importe quand. Soumettez vos propres paris à l'IA pour une analyse détaillée.",
     join_grid_title3: "Gestion de Bankroll Pro",
@@ -136,7 +137,7 @@ export const translations = {
     join_grid_title6: "Support Membre Prioritaire",
     join_grid_desc6: "Vos demandes sont traitées en priorité par notre équipe pour vous garantir la meilleure expérience.",
     join_feature_list_1: "Accès complet à tous les outils",
-    join_feature_list_2: "5 Pronostics IA / jour",
+    join_feature_list_2: "6 Pronostics IA Exclusifs / jour",
     join_feature_list_3: "Analyseur de match illimité",
     join_cta: "Je deviens Membre Pro",
     join_info: "ACTIVATION IMMÉDIATE APRÈS PAIEMENT SÉCURISÉ",
@@ -163,7 +164,7 @@ export const translations = {
         { quote: "Enfin un service qui met l'accent sur le long terme et la gestion des risques plutôt que sur des promesses de gains rapides. C'est rafraîchissant et efficace.", name: "Émilie B.", role: "Étudiante en Finance" },
         { quote: "J'utilise NEXTWIN pour confirmer mes propres analyses. C'est comme avoir un second avis d'expert disponible 24/7. Indispensable.", name: "Julien C.", role: "Coach Sportif" },
         { quote: "L'interface est clean, les données sont claires. On sent que le produit a été pensé pour l'utilisateur. Bravo à l'équipe.", name: "Chloé N.", role: "UX Designer" },
-        { quote: "Les 5 pronos quotidiens me donnent une base de travail solide. Je ne les suis pas aveuglément, mais c'est un excellent point de départ pour mes recherches.", name: "Lucas F.", role: "Ingénieur Logiciel" }
+        { quote: "Les 6 pronos quotidiens me donnent une base de travail solide. Je ne les suis pas aveuglément, mais c'est un excellent point de départ pour mes recherches.", name: "Lucas F.", role: "Ingénieur Logiciel" }
     ],
 
     // FAQ Page
@@ -272,13 +273,14 @@ export const translations = {
     home_badge: 'NEXTWIN Engine V7.0 ACTIVE',
     home_title1: 'The power of AI for ',
     home_title2: 'your sports analysis',
-    home_subtitle: 'Benefit each day from 5 exclusive predictions and analyze all your bets in a single click thanks to our advanced artificial intelligence.',
+    home_subtitle: 'Access 6 exclusive daily predictions (2 Football, 2 Basketball, 2 Tennis) and analyze all your bets in a single click thanks to our advanced AI.',
     home_cta_main: 'Access Predictions',
     home_cta_secondary: 'How It Works',
     home_feature1_title: 'Daily Predictions, Unmatched Reliability.',
     home_feature1_desc: 'Our AI never sleeps. It constantly scans the markets to deliver the most promising opportunities every morning, with a strict probability threshold to keep only the best.',
     home_feature1_items: [
-      "5 exclusive predictions (Football, Basketball, Tennis)",
+      "6 exclusive predictions per day",
+      "Balanced breakdown: 2 Football, 2 Basketball, 2 Tennis",
       "Minimum 70% confidence threshold",
       "Flash Analysis for each prediction"
     ],
@@ -380,7 +382,7 @@ export const translations = {
     join_price: "/ MONTHLY",
     join_commitment: "NO COMMITMENT",
     join_grid_title1: "Daily AI Predictions",
-    join_grid_desc1: "Receive 5 of the most reliable opportunities (≥ 70%) detected daily by our engine across Football, Basketball, and Tennis.",
+    join_grid_desc1: "Receive 6 top opportunities (2 Football, 2 Basketball, 2 Tennis) detected by our engine.",
     join_grid_title2: "Unlimited Expert Analyzer",
     join_grid_desc2: "Analyze any match, anytime. Submit your own bets to the AI for a detailed probability analysis.",
     join_grid_title3: "Pro Bankroll Management",
@@ -392,7 +394,7 @@ export const translations = {
     join_grid_title6: "Priority Member Support",
     join_grid_desc6: "Your requests are handled with priority by our support team to ensure the best possible experience.",
     join_feature_list_1: "Full access to all tools",
-    join_feature_list_2: "5 AI Predictions / day",
+    join_feature_list_2: "6 Exclusive AI Predictions / day",
     join_feature_list_3: "Unlimited match analyzer",
     join_cta: "I'm Becoming a Pro Member",
     join_info: "IMMEDIATE ACTIVATION AFTER SECURE PAYMENT",
@@ -419,7 +421,7 @@ export const translations = {
         { quote: "Finally, a service that focuses on the long term and risk management rather than promises of quick gains. It's refreshing and effective.", name: "Emily B.", role: "Finance Student" },
         { quote: "I use NEXTWIN to confirm my own analyses. It's like having a second expert opinion available 24/7. Indispensable.", name: "Julien C.", role: "Sports Coach" },
         { quote: "The interface is clean, the data is clear. You can feel the product was designed with the user in mind. Kudos to the team.", name: "Chloe N.", role: "UX Designer" },
-        { quote: "The 5 daily picks give me a solid foundation to work from. I don't follow them blindly, but it's an excellent starting point for my research.", name: "Lucas F.", role: "Software Engineer" }
+        { quote: "The 6 daily picks give me a solid foundation to work from. I don't follow them blindly, but it's an excellent starting point for my research.", name: "Lucas F.", role: "Software Engineer" }
     ],
     
     // FAQ Page
