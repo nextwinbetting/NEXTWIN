@@ -181,7 +181,7 @@ export const analyzeMatch = async (sport: string, team1: string, team2: string, 
     try {
         const ai = getAiClient(); // Initialisation juste-à-temps
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-3-flash-preview',
             contents: prompt,
             config: {
                 responseMimeType: 'application/json',
