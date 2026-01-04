@@ -44,14 +44,10 @@ const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (email: string) => {
-    const adminEmail = 'admin@nextwin.ai';
-
     setIsLoggedIn(true);
-    if (email.toLowerCase() === adminEmail) {
-      setIsSubscribed(true); // Admin gets automatic pro access
-    } else {
-      setIsSubscribed(false); // Regular user is logged in but not subscribed yet
-    }
+    // Pour la phase de test, toute connexion donne un accès "Pro".
+    // Cette ligne sera modifiée pour gérer les vrais abonnements.
+    setIsSubscribed(true); 
     handleNavigation(Page.Dashboard);
   };
   

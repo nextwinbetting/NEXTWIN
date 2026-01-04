@@ -32,11 +32,12 @@ const LoadingComponent: React.FC = () => {
     );
 };
 
-const ErrorComponent: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
-    <div className="text-center flex flex-col items-center justify-center min-h-[400px] text-red-400">
+const ErrorComponent: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => (
+    <div className="text-center flex flex-col items-center justify-center min-h-[400px] text-red-400 bg-brand-card border border-red-500/30 rounded-xl p-6">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <h3 className="text-xl font-bold mt-4">Erreur de Connexion</h3>
-        <p className="text-sm mt-2 max-w-sm">NEXTWIN Engine n'a pas pu récupérer les pronostics. Veuillez vérifier votre connexion ou réessayer.</p>
+        <h3 className="text-xl font-bold mt-4 text-white">Erreur de Connexion</h3>
+        <p className="text-sm mt-2 max-w-sm text-gray-300">NEXTWIN Engine n'a pas pu récupérer les pronostics. Voici les détails :</p>
+        <p className="text-xs mt-2 text-gray-400 bg-gray-900/50 p-2 rounded-md max-w-sm">{message}</p>
         <button onClick={onRetry} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
             RÉESSAYER
         </button>
@@ -47,7 +48,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
     const t = translations[language];
     const [activeSport, setActiveSport] = useState<Sport | 'ALL'>('ALL');
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [predictions, setPredictions] = useState<Prediction[]>([]);
     const [sources, setSources] = useState<GroundingSource[]>([]);
 
@@ -55,24 +56,22 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
         setIsLoading(true);
         setError(null);
         try {
-            // Appel à l'API Route interne, sécurisée et côté serveur.
             const response = await fetch('/api/pronostics');
-            if (!response.ok) {
-                // Gérer les erreurs HTTP comme 500, 404, etc.
-                throw new Error(`Erreur du serveur: ${response.status} ${response.statusText}`);
-            }
             const data = await response.json();
 
-            // Gérer une réponse JSON qui contient une erreur applicative
-            if (data.error) {
-                throw new Error(data.error);
+            if (!response.ok) {
+                throw new Error(data.details || data.error || `Erreur du serveur: ${response.status}`);
+            }
+            
+            if (!data.predictions) {
+                throw new Error("La réponse du serveur ne contient pas de pronostics.");
             }
 
             setPredictions(data.predictions);
-            setSources(data.sources);
+            setSources(data.sources || []);
         } catch (err) {
             console.error("Failed to fetch predictions from API route:", err);
-            setError(err as Error);
+            setError((err as Error).message);
         } finally {
             setIsLoading(false);
         }
@@ -83,6 +82,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
     }, [fetchPredictions]);
 
     const filteredPredictions = useMemo(() => {
+        if (!predictions) return [];
         if (activeSport === 'ALL') return predictions;
         return predictions.filter(p => p.sport === activeSport);
     }, [activeSport, predictions]);
@@ -99,9 +99,9 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             </div>
             
             {isLoading && <LoadingComponent />}
-            {error && <ErrorComponent onRetry={fetchPredictions} />}
+            {error && <ErrorComponent message={error} onRetry={fetchPredictions} />}
             
-            {!isLoading && !error && (
+            {!isLoading && !error && predictions && (
                 <div className="transition-opacity duration-700 opacity-100">
                     <div className="flex justify-center my-8 space-x-2">
                         {sportsWithAll.map(sport => (

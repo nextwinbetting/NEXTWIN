@@ -12,8 +12,8 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) => {
     const t = translations[language];
-    const [email, setEmail] = useState('demo@nextwin.ai');
-    const [password, setPassword] = useState('password');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,6 +37,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) =
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                placeholder="ex: john.doe@email.com"
                                 className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:ring-orange-500 focus:border-orange-500" 
                             />
                         </div>
@@ -47,6 +48,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) =
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
                                 className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:ring-orange-500 focus:border-orange-500" 
                             />
                         </div>

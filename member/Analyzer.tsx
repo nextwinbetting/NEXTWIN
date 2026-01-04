@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
-import { analyzeMatch } from '../engine/nextwinEngine';
 import { AnalysisResult } from '../types';
 
 enum AnalysisStatus {
@@ -40,6 +38,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
     const [betType, setBetType] = useState(betTypesBySport[sport][0]);
     const [status, setStatus] = useState<AnalysisStatus>(AnalysisStatus.Idle);
     const [result, setResult] = useState<AnalysisResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
         // Reset bet type to the first in the list when sport changes
@@ -54,14 +53,27 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
         }
         setStatus(AnalysisStatus.Loading);
         setResult(null);
+        setError(null);
         
         try {
-            const analysisResult = await analyzeMatch(sport, team1, team2, betType);
-            setResult(analysisResult);
+            const response = await fetch('/api/analyzer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sport, team1, team2, betType })
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                throw new Error(data.details || data.error || "An unknown error occurred during analysis.");
+            }
+    
+            setResult(data);
             setStatus(AnalysisStatus.Success);
-            onNewAnalysis({ result: analysisResult, sport, team1, team2, betType });
-        } catch (error) {
-            console.error("Analysis failed:", error);
+            onNewAnalysis({ result: data, sport, team1, team2, betType });
+        } catch (err) {
+            console.error("Analysis failed:", err);
+            setError((err as Error).message);
             setStatus(AnalysisStatus.Error);
         }
     };
@@ -139,8 +151,9 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
                  return (
                     <div className="text-center flex flex-col items-center justify-center h-full text-red-400">
                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <h3 className="text-xl font-bold mt-4">Erreur d'Analyse</h3>
-                        <p className="text-sm mt-2">NEXTWIN Engine n'a pas pu traiter cette requête. Veuillez réessayer.</p>
+                        <h3 className="text-xl font-bold mt-4 text-white">Erreur d'Analyse</h3>
+                        <p className="text-sm mt-2 text-gray-300">Détails :</p>
+                        <p className="text-xs mt-1 text-gray-400 bg-gray-900/50 p-2 rounded-md max-w-sm">{error || "NEXTWIN Engine n'a pas pu traiter cette requête."}</p>
                         <button onClick={handleAnalyze} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
                            RÉESSAYER L'ANALYSE
                         </button>
