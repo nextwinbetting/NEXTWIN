@@ -101,7 +101,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - "keyData": Tableau de 3-4 points statistiques clés (array of strings)
             - "recommendedBet": Suggestion de pari basée sur l'analyse globale (string)
             - "recommendationReason": Justification de cette suggestion (string)
-            - "matchDateTimeUTC": Date et heure du match en UTC, format ISO 8601 (string)
+            - "matchDateTimeUTC": Date et heure OFFICIELLE du match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE. Vérifie la source pour l'heure de coup d'envoi locale et convertis-la précisément en UTC.
             `;
             
             const ai = getAiClient();
