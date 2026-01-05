@@ -98,6 +98,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - Tu dois **IMPÉRATIVEMENT** utiliser tes outils de recherche (Google Search) pour trouver la date et l'heure du **PROCHAIN** match **OFFICIELLEMENT PROGRAMMÉ** entre ces deux équipes/joueurs.
             - Si aucun match futur n'est programmé entre eux, tu DOIS retourner le JSON d'erreur spécifié ci-dessus.
             - **NE PAS INVENTER de match ou utiliser la date d'un match déjà joué.** L'exactitude de la date est la priorité absolue.
+            - **ATTENTION AUX FUSEAUX HORAIRES (source d'erreur fréquente) :** Pour les sports américains (NBA, etc.), l'heure locale (ex: EST, PST) doit être **soigneusement convertie en UTC**. Un match ayant lieu le soir aux USA (ex: 6 janvier à 20h EST) se déroule en réalité le lendemain matin en Europe (7 janvier à 2h CET). La date en UTC doit OBLIGATOIREMENT refléter ce décalage.
     
             FORMAT JSON OBLIGATOIRE :
             La réponse doit être un objet JSON unique avec les champs suivants :
@@ -106,7 +107,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - "keyData": Tableau de 3-4 points statistiques clés (array of strings)
             - "recommendedBet": Suggestion de pari basée sur l'analyse globale (string)
             - "recommendationReason": Justification de cette suggestion (string)
-            - "matchDateTimeUTC": Date et heure **VÉRIFIÉE et OFFICIELLE** du prochain match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
+            - "matchDateTimeUTC": Date et heure **VÉRIFIÉE et OFFICIELLE** du prochain match, après **conversion PRÉCISE de l'heure locale en UTC**, formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             `;
             
             const ai = getAiClient();

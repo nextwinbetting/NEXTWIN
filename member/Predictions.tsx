@@ -112,10 +112,9 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             Générer 6 pronostics sportifs pour des matchs réels, officiellement programmés et non encore joués. Les matchs doivent avoir lieu aujourd'hui (${currentDate}) ou dans les 7 prochains jours. Il doit y avoir EXACTEMENT 2 pronostics pour le Football, 2 pour le Basketball, et 2 pour le Tennis.
 
             CONTRAINTE CRITIQUE DE VÉRACITÉ ET DE TEMPS :
-            - L'heure de référence actuelle est ${currentUTC}.
-            - Tu dois **IMPÉRATIVEMENT** utiliser tes outils de recherche (Google Search) pour vérifier que chaque match est **réel, confirmé** et a lieu dans le futur (après ${currentUTC}).
-            - **NE PAS UTILISER DE MATCHS HISTORIQUES OU ANNULÉS.** Si tu trouves un match passé, ne l'invente pas pour le futur. Cherche un autre match réellement programmé.
-            - La date du match doit être correcte. Par exemple, ne propose pas un match de 2024 avec une date en 2026.
+            - L'heure de référence actuelle est ${currentUTC}. Tu dois IMPÉRATIVEMENT sélectionner des matchs dont le coup d'envoi est POSTÉRIEUR à cette heure.
+            - VÉRIFICATION OBLIGATOIRE : Chaque match doit être réel, confirmé via tes sources, et non un match historique ou annulé. Ne jamais inventer une date future pour un match passé.
+            - **ATTENTION AUX FUSEAUX HORAIRES (source d'erreur fréquente) :** Pour les sports américains (NBA, etc.), l'heure locale (ex: EST, PST) doit être **soigneusement convertie en UTC**. Un match ayant lieu le soir aux USA (ex: 6 janvier à 20h EST) se déroule en réalité le lendemain matin en Europe (7 janvier à 2h CET). La date en UTC doit OBLIGATOIREMENT refléter ce décalage.
     
             FORMAT JSON OBLIGATOIRE :
             La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 6 objets, chacun avec les champs suivants :
@@ -123,7 +122,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             - "league": Nom de la compétition (string)
             - "match": "Équipe A vs Équipe B" (string)
             - "betType": Le type de pari (string)
-            - "matchDateTimeUTC": Date et heure **OFFICIELLE et VÉRIFIÉE** du match, impérativement convertie en UTC et formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
+            - "matchDateTimeUTC": Date et heure **OFFICIELLE et VÉRIFIÉE** du match, après **conversion PRÉCISE de l'heure locale en UTC**, formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             - "probability": Indice de confiance (integer, ≥ 70)
             - "analysis": Analyse courte et factuelle (string)
             `;
