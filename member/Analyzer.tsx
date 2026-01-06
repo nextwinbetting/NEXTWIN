@@ -105,7 +105,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             - "analysis": Analyse détaillée (string)
             - "probability": Indice de confiance pour le pari demandé (integer)
             - "keyData": Tableau de 3-4 points statistiques clés (array of strings)
-            - "recommendedBet": Suggestion de pari basée sur l'analyse globale (string)
+            - "recommendedBet": Suggestion de pari **PRÉCISE et EXPLOITABLE** basée sur l'analyse globale. Exemples : "France Gagnant", "Plus de 2.5 buts", "New York Knicks -5.5".
             - "recommendationReason": Justification de cette suggestion (string)
             - "matchDateTimeUTC": Date et heure **VÉRIFIÉE et OFFICIELLE** du prochain match, après **conversion PRÉCISE de l'heure locale en UTC**, formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             `;

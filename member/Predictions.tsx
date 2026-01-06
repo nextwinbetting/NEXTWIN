@@ -121,7 +121,11 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             - "sport": "Football", "Basketball", ou "Tennis"
             - "league": Nom de la compétition (string)
             - "match": "Équipe A vs Équipe B" (string)
-            - "betType": Le type de pari (string)
+            - "betType": Le **pronostic PRÉCIS et EXPLOITABLE**. Ce champ est CRUCIAL. Il NE DOIT PAS être une catégorie générique comme "Vainqueur du match" ou "Moneyline". Il DOIT indiquer l'équipe ou le résultat précis.
+                - Pour un vainqueur de match: "France Gagnant", "New York Knicks Gagnant".
+                - Pour une double chance: "Nul ou AS Roma".
+                - Pour un total de points/buts: "Plus de 2.5 buts", "Moins de 220.5 points".
+                - Le type de pari (ex: Moneyline) peut être ajouté entre parenthèses si pertinent : "LA Clippers Gagnant (Moneyline)".
             - "matchDateTimeUTC": Date et heure **OFFICIELLE et VÉRIFIÉE** du match, après **conversion PRÉCISE de l'heure locale en UTC**, formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
             - "probability": Indice de confiance (integer, ≥ 70)
             - "analysis": Analyse courte et factuelle (string)
