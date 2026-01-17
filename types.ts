@@ -16,6 +16,18 @@ export enum Page {
 
 export type Language = 'FR' | 'EN';
 
+export enum DashboardNav {
+  DashboardHome = "TABLEAU DE BORD",
+  Predictions = "PRONOSTICS",
+  Analyzer = "ANALYSEUR",
+  Strategy = "STRATÉGIE",
+  Bankroll = "BANKROLL",
+  Archives = "ARCHIVES & SUIVI",
+  Profile = "PARAMÈTRES",
+  Support = "SUPPORT",
+}
+
+
 export enum Sport {
   Football = 'FOOTBALL',
   Basketball = 'BASKETBALL',

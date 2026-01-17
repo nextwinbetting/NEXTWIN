@@ -7,11 +7,11 @@ import Subscription from './Subscription';
 import Profile from './Profile';
 import LockedFeature from './LockedFeature';
 import Strategy from './Strategy';
-import { Language } from '../types';
-import { translations } from '../translations';
+import DashboardHome from './DashboardHome';
+import Support from './Support';
+import DashboardSidebar from './DashboardSidebar';
+import { Language, DashboardNav } from '../types';
 import { ArchivedAnalysis, AnalysisResult } from '../types';
-
-type DashboardPage = 'Pronostics' | 'Stratégie' | 'Analyseur' | 'Bankroll' | 'Archives' | 'Abonnement' | 'Profil';
 
 interface DashboardProps {
     language: Language;
@@ -20,9 +20,9 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscribe }) => {
-    const [activePage, setActivePage] = useState<DashboardPage>('Pronostics');
+    const [activePage, setActivePage] = useState<DashboardNav>(DashboardNav.DashboardHome);
     const [archives, setArchives] = useState<ArchivedAnalysis[]>([]);
-    const t = translations[language];
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleNewAnalysis = (analysisData: { result: AnalysisResult; sport: string; team1: string; team2: string; betType: string; }) => {
         const newArchiveEntry: ArchivedAnalysis = {
@@ -37,48 +37,44 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
         setArchives(prev => [newArchiveEntry, ...prev]);
     };
     
-    const pageMapping: { [key in DashboardPage]: React.ReactNode } = {
-        'Pronostics': isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
-        'Stratégie': isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
-        'Analyseur': isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
-        'Bankroll': <BankrollManagement />,
-        'Archives': <Archives archives={archives} />,
-        'Abonnement': <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} language={language} />,
-        'Profil': <Profile />
-    };
-
-    const navItems: { key: DashboardPage; label: string }[] = [
-        { key: 'Pronostics', label: t.dash_nav_predictions },
-        { key: 'Stratégie', label: t.dash_nav_strategy },
-        { key: 'Analyseur', label: t.dash_nav_analyzer },
-        { key: 'Bankroll', label: t.dash_nav_bankroll },
-        { key: 'Archives', label: t.dash_nav_archives },
-        { key: 'Abonnement', label: t.dash_nav_subscription },
-        { key: 'Profil', label: t.dash_nav_profile },
-    ];
-
+    const renderContent = () => {
+        const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
+            [DashboardNav.DashboardHome]: <DashboardHome setActivePage={setActivePage} language={language} />,
+            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
+            [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
+            [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
+            [DashboardNav.Bankroll]: <BankrollManagement />,
+            [DashboardNav.Archives]: <Archives archives={archives} />,
+            [DashboardNav.Profile]: <Profile />,
+            [DashboardNav.Support]: <Support language={language} />,
+        };
+        return pageMapping[activePage];
+    }
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-center mb-8 border-b border-gray-800">
-                <nav className="flex space-x-2 sm:space-x-4 overflow-x-auto pb-2" aria-label="Tabs">
-                    {navItems.map((item) => (
-                        <button
-                            key={item.key}
-                            onClick={() => setActivePage(item.key)}
-                            className={`${
-                                activePage === item.key
-                                    ? 'border-orange-500 text-white'
-                                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500'
-                            } whitespace-nowrap py-4 px-2 sm:px-4 border-b-2 font-medium text-sm transition-colors`}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                </nav>
-            </div>
-            <div>
-                {pageMapping[activePage]}
+        <div className="flex min-h-screen bg-brand-dark">
+            <DashboardSidebar 
+                activePage={activePage} 
+                setActivePage={setActivePage} 
+                isSidebarOpen={isSidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                language={language}
+            />
+
+            <div className="flex-1 md:ml-64 transition-all duration-300">
+                 {/* Mobile Header */}
+                <div className="md:hidden sticky top-0 z-30 flex items-center justify-between p-4 bg-brand-dark-blue/80 backdrop-blur-sm border-b border-gray-800">
+                    <span className="text-white font-bold">NEXTWIN</span>
+                    <button onClick={() => setSidebarOpen(true)} className="text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <main className="p-4 sm:p-6 lg:p-8">
+                    {renderContent()}
+                </main>
             </div>
         </div>
     );
