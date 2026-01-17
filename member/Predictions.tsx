@@ -215,6 +215,24 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
                 <p className="mt-4 text-lg text-brand-light-gray">
                     {t.predictions_subtitle}
                 </p>
+                 <div className="mt-6">
+                    <button
+                        onClick={fetchPredictions}
+                        disabled={isLoading}
+                        className="inline-flex items-center rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg className={`-ml-1 mr-2 h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                            <path d="M21 3v5h-5"/>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                            <path d="M3 21v-5h5"/>
+                        </svg>
+                        Régénérer les pronostics
+                    </button>
+                    <p className="mt-2 text-xs text-gray-500 max-w-xs mx-auto">
+                        Ce bouton vous permet de générer instantanément 6 nouveaux pronostics si les précédents ne vous conviennent pas.
+                    </p>
+                </div>
             </div>
             
             {isLoading && <LoadingComponent />}
