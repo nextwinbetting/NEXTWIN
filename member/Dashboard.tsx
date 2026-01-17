@@ -49,7 +49,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
             [DashboardNav.Archives]: <Archives archives={archives} />,
             [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
             [DashboardNav.Profile]: <Profile />,
-            [DashboardNav.Support]: <Support language={language} />,
+            [DashboardNav.Support]: <Support language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
         };
         return pageMapping[activePage];
     }

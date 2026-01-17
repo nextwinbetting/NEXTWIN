@@ -4,6 +4,8 @@ import { translations } from '../translations';
 
 interface SupportProps {
     language: Language;
+    onNavigateToFaq: () => void;
+    onNavigateToContact: () => void;
 }
 
 const SupportCard: React.FC<{
@@ -28,7 +30,7 @@ const SupportCard: React.FC<{
     </div>
 );
 
-const Support: React.FC<SupportProps> = ({ language }) => {
+const Support: React.FC<SupportProps> = ({ language, onNavigateToFaq, onNavigateToContact }) => {
     const t = translations[language];
 
     return (
@@ -40,13 +42,13 @@ const Support: React.FC<SupportProps> = ({ language }) => {
                 </p>
             </div>
 
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                  <SupportCard
                     title={t.support_card1_title}
                     description={t.support_card1_desc}
                     cta={t.support_card1_cta}
                     icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>}
-                    onClick={() => { /* This should navigate to the main FAQ page */ }}
+                    onClick={onNavigateToFaq}
                 />
                  <SupportCard
                     title={t.support_card2_title}
@@ -54,6 +56,13 @@ const Support: React.FC<SupportProps> = ({ language }) => {
                     cta={t.support_card2_cta}
                     icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>}
                     onClick={() => window.location.href = `mailto:${t.contact_info_email}`}
+                />
+                 <SupportCard
+                    title={t.support_card3_title}
+                    description={t.support_card3_desc}
+                    cta={t.support_card3_cta}
+                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                    onClick={onNavigateToContact}
                 />
             </div>
         </div>

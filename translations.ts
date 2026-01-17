@@ -295,6 +295,9 @@ export const translations = {
     support_card2_title: "Support par Email",
     support_card2_desc: "Pour toute question technique, administrative ou commerciale, contactez directement notre équipe de support.",
     support_card2_cta: "Envoyer un email",
+    support_card3_title: "Formulaire de Contact",
+    support_card3_desc: "Utilisez notre formulaire structuré pour nous envoyer votre demande. Idéal pour les questions détaillées.",
+    support_card3_cta: "Ouvrir le formulaire",
 
     // Subscription Page
     sub_manage_title: "Gérer l'Abonnement",
@@ -677,6 +680,9 @@ export const translations = {
     support_card2_title: "Email Support",
     support_card2_desc: "For any technical, administrative, or business-related questions, contact our support team directly.",
     support_card2_cta: "Send an email",
+    support_card3_title: "Contact Form",
+    support_card3_desc: "Use our structured form to send us your request. Ideal for detailed questions.",
+    support_card3_cta: "Open form",
 
     // Subscription Page
     sub_manage_title: "Manage Subscription",

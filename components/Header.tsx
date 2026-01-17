@@ -81,9 +81,10 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                     </div>
 
                     <nav className="hidden lg:flex items-baseline space-x-4">
-                        {!isLoggedIn && navItems.map(item => <NavLink key={item.page} page={item.page} currentPage={currentPage} onNavigate={onNavigate}>{item.label}</NavLink>)}
-                        {isLoggedIn && (
-                             <span className="px-3 py-2 text-sm font-medium text-white">{t.nav_dashboard}</span>
+                        {isLoggedIn ? (
+                             <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate}>{t.nav_dashboard}</NavLink>
+                        ) : (
+                            navItems.map(item => <NavLink key={item.page} page={item.page} currentPage={currentPage} onNavigate={onNavigate}>{item.label}</NavLink>)
                         )}
                     </nav>
                    
@@ -140,13 +141,16 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
              {/* Mobile menu */}
             <div className={`${isMenuOpen ? 'block' : 'hidden'} lg:hidden absolute left-0 w-full bg-brand-dark-blue/95 backdrop-blur-sm shadow-lg`} id="mobile-menu">
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    {!isLoggedIn && navItems.map(item => (
-                        <MobileNavLink key={item.page} page={item.page} currentPage={currentPage} onNavigate={() => handleMobileNav(item.page)}>
-                            {item.label}
+                    {isLoggedIn ? (
+                         <MobileNavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={() => handleMobileNav(Page.Dashboard)}>
+                            {t.nav_dashboard}
                         </MobileNavLink>
-                    ))}
-                    {isLoggedIn && (
-                        <div className="block rounded-md px-3 py-2 text-base font-medium bg-gray-900 text-white">{t.nav_dashboard}</div>
+                    ) : (
+                        navItems.map(item => (
+                            <MobileNavLink key={item.page} page={item.page} currentPage={currentPage} onNavigate={() => handleMobileNav(item.page)}>
+                                {item.label}
+                            </MobileNavLink>
+                        ))
                     )}
                 </div>
                  <div className="pt-4 pb-3 border-t border-gray-700">
