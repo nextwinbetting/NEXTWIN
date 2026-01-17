@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Predictions from './Predictions';
 import Analyzer from './Analyzer';
@@ -7,11 +6,12 @@ import Archives from './Archives';
 import Subscription from './Subscription';
 import Profile from './Profile';
 import LockedFeature from './LockedFeature';
+import Strategy from './Strategy';
 import { Language } from '../types';
 import { translations } from '../translations';
 import { ArchivedAnalysis, AnalysisResult } from '../types';
 
-type DashboardPage = 'Pronostics' | 'Analyseur' | 'Bankroll' | 'Archives' | 'Abonnement' | 'Profil';
+type DashboardPage = 'Pronostics' | 'Stratégie' | 'Analyseur' | 'Bankroll' | 'Archives' | 'Abonnement' | 'Profil';
 
 interface DashboardProps {
     language: Language;
@@ -39,6 +39,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
     
     const pageMapping: { [key in DashboardPage]: React.ReactNode } = {
         'Pronostics': isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
+        'Stratégie': isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
         'Analyseur': isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage('Abonnement')} />,
         'Bankroll': <BankrollManagement />,
         'Archives': <Archives archives={archives} />,
@@ -48,6 +49,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
 
     const navItems: { key: DashboardPage; label: string }[] = [
         { key: 'Pronostics', label: t.dash_nav_predictions },
+        { key: 'Stratégie', label: t.dash_nav_strategy },
         { key: 'Analyseur', label: t.dash_nav_analyzer },
         { key: 'Bankroll', label: t.dash_nav_bankroll },
         { key: 'Archives', label: t.dash_nav_archives },
