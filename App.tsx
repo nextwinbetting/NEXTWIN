@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -10,6 +9,7 @@ const Home = lazy(() => import('./pages/Home'));
 const HowItWorks = lazy(() => import('./pages/HowItWorks'));
 const Bankroll = lazy(() => import('./pages/Bankroll'));
 const Markets = lazy(() => import('./pages/Markets'));
+const StrategyInfo = lazy(() => import('./pages/StrategyInfo'));
 const JoinUs = lazy(() => import('./pages/JoinUs'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Login = lazy(() => import('./pages/Login'));
@@ -77,6 +77,8 @@ const App: React.FC = () => {
         return <Bankroll language={language} onNavigate={handleNavigation} />;
       case Page.Markets:
         return <Markets language={language} onNavigate={handleNavigation} />;
+      case Page.StrategyInfo:
+        return <StrategyInfo language={language} onNavigate={handleNavigation} />;
       case Page.JoinUs:
         return <JoinUs language={language} />;
       case Page.FAQ:

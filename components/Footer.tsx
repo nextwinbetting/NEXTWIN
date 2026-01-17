@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Page, Language } from '../types';
 import NextWinLogo from './NextWinLogo';
@@ -41,6 +40,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, language }) => {
             <h3 className="text-white font-semibold tracking-wider">{t.footer_nav}</h3>
             <ul className="mt-4 space-y-2 text-sm">
               <li><button onClick={() => onNavigate(Page.HowItWorks)} className="text-brand-light-gray hover:text-white transition-colors">{t.footer_nav_how_it_works}</button></li>
+              <li><button onClick={() => onNavigate(Page.StrategyInfo)} className="text-brand-light-gray hover:text-white transition-colors">{t.footer_nav_strategy_info}</button></li>
               <li><button onClick={() => onNavigate(Page.Markets)} className="text-brand-light-gray hover:text-white transition-colors">Sports & Marchés Analysés</button></li>
               <li><button onClick={() => onNavigate(Page.JoinUs)} className="text-brand-light-gray hover:text-white transition-colors">Tarifs</button></li>
               <li><button onClick={() => onNavigate(Page.FAQ)} className="text-brand-light-gray hover:text-white transition-colors">{t.nav_faq}</button></li>

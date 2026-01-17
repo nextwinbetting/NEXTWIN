@@ -127,6 +127,9 @@ const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
                     <p className="mt-6 text-lg text-brand-light-gray max-w-2xl mx-auto">
                         {t.home_subtitle}
                     </p>
+                    <p className="mt-4 text-sm text-yellow-300/80 max-w-2xl mx-auto border border-yellow-300/30 bg-yellow-900/20 rounded-lg p-3">
+                        {t.home_strategy_intro}
+                    </p>
                     <div className="mt-10 flex items-center justify-center gap-x-6">
                         <button
                             onClick={() => onNavigate(Page.Dashboard)}

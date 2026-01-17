@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Page, Language } from '../types';
 import NextWinLogo from './NextWinLogo';
@@ -50,6 +49,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
     const navItems = [
         { page: Page.Home, label: t.nav_home },
         { page: Page.HowItWorks, label: t.nav_how_it_works },
+        { page: Page.StrategyInfo, label: t.nav_strategy_info },
         { page: Page.Bankroll, label: t.nav_bankroll },
         { page: Page.JoinUs, label: t.nav_join_us },
         { page: Page.FAQ, label: t.nav_faq },

@@ -1,9 +1,9 @@
-
 export enum Page {
   Home = 'ACCUEIL',
   HowItWorks = 'COMMENT ÇA MARCHE ?',
   Bankroll = 'BANKROLL',
   Markets = 'SPORTS & MARCHÉS ANALYSÉS',
+  StrategyInfo = 'NOTRE STRATÉGIE – ACCÈS MEMBRES',
   JoinUs = 'NOUS REJOINDRE',
   FAQ = 'FAQ',
   Contact = 'CONTACTEZ-NOUS',
