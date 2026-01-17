@@ -82,7 +82,13 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
 
                     <nav className="hidden lg:flex items-baseline space-x-4">
                         {isLoggedIn ? (
-                             <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate}>{t.nav_dashboard}</NavLink>
+                             <div className="relative group flex items-center">
+                                <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate}>{t.nav_dashboard}</NavLink>
+                                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-max max-w-xs p-3 text-xs bg-gray-900 border border-gray-700 text-gray-300 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+                                    {t.header_dashboard_tooltip}
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-gray-700"></div>
+                                </div>
+                            </div>
                         ) : (
                             navItems.map(item => <NavLink key={item.page} page={item.page} currentPage={currentPage} onNavigate={onNavigate}>{item.label}</NavLink>)
                         )}

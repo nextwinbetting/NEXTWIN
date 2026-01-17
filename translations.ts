@@ -12,6 +12,7 @@ export const translations = {
     nav_login: 'CONNEXION',
     nav_signup: 'INSCRIPTION',
     nav_logout: 'DÉCONNEXION',
+    header_dashboard_tooltip: "Pour revenir à la page principale de votre tableau de bord, cliquez sur cet onglet à tout moment.",
 
     // Home Page
     home_badge: 'NEXTWIN Engine V7.0 ACTIF',
@@ -397,6 +398,7 @@ export const translations = {
     nav_login: 'LOGIN',
     nav_signup: 'SIGN UP',
     nav_logout: 'LOGOUT',
+    header_dashboard_tooltip: "To return to your main dashboard page, click this tab at any time.",
 
     // Home Page
     home_badge: 'NEXTWIN Engine V7.0 ACTIVE',
