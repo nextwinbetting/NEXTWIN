@@ -73,18 +73,18 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
     return (
         <header className="bg-brand-dark-blue/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-800">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-20">
+                <div className="flex items-center justify-between h-28">
                     <div className="flex-shrink-0">
                          <button onClick={() => onNavigate(Page.Home)} className="focus:outline-none">
                             <NextWinLogo className="h-10"/>
                         </button>
                     </div>
 
-                    <nav className="hidden lg:flex items-baseline space-x-4">
+                    <nav className="hidden lg:flex items-center space-x-4">
                         {isLoggedIn ? (
                             <div className="relative">
                                 <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate}>{t.nav_dashboard}</NavLink>
-                                <p className="absolute left-1/2 -translate-x-1/2 top-full whitespace-nowrap text-[11px] italic text-yellow-400 mt-0.5 pointer-events-none">
+                                <p className="absolute left-1/2 -translate-x-1/2 top-full whitespace-nowrap text-[11px] italic text-yellow-400 mt-1 pointer-events-none">
                                     {t.header_dashboard_tooltip}
                                 </p>
                             </div>
