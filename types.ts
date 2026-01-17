@@ -23,6 +23,7 @@ export enum DashboardNav {
   Strategy = "STRATÉGIE",
   Bankroll = "BANKROLL",
   Archives = "ARCHIVES & SUIVI",
+  Subscription = "ABONNEMENT",
   Profile = "PARAMÈTRES",
   Support = "SUPPORT",
 }

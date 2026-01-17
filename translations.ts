@@ -266,6 +266,7 @@ export const translations = {
     dash_nav_strategy: "Accès Stratégie",
     dash_nav_bankroll: "Gestion de Bankroll",
     dash_nav_archives: "Suivi & Progression",
+    dash_nav_subscription: "Mon abonnement",
     dash_nav_profile: "Paramètres",
     dash_nav_support: "Support",
 
@@ -294,6 +295,24 @@ export const translations = {
     support_card2_title: "Support par Email",
     support_card2_desc: "Pour toute question technique, administrative ou commerciale, contactez directement notre équipe de support.",
     support_card2_cta: "Envoyer un email",
+
+    // Subscription Page
+    sub_manage_title: "Gérer l'Abonnement",
+    sub_manage_subtitle: "Gérez votre abonnement Pro en toute simplicité.",
+    sub_card_type_title: "Type d'abonnement",
+    sub_card_type_value: "Pass NextWin Pro",
+    sub_card_status_title: "Statut",
+    sub_card_status_active: "Actif",
+    sub_card_renewal_title: "Prochain renouvellement",
+    sub_card_renewal_date: "01/03/2026",
+    sub_cancel_button: "Résilier l'abonnement",
+    sub_faq_link: "Consulter la FAQ",
+    sub_modal_title: "Confirmer la résiliation",
+    sub_modal_text: "Êtes-vous sûr de vouloir résilier votre abonnement ? Vous perdrez l'accès à tous les outils Pro à la fin de votre période de facturation en cours. Cette action est irréversible.",
+    sub_modal_confirm: "Oui, résilier",
+    sub_modal_cancel: "Annuler",
+    sub_inactive_title: "Mon Abonnement",
+    sub_inactive_subtitle: "Statut actuel: Inactif. Passez Pro pour accéder à tous les outils.",
     
     // Predictions page
     predictions_title: "Les 6 Pronostics du Jour",
@@ -629,6 +648,7 @@ export const translations = {
     dash_nav_strategy: "Strategy Access",
     dash_nav_bankroll: "Bankroll Management",
     dash_nav_archives: "Tracking & Progress",
+    dash_nav_subscription: "My Subscription",
     dash_nav_profile: "Settings",
     dash_nav_support: "Support",
     
@@ -657,6 +677,24 @@ export const translations = {
     support_card2_title: "Email Support",
     support_card2_desc: "For any technical, administrative, or business-related questions, contact our support team directly.",
     support_card2_cta: "Send an email",
+
+    // Subscription Page
+    sub_manage_title: "Manage Subscription",
+    sub_manage_subtitle: "Manage your Pro subscription with ease.",
+    sub_card_type_title: "Subscription Type",
+    sub_card_type_value: "NextWin Pro Pass",
+    sub_card_status_title: "Status",
+    sub_card_status_active: "Active",
+    sub_card_renewal_title: "Next Renewal",
+    sub_card_renewal_date: "03/01/2026",
+    sub_cancel_button: "Cancel Subscription",
+    sub_faq_link: "Consult the FAQ",
+    sub_modal_title: "Confirm Cancellation",
+    sub_modal_text: "Are you sure you want to cancel your subscription? You will lose access to all Pro tools at the end of your current billing period. This action is irreversible.",
+    sub_modal_confirm: "Yes, cancel",
+    sub_modal_cancel: "Go back",
+    sub_inactive_title: "My Subscription",
+    sub_inactive_subtitle: "Current status: Inactive. Go Pro to access all tools.",
 
     // Predictions page
     predictions_title: "Today's 6 Predictions",

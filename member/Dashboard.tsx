@@ -10,16 +10,18 @@ import Strategy from './Strategy';
 import DashboardHome from './DashboardHome';
 import Support from './Support';
 import DashboardSidebar from './DashboardSidebar';
-import { Language, DashboardNav } from '../types';
+import { Language, DashboardNav, Page } from '../types';
 import { ArchivedAnalysis, AnalysisResult } from '../types';
 
 interface DashboardProps {
     language: Language;
     isSubscribed: boolean;
     onSubscribe: () => void;
+    onCancelSubscription: () => void;
+    onNavigate: (page: Page) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscribe }) => {
+const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscribe, onCancelSubscription, onNavigate }) => {
     const [activePage, setActivePage] = useState<DashboardNav>(DashboardNav.DashboardHome);
     const [archives, setArchives] = useState<ArchivedAnalysis[]>([]);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -40,11 +42,12 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome setActivePage={setActivePage} language={language} />,
-            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
-            [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
-            [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Profile)} />,
+            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Bankroll]: <BankrollManagement />,
             [DashboardNav.Archives]: <Archives archives={archives} />,
+            [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
             [DashboardNav.Profile]: <Profile />,
             [DashboardNav.Support]: <Support language={language} />,
         };

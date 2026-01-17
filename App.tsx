@@ -62,6 +62,10 @@ const App: React.FC = () => {
       setIsSubscribed(true);
     }
   };
+  
+  const handleCancelSubscription = () => {
+      setIsSubscribed(false);
+  };
 
   const renderCurrentPage = () => {
     if (currentPage === Page.Dashboard && !isLoggedIn) {
@@ -94,7 +98,7 @@ const App: React.FC = () => {
       case Page.Login:
         return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
       case Page.Dashboard:
-         return <Dashboard language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} />;
+         return <Dashboard language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} onCancelSubscription={handleCancelSubscription} onNavigate={handleNavigation} />;
       default:
         return <Home onNavigate={handleNavigation} language={language}/>;
     }
@@ -116,7 +120,7 @@ const App: React.FC = () => {
           {renderCurrentPage()}
         </Suspense>
       </main>
-      <Footer onNavigate={handleNavigation} language={language} />
+      {currentPage !== Page.Dashboard && <Footer onNavigate={handleNavigation} language={language} />}
     </div>
   );
 };
