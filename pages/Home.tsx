@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Page, Language } from '../types';
 import { translations } from '../translations';

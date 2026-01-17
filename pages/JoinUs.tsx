@@ -76,6 +76,13 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
         </svg>
     );
 
+    const featureList = [
+        t.join_feature_list_1,
+        t.join_feature_list_2,
+        t.join_feature_list_3,
+        t.join_feature_list_4,
+    ];
+
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center max-w-3xl mx-auto">
@@ -99,12 +106,9 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
                             <p className="mt-2 text-sm text-yellow-400 bg-yellow-900/50 inline-block px-3 py-1 rounded-full">{t.join_commitment}</p>
 
                             <ul className="text-left mt-8 space-y-3">
-                                <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_1}</span></li>
-                                <li className="flex items-start"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_2}
-                                <br/><span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-brand">(2 Football, 2 Basket, 2 Tennis)</span>
-                                </span></li>
-                                <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_3}</span></li>
-                                <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_4}</span></li>
+                                {featureList.map((feature, index) => (
+                                     <li key={index} className="flex items-start"><CheckIcon /><span className="ml-3 text-brand-light-gray">{feature}</span></li>
+                                ))}
                             </ul>
 
                             <button className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">

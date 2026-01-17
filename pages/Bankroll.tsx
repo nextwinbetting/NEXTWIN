@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Language, Page } from '../types';
 import { translations } from '../translations';
@@ -77,6 +76,12 @@ const Bankroll: React.FC<BankrollProps> = ({ language, onNavigate }) => {
                         </div>
                     </div>
                 </div>
+
+                <div className="mt-20 bg-brand-card border border-gray-800 rounded-2xl p-8 lg:p-12 text-center">
+                    <h2 className="text-3xl font-bold text-white">{t.bankroll_strategy_title}</h2>
+                    <p className="mt-4 text-lg text-brand-light-gray max-w-3xl mx-auto">{t.bankroll_strategy_desc}</p>
+                </div>
+
 
                  <div className="mt-20 text-center">
                      <h2 className="text-3xl font-bold text-white">{t.bankroll_features_title}</h2>
