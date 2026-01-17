@@ -85,7 +85,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
             </div>
 
             {/* Desktop Sidebar */}
-            <div className="hidden md:flex md:fixed md:inset-y-0 md:w-64 md:flex-col bg-brand-dark-blue border-r border-gray-800">
+            <div className="hidden md:flex md:fixed md:top-28 md:bottom-0 md:left-0 md:w-64 md:flex-col bg-brand-dark-blue border-r border-gray-800">
                 {content}
             </div>
         </>
