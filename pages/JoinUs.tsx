@@ -63,6 +63,11 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
             title: t.join_grid_title6,
             description: t.join_grid_desc6,
         },
+        { 
+            icon: <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>,
+            title: t.join_grid_title7,
+            description: t.join_grid_desc7,
+        },
     ];
 
     const CheckIcon: React.FC = () => (
@@ -99,6 +104,7 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
                                 <br/><span className="text-xs font-bold text-transparent bg-clip-text bg-gradient-brand">(2 Football, 2 Basket, 2 Tennis)</span>
                                 </span></li>
                                 <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_3}</span></li>
+                                <li className="flex items-center"><CheckIcon /><span className="ml-3 text-brand-light-gray">{t.join_feature_list_4}</span></li>
                             </ul>
 
                             <button className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
