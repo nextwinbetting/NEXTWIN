@@ -10,10 +10,11 @@ import Strategy from './Strategy';
 import DashboardHome from './DashboardHome';
 import Support from './Support';
 import DashboardSidebar from './DashboardSidebar';
-import { Language, DashboardNav, Page } from '../types';
+import { Language, DashboardNav, Page, User } from '../types';
 import { ArchivedAnalysis, AnalysisResult } from '../types';
 
 interface DashboardProps {
+    currentUser: User;
     language: Language;
     isSubscribed: boolean;
     onSubscribe: () => void;
@@ -21,7 +22,7 @@ interface DashboardProps {
     onNavigate: (page: Page) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscribe, onCancelSubscription, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscribed, onSubscribe, onCancelSubscription, onNavigate }) => {
     const [activePage, setActivePage] = useState<DashboardNav>(DashboardNav.DashboardHome);
     const [archives, setArchives] = useState<ArchivedAnalysis[]>([]);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -41,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language, isSubscribed, onSubscri
     
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
-            [DashboardNav.DashboardHome]: <DashboardHome setActivePage={setActivePage} language={language} />,
+            [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
             [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,

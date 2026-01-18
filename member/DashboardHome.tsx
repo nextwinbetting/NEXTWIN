@@ -3,6 +3,7 @@ import { DashboardNav, Language } from '../types';
 import { translations } from '../translations';
 
 interface DashboardHomeProps {
+    username: string;
     setActivePage: (page: DashboardNav) => void;
     language: Language;
 }
@@ -31,12 +32,12 @@ const InfoCard: React.FC<{
     </div>
 );
 
-const DashboardHome: React.FC<DashboardHomeProps> = ({ setActivePage, language }) => {
+const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, language }) => {
     const t = translations[language];
 
     return (
         <div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-white">{t.dash_home_welcome}</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold text-white">{t.dash_home_welcome} {username}</h1>
             <p className="mt-2 text-lg text-brand-light-gray">
                 {t.dash_home_subtitle}
             </p>

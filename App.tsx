@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { translations } from './translations';
-import { Page, Language } from './types';
+import { Page, Language, User } from './types';
 
 // --- Lazy Loading des Pages ---
 const Home = lazy(() => import('./pages/Home'));
@@ -18,6 +18,9 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Legal = lazy(() => import('./pages/Legal'));
 const CGV = lazy(() => import('./pages/CGV'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Register = lazy(() => import('./pages/Register'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+
 
 const LoadingFallback: React.FC = () => (
   <div className="flex justify-center items-center h-screen">
@@ -27,7 +30,7 @@ const LoadingFallback: React.FC = () => (
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.Home);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [language, setLanguage] = useState<Language>('FR');
 
@@ -43,22 +46,27 @@ const App: React.FC = () => {
     setCurrentPage(Page.Login);
   };
 
-  const handleLoginSuccess = (email: string) => {
-    setIsLoggedIn(true);
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user);
     // Pour la phase de test, toute connexion donne un accès "Pro".
-    // Cette ligne sera modifiée pour gérer les vrais abonnements.
     setIsSubscribed(true); 
+    handleNavigation(Page.Dashboard);
+  };
+
+  const handleRegisterSuccess = (user: User) => {
+    setCurrentUser(user);
+    setIsSubscribed(true);
     handleNavigation(Page.Dashboard);
   };
   
   const handleLogout = () => {
-      setIsLoggedIn(false);
+      setCurrentUser(null);
       setIsSubscribed(false);
       handleNavigation(Page.Home);
   };
 
   const handleSubscribe = () => {
-    if (isLoggedIn) {
+    if (currentUser) {
       setIsSubscribed(true);
     }
   };
@@ -68,7 +76,7 @@ const App: React.FC = () => {
   };
 
   const renderCurrentPage = () => {
-    if (currentPage === Page.Dashboard && !isLoggedIn) {
+    if (currentPage === Page.Dashboard && !currentUser) {
         return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
     }
 
@@ -84,7 +92,7 @@ const App: React.FC = () => {
       case Page.StrategyInfo:
         return <StrategyInfo language={language} onNavigate={handleNavigation} />;
       case Page.JoinUs:
-        return <JoinUs language={language} />;
+        return <JoinUs language={language} onNavigate={handleNavigation} />;
       case Page.FAQ:
         return <FAQ language={language} />;
       case Page.Contact:
@@ -97,8 +105,12 @@ const App: React.FC = () => {
         return <PrivacyPolicy language={language} onNavigate={handleNavigation} />;
       case Page.Login:
         return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
+      case Page.Register:
+        return <Register onRegisterSuccess={handleRegisterSuccess} onNavigate={handleNavigation} language={language} />;
+       case Page.ForgotPassword:
+        return <ForgotPassword onNavigate={handleNavigation} language={language} />;
       case Page.Dashboard:
-         return <Dashboard language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} onCancelSubscription={handleCancelSubscription} onNavigate={handleNavigation} />;
+         return <Dashboard currentUser={currentUser!} language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} onCancelSubscription={handleCancelSubscription} onNavigate={handleNavigation} />;
       default:
         return <Home onNavigate={handleNavigation} language={language}/>;
     }
@@ -109,7 +121,7 @@ const App: React.FC = () => {
       <Header 
         currentPage={currentPage} 
         onNavigate={handleNavigation} 
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={!!currentUser}
         onShowLogin={showLoginPage}
         onLogout={handleLogout}
         language={language}

@@ -12,6 +12,8 @@ export enum Page {
   Legal = 'MENTIONS LÉGALES',
   CGV = 'CGV',
   PrivacyPolicy = 'POLITIQUE DE CONFIDENTIALITÉ',
+  Register = 'INSCRIPTION',
+  ForgotPassword = 'MOT_DE_PASSE_OUBLIE',
 }
 
 export type Language = 'FR' | 'EN';
@@ -33,6 +35,14 @@ export enum Sport {
   Football = 'FOOTBALL',
   Basketball = 'BASKETBALL',
   Tennis = 'TENNIS',
+}
+
+export interface User {
+  firstName: string;
+  lastName: string;
+  dob: string;
+  username: string;
+  email: string;
 }
 
 export interface Prediction {

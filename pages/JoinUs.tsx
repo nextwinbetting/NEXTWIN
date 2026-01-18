@@ -1,5 +1,5 @@
 import React from 'react';
-import { Language } from '../types';
+import { Language, Page } from '../types';
 import { translations } from '../translations';
 
 const FeatureGridItem: React.FC<{ icon: React.ReactNode; title: string; description: string; }> = ({ icon, title, description }) => (
@@ -27,9 +27,10 @@ const TestimonialCard: React.FC<{ quote: string; name: string; role: string; }> 
 
 interface JoinUsProps {
     language: Language;
+    onNavigate: (page: Page) => void;
 }
 
-const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
+const JoinUs: React.FC<JoinUsProps> = ({ language, onNavigate }) => {
     const t = translations[language];
     
     const features = [
@@ -111,7 +112,7 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
                                 ))}
                             </ul>
 
-                            <button className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
+                            <button onClick={() => onNavigate(Page.Register)} className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
                                 {t.join_cta}
                             </button>
                             <p className="mt-4 text-xs text-gray-500">{t.join_info}</p>
@@ -153,7 +154,7 @@ const JoinUs: React.FC<JoinUsProps> = ({ language }) => {
                 <h2 className="text-3xl sm:text-4xl font-bold text-white">{t.join_final_cta_title}</h2>
                 <p className="mt-4 text-lg text-brand-light-gray max-w-2xl mx-auto">{t.join_final_cta_subtitle}</p>
                 <div className="mt-8">
-                    <button className="rounded-md bg-gradient-brand px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
+                    <button onClick={() => onNavigate(Page.Register)} className="rounded-md bg-gradient-brand px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
                         {t.join_final_cta_button}
                     </button>
                 </div>

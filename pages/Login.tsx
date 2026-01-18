@@ -1,23 +1,30 @@
-
 import React, { useState } from 'react';
-import { Page, Language } from '../types';
+import { Page, Language, User } from '../types';
 import NextWinLogo from '../components/NextWinLogo';
 import { translations } from '../translations';
 
 interface LoginProps {
-    onLoginSuccess: (email: string) => void;
+    onLoginSuccess: (user: User) => void;
     onNavigate: (page: Page) => void;
     language: Language;
 }
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) => {
     const t = translations[language];
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onLoginSuccess(email);
+        // Simulation d'une connexion réussie avec un utilisateur factice
+        const dummyUser: User = {
+            firstName: 'Membre',
+            lastName: 'Pro',
+            dob: '01/01/1990',
+            username: username,
+            email: `${username.toLowerCase()}@nextwin.ai`,
+        };
+        onLoginSuccess(dummyUser);
     };
 
     return (
@@ -31,18 +38,21 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) =
 
                     <form onSubmit={handleSubmit} className="text-left mt-8 space-y-6">
                         <div>
-                            <label className="text-sm font-semibold text-brand-light-gray">{t.login_email}</label>
+                            <label className="text-sm font-semibold text-brand-light-gray">{t.login_username}</label>
                             <input 
-                                type="email" 
+                                type="text" 
                                 required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="ex: john.doe@email.com"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="ex: SuperGagnant"
                                 className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:ring-orange-500 focus:border-orange-500" 
                             />
                         </div>
                         <div>
-                            <label className="text-sm font-semibold text-brand-light-gray">{t.login_password}</label>
+                             <div className="flex justify-between items-center">
+                                <label className="text-sm font-semibold text-brand-light-gray">{t.login_password}</label>
+                                <button type="button" onClick={() => onNavigate(Page.ForgotPassword)} className="text-xs text-orange-400 hover:underline">{t.login_forgot_password}</button>
+                            </div>
                             <input 
                                 type="password" 
                                 required
@@ -61,7 +71,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onNavigate, language }) =
                     
                     <p className="mt-6 text-sm text-brand-light-gray">
                         {t.login_no_account}{' '}
-                        <button onClick={() => onNavigate(Page.JoinUs)} className="font-semibold text-transparent bg-clip-text bg-gradient-brand hover:brightness-125">
+                        <button onClick={() => onNavigate(Page.Register)} className="font-semibold text-transparent bg-clip-text bg-gradient-brand hover:brightness-125">
                             {t.login_join_us}
                         </button>
                     </p>
