@@ -90,7 +90,7 @@ export const translations = {
     bankroll_page_title2: "du Succès à Long Terme",
     bankroll_page_subtitle: "Les meilleurs pronostics au monde ne valent rien sans une gestion de capital rigoureuse. Découvrez comment notre outil de Bankroll Management vous aide à protéger et faire fructifier votre capital de manière stratégique.",
     bankroll_risk_title: "Le Principe Sacré : Le Risk Management 5 %",
-    bankroll_risk_desc1: "C'est la règle d'or utilisée par tous les investisseurs et parieurs professionnels. Ne jamais miser plus de 5% de votre capital total sur un seul pari, peu importe votre niveau de confiance. Cette approche mathématique vous protège des séries de pertes inévitables et assure la pérennité de votre bankroll.",
+    bankroll_risk_desc1: "C'est la règle d'or utilisée par tous les investisseurs et parieurs professionnels. Ne jamais miser plus de 5% de votre capital total sur un seul pari, peu importe votre niveau de confiance. Cette approche mathématique vous protège des séries de pertes inévitables et assure la pérenité de votre bankroll.",
     bankroll_risk_desc2: "Notre outil intègre cette règle au cœur de son fonctionnement. Pour chaque pari, nous vous indiquons la mise exacte à placer pour respecter cette gestion stricte, vous libérant de l'aspect émotionnel de la décision.",
     bankroll_strategy_title: "Plus qu'un Outil, une Stratégie Complète",
     bankroll_strategy_desc: "Notre gestionnaire de bankroll n'est pas un simple calculateur. C'est le bras armé de la Stratégie Officielle NEXTWIN. Il applique pour vous les règles de mise, vous aide à suivre la structure de paris recommandée et vous donne une vision claire de votre performance dans le respect de notre méthode.",
@@ -272,6 +272,18 @@ export const translations = {
     forgot_password_button: "ENVOYER LE LIEN",
     forgot_password_success: "Si un compte est associé à cet e-mail, un lien a été envoyé.",
     forgot_password_back_to_login: "Retour à la connexion",
+    forgot_password_simulation_link: "(Simulation) Accéder à la réinitialisation",
+
+    // Reset Password Page
+    reset_password_title: "Créer un nouveau mot de passe",
+    reset_password_subtitle: "Votre nouveau mot de passe doit être différent du précédent.",
+    reset_password_email_info: "Réinitialisation pour l'e-mail :",
+    reset_password_new: "Nouveau mot de passe",
+    reset_password_confirm: "Confirmer le nouveau mot de passe",
+    reset_password_button: "RÉINITIALISER LE MOT DE PASSE",
+    reset_password_success_title: "Mot de passe réinitialisé !",
+    reset_password_success_message: "Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter.",
+    reset_password_go_to_login: "Aller à la page de connexion",
     
     // Footer
     footer_tagline: "Optimisez vos décisions en paris sportifs grâce à l’IA.",
@@ -681,6 +693,18 @@ export const translations = {
     forgot_password_button: "SEND LINK",
     forgot_password_success: "If an account is associated with this email, a link has been sent.",
     forgot_password_back_to_login: "Back to login",
+    forgot_password_simulation_link: "(Simulation) Proceed to Reset Page",
+
+    // Reset Password Page
+    reset_password_title: "Create a new password",
+    reset_password_subtitle: "Your new password must be different from the previous one.",
+    reset_password_email_info: "Resetting password for:",
+    reset_password_new: "New password",
+    reset_password_confirm: "Confirm new password",
+    reset_password_button: "RESET PASSWORD",
+    reset_password_success_title: "Password Reset!",
+    reset_password_success_message: "Your password has been successfully updated. You can now log in.",
+    reset_password_go_to_login: "Go to login page",
 
     // Footer
     footer_tagline: "Optimize your sports betting decisions with AI.",

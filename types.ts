@@ -14,6 +14,7 @@ export enum Page {
   PrivacyPolicy = 'POLITIQUE DE CONFIDENTIALITÉ',
   Register = 'INSCRIPTION',
   ForgotPassword = 'MOT_DE_PASSE_OUBLIE',
+  ResetPassword = 'RÉINITIALISER_MOT_DE_PASSE',
 }
 
 export type Language = 'FR' | 'EN';

@@ -6,9 +6,10 @@ import { translations } from '../translations';
 interface ForgotPasswordProps {
     onNavigate: (page: Page) => void;
     language: Language;
+    onRequestReset: (email: string) => void;
 }
 
-const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate, language }) => {
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate, language, onRequestReset }) => {
     const t = translations[language];
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
@@ -16,6 +17,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate, language })
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Dans une vraie application, ici on appellerait une API pour envoyer l'e-mail.
+        onRequestReset(email);
         setSubmitted(true);
     };
 
@@ -30,7 +32,13 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate, language })
                     {submitted ? (
                         <div className="mt-8 text-center">
                             <p className="text-brand-light-gray">{t.forgot_password_success}</p>
-                            <button onClick={() => onNavigate(Page.Login)} className="mt-6 font-semibold text-transparent bg-clip-text bg-gradient-brand hover:brightness-125">
+                            <button 
+                                onClick={() => onNavigate(Page.ResetPassword)} 
+                                className="mt-6 w-full rounded-md bg-orange-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-orange-500 transition-colors"
+                            >
+                                {t.forgot_password_simulation_link}
+                            </button>
+                            <button onClick={() => onNavigate(Page.Login)} className="mt-4 text-sm font-semibold text-brand-light-gray hover:text-white">
                                 {t.forgot_password_back_to_login}
                             </button>
                         </div>

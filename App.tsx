@@ -20,6 +20,7 @@ const CGV = lazy(() => import('./pages/CGV'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 
 const LoadingFallback: React.FC = () => (
@@ -33,6 +34,7 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [language, setLanguage] = useState<Language>('FR');
+  const [emailToReset, setEmailToReset] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -107,8 +109,10 @@ const App: React.FC = () => {
         return <Login onLoginSuccess={handleLoginSuccess} onNavigate={handleNavigation} language={language} />;
       case Page.Register:
         return <Register onRegisterSuccess={handleRegisterSuccess} onNavigate={handleNavigation} language={language} />;
-       case Page.ForgotPassword:
-        return <ForgotPassword onNavigate={handleNavigation} language={language} />;
+      case Page.ForgotPassword:
+        return <ForgotPassword onNavigate={handleNavigation} language={language} onRequestReset={setEmailToReset} />;
+      case Page.ResetPassword:
+        return <ResetPassword email={emailToReset} onNavigate={handleNavigation} language={language} />;
       case Page.Dashboard:
          return <Dashboard currentUser={currentUser!} language={language} isSubscribed={isSubscribed} onSubscribe={handleSubscribe} onCancelSubscription={handleCancelSubscription} onNavigate={handleNavigation} />;
       default:
