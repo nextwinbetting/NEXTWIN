@@ -25,6 +25,7 @@ export enum DashboardNav {
   Analyzer = "ANALYSEUR",
   Strategy = "STRATÉGIE",
   Bankroll = "BANKROLL",
+  LiveScores = "MATCHS_EN_DIRECT",
   Archives = "ARCHIVES & SUIVI",
   Subscription = "ABONNEMENT",
   Profile = "PARAMÈTRES",

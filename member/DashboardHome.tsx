@@ -71,6 +71,13 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                     icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0a.75.75 0 00-.75-.75h-.75m7.5-1.5V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.75m0 0h3.75m-3.75 0a2.25 2.25 0 01-2.25 2.25V15m1.5 0v.75a2.25 2.25 0 002.25 2.25h3a2.25 2.25 0 002.25-2.25v-.75" /></svg>}
                     onClick={() => setActivePage(DashboardNav.Bankroll)}
                 />
+                <InfoCard
+                    title={t.dash_home_card5_title}
+                    description={t.dash_home_card5_desc}
+                    cta={t.dash_home_card5_cta}
+                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.95 14.95 0 00-5.84-2.56m0 0a14.95 14.95 0 00-5.84 2.56m5.84-2.56V4.72a.75.75 0 011.5 0v4.82m-1.5 0a6 6 0 005.84 7.38m-5.84-7.38a6 6 0 00-5.84 7.38m5.84-7.38L15.59 14.37" /></svg>}
+                    onClick={() => window.open('https://www.flashscore.fr/', '_blank', 'noopener,noreferrer')}
+                />
             </div>
         </div>
     );

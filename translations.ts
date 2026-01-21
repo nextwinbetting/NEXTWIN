@@ -301,6 +301,7 @@ export const translations = {
     dash_nav_analyzer: "Analyseur Expert",
     dash_nav_strategy: "Accès Stratégie",
     dash_nav_bankroll: "Gestion de Bankroll",
+    dash_nav_live_scores: "Matchs en direct",
     dash_nav_archives: "Suivi & Progression",
     dash_nav_subscription: "Mon abonnement",
     dash_nav_profile: "Paramètres",
@@ -321,6 +322,9 @@ export const translations = {
     dash_home_card4_title: "Gestion de Bankroll",
     dash_home_card4_desc: "Suivez vos paris, protégez votre capital avec le risk management 5% et analysez votre rentabilité (ROI, Yield).",
     dash_home_card4_cta: "Gérer ma bankroll",
+    dash_home_card5_title: "Matchs en direct",
+    dash_home_card5_desc: "Accédez aux résultats sportifs en temps réel, aux statistiques détaillées et aux informations complètes sur de nombreux sports grâce à notre outil dédié.",
+    dash_home_card5_cta: "Consulter les scores",
 
     // Support Page
     support_title: "Support Membre",
@@ -722,6 +726,7 @@ export const translations = {
     dash_nav_analyzer: "Expert Analyzer",
     dash_nav_strategy: "Strategy Access",
     dash_nav_bankroll: "Bankroll Management",
+    dash_nav_live_scores: "Live Scores",
     dash_nav_archives: "Tracking & Progress",
     dash_nav_subscription: "My Subscription",
     dash_nav_profile: "Settings",
@@ -742,6 +747,9 @@ export const translations = {
     dash_home_card4_title: "Bankroll Management",
     dash_home_card4_desc: "Track your bets, protect your capital with 5% risk management, and analyze your profitability (ROI, Yield).",
     dash_home_card4_cta: "Manage my bankroll",
+    dash_home_card5_title: "Live Scores",
+    dash_home_card5_desc: "Access real-time sports results, detailed statistics, and complete information on many sports thanks to our dedicated tool.",
+    dash_home_card5_cta: "Check Scores",
 
     // Support Page
     support_title: "Member Support",
