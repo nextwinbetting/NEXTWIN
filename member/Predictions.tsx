@@ -4,7 +4,7 @@ import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
 import { GoogleGenAI } from "@google/genai";
 
-// --- AI LOGIC MOVED HERE FOR AI STUDIO COMPATIBILITY ---
+// --- AI LOGIC ---
 const extractJson = (rawText: string): string => {
     const match = rawText.match(/```json\s*([\sS]*?)\s*```/);
     if (match && match[1]) {
@@ -15,21 +15,13 @@ const extractJson = (rawText: string): string => {
     if (startIndex > -1 && endIndex > -1) {
         return rawText.substring(startIndex, endIndex + 1);
     }
-    throw new Error("Aucun objet JSON valide n'a été trouvé dans la réponse de l'IA.");
+    throw new Error("Aucun objet JSON valide n'a été trouvé.");
 };
 
 const getAiClient = () => {
     const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-        console.error("API key not found in environment variables.");
-        throw new Error("La clé API n'est pas configurée dans l'environnement.");
-    }
+    if (!apiKey) throw new Error("La clé API n'est pas configurée.");
     return new GoogleGenAI({ apiKey });
-};
-
-const getCurrentDateFR = (): string => {
-    const today = new Date();
-    return today.toLocaleDateString('fr-FR');
 };
 
 const getCurrentUTCISO = (): string => {
@@ -42,7 +34,26 @@ const mapStringToSport = (sport: string): Sport => {
     if (upperCaseSport.includes('TENNIS')) return Sport.Tennis;
     return Sport.Football;
 };
-// --- END OF AI LOGIC ---
+
+// Formateur de date/heure partagé pour la cohérence
+const formatMatchDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    // Formatage strict en heure de Paris (Europe/Paris) comme Flashscore
+    const dateStr = date.toLocaleDateString('fr-FR', { 
+        timeZone: 'Europe/Paris', 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+    }).replace(/\//g, '.');
+    
+    const timeStr = date.toLocaleTimeString('fr-FR', { 
+        timeZone: 'Europe/Paris', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    return { dateStr, timeStr };
+};
 
 interface PredictionsProps {
     language: Language;
@@ -53,7 +64,7 @@ const LoadingComponent: React.FC = () => {
         "Connexion à NEXTWIN Engine...",
         "Analyse des marchés en temps réel...",
         "Calibration du moteur prédictif...",
-        "Croisement des données multi-sources..."
+        "Synchronisation des horaires officiels..."
     ];
     const [textIndex, setTextIndex] = useState(0);
 
@@ -76,9 +87,8 @@ const LoadingComponent: React.FC = () => {
 const ErrorComponent: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => (
     <div className="text-center flex flex-col items-center justify-center min-h-[400px] text-red-400 bg-brand-card border border-red-500/30 rounded-xl p-6">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <h3 className="text-xl font-bold mt-4 text-white">Erreur de Connexion</h3>
-        <p className="text-sm mt-2 max-w-sm text-gray-300">NEXTWIN Engine n'a pas pu récupérer les pronostics. Voici les détails :</p>
-        <p className="text-xs mt-2 text-gray-400 bg-gray-900/50 p-2 rounded-md max-w-sm">{message}</p>
+        <h3 className="text-xl font-bold mt-4 text-white">Erreur de Synchronisation</h3>
+        <p className="text-sm mt-2 max-w-sm text-gray-300">NEXTWIN Engine n'a pas pu récupérer les données en temps réel.</p>
         <button onClick={onRetry} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
             RÉESSAYER
         </button>
@@ -97,90 +107,72 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
         setIsLoading(true);
         setError(null);
         try {
-            const currentDate = getCurrentDateFR();
             const currentUTC = getCurrentUTCISO();
             const prompt = `
-            Tu es NEXTWIN AI ENGINE, un moteur automatisé de pronostics sportifs.
+            Tu es NEXTWIN AI ENGINE, un moteur automatisé de pronostics sportifs de haute précision.
     
             INSTRUCTIONS SYSTÈME (OBLIGATOIRES ET STRICTES) :
             - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
             - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
-            - AUCUN texte, commentaire, ou markdown (comme \`\`\`json) ne doit être présent en dehors de l'objet JSON principal.
-            - Si tu ne peux pas générer une réponse valide, retourne EXACTEMENT : \`{"predictions": []}\`.
+            - AUCUN texte ou markdown ne doit être présent en dehors du JSON.
     
             OBJECTIF :
-            Générer 6 pronostics sportifs pour des matchs réels, officiellement programmés et non encore joués. Les matchs doivent avoir lieu aujourd'hui (${currentDate}) ou dans les 7 prochains jours. Il doit y avoir EXACTEMENT 2 pronostics pour le Football, 2 pour le Basketball, et 2 pour le Tennis.
+            Générer 6 pronostics sportifs pour des matchs réels, officiellement programmés (2 Football, 2 Basketball, 2 Tennis).
 
-            CONTRAINTE CRITIQUE DE VÉRACITÉ ET DE TEMPS :
-            - L'heure de référence actuelle est ${currentUTC}. Tu dois IMPÉRATIVEMENT sélectionner des matchs dont le coup d'envoi est POSTÉRIEUR à cette heure.
-            - VÉRIFICATION OBLIGATOIRE : Chaque match doit être réel, confirmé via tes sources, et non un match historique ou annulé. Ne jamais inventer une date future pour un match passé.
-            - **ATTENTION AUX FUSEAUX HORAIRES (source d'erreur fréquente) :** Pour les sports américains (NBA, etc.), l'heure locale (ex: EST, PST) doit être **soigneusement convertie en UTC**. Un match ayant lieu le soir aux USA (ex: 6 janvier à 20h EST) se déroule en réalité le lendemain matin en Europe (7 janvier à 2h CET). La date en UTC doit OBLIGATOIREMENT refléter ce décalage.
+            CONTRAINTE DE TEMPS ET DE SYNCHRONISATION (CRITIQUE) :
+            - L'heure actuelle de référence est ${currentUTC}. Sélectionne uniquement des matchs POSTÉRIEURS à cette heure.
+            - Utilise Google Search pour vérifier l'horaire exact du coup d'envoi.
+            - FOURNIT L'HEURE AU FORMAT ISO 8601 UTC STRICT (ex: "2024-02-15T20:00:00Z").
+            - SOIS EXTRÊMEMENT PRÉCIS : l'horaire doit correspondre à celui de Flashscore.fr. Si un match NBA a lieu à 20h à New York, l'heure UTC doit être correctement calculée (01h UTC le lendemain).
     
-            FORMAT JSON OBLIGATOIRE :
-            La réponse doit être un objet JSON unique contenant une clé "predictions". Cette clé contient un tableau de 6 objets, chacun avec les champs suivants :
-            - "sport": "Football", "Basketball", ou "Tennis"
-            - "league": Nom de la compétition (string)
-            - "match": "Équipe A vs Équipe B" (string)
-            - "betType": Le **pronostic PRÉCIS et EXPLOITABLE**. Ce champ est CRUCIAL. Il NE DOIT PAS être une catégorie générique comme "Vainqueur du match" ou "Moneyline". Il DOIT indiquer l'équipe ou le résultat précis.
-                - Pour un vainqueur de match: "France Gagnant", "New York Knicks Gagnant".
-                - Pour une double chance: "Nul ou AS Roma".
-                - Pour un total de points/buts: "Plus de 2.5 buts", "Moins de 220.5 points".
-                - Le type de pari (ex: Moneyline) peut être ajouté entre parenthèses si pertinent : "LA Clippers Gagnant (Moneyline)".
-            - "matchDateTimeUTC": Date et heure **OFFICIELLE et VÉRIFIÉE** du match, après **conversion PRÉCISE de l'heure locale en UTC**, formatée en ISO 8601 (string). La précision de cette information est CRITIQUE.
-            - "probability": Indice de confiance (integer, ≥ 70)
-            - "analysis": Analyse courte et factuelle (string)
+            FORMAT JSON :
+            {
+              "predictions": [
+                {
+                  "sport": "Football" | "Basketball" | "Tennis",
+                  "league": "Nom de la ligue",
+                  "match": "Équipe A vs Équipe B",
+                  "betType": "Pronostic précis (ex: France Gagnant)",
+                  "matchDateTimeUTC": "ISO 8601 UTC String",
+                  "probability": integer (>= 70),
+                  "analysis": "Analyse factuelle courte"
+                }
+              ]
+            }
             `;
     
             const ai = getAiClient();
             const response = await ai.models.generateContent({
                 model: 'gemini-3-pro-preview',
                 contents: prompt,
-                config: {
-                    tools: [{googleSearch: {}}],
-                },
+                config: { tools: [{googleSearch: {}}] },
             });
     
             const rawText = response.text?.trim();
-            if (!rawText) {
-                throw new Error("La réponse de NEXTWIN Engine est vide.");
-            }
+            if (!rawText) throw new Error("Réponse vide.");
     
             const jsonText = extractJson(rawText);
+            const parsed = JSON.parse(jsonText);
             
-            let parsed;
-            try {
-                parsed = JSON.parse(jsonText);
-            } catch (e) {
-                console.error("Erreur de parsing JSON. Texte reçu de l'IA:", jsonText);
-                throw new Error(`Le format de la réponse de l'IA est invalide. Contenu : "${jsonText.slice(0, 200)}..."`);
-            }
-    
-            if (!parsed.predictions || !Array.isArray(parsed.predictions)) {
-                throw new Error("La réponse JSON de l'IA n'a pas le format attendu (tableau 'predictions' manquant).");
-            }
+            if (!parsed.predictions || !Array.isArray(parsed.predictions)) throw new Error("Format invalide.");
     
             const newSources: GroundingSource[] = [];
             const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
             if (groundingChunks) {
                 for (const chunk of groundingChunks) {
-                    if (chunk.web) {
-                        newSources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
-                    }
+                    if (chunk.web) newSources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
                 }
             }
     
             const newPredictions: Prediction[] = parsed.predictions.map((p: any, index: number) => {
-                const matchDate = new Date(p.matchDateTimeUTC);
-                const dateFR = matchDate.toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' });
-                const timeFR = matchDate.toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' });
-    
+                const { dateStr, timeStr } = formatMatchDateTime(p.matchDateTimeUTC);
                 return {
-                    id: `${p.match.replace(/\s/g, '-')}-${index}-${Date.now()}`,
+                    id: `${p.match}-${index}-${Date.now()}`,
                     sport: mapStringToSport(p.sport),
                     match: p.match,
                     betType: p.betType,
-                    date: dateFR,
-                    time: timeFR,
+                    date: dateStr,
+                    time: timeStr,
                     probability: p.probability,
                     analysis: `[${p.league}] ${p.analysis}`,
                 };
@@ -189,7 +181,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             setPredictions(newPredictions);
             setSources(newSources);
         } catch (err) {
-            console.error("Failed to fetch predictions directly from AI:", err);
+            console.error("Fetch failed:", err);
             setError((err as Error).message);
         } finally {
             setIsLoading(false);
@@ -229,9 +221,6 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
                         </svg>
                         Régénérer les pronostics
                     </button>
-                    <p className="mt-2 text-xs text-gray-500 max-w-xs mx-auto">
-                        Ce bouton vous permet de générer instantanément 6 nouveaux pronostics si les précédents ne vous conviennent pas.
-                    </p>
                 </div>
             </div>
             
@@ -251,22 +240,6 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
                             </button>
                         ))}
                     </div>
-
-                    {sources.length > 0 && (
-                        <div className="my-8 p-4 bg-brand-card border border-gray-800 rounded-xl max-w-4xl mx-auto">
-                            <h4 className="text-sm font-semibold text-white mb-2 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-blue-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                                Sources utilisées par NEXTWIN Engine
-                            </h4>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                {sources.map((source, index) => (
-                                    <a key={index} href={source.uri} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:text-blue-300 transition-colors truncate" title={source.title}>
-                                        {source.title || new URL(source.uri).hostname}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredPredictions.map(prediction => (
