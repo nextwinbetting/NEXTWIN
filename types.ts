@@ -46,6 +46,7 @@ export interface User {
   dob: string;
   username: string;
   email: string;
+  isAdmin?: boolean;
 }
 
 export interface GroundingSource {
@@ -58,12 +59,21 @@ export interface Prediction {
   sport: Sport;
   match: string;
   betType: string;
+  marketType?: string;
+  category: 'Standard' | 'Bonus Football' | 'Bonus Basket';
   date: string;
   time: string;
   probability: number;
   analysis: string;
   status?: 'won' | 'lost' | 'pending';
   sources?: GroundingSource[];
+}
+
+export interface DailyPack {
+  timestamp: number;
+  isValidated: boolean;
+  predictions: Prediction[];
+  publishedBy: string;
 }
 
 export interface Bankroll {
