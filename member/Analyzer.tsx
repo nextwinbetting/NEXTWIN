@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Language, AnalysisResult } from '../types';
 import { translations } from '../translations';
@@ -33,23 +34,28 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
         setResult(null);
 
         try {
-            // FIX: Initialized GoogleGenAI according to strict guidelines (named parameter, direct env access)
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
-            const prompt = `EXPERT ANALYSTE : ${team1} vs ${team2} (${sport}).
-            Scraper SofaScore/Flashscore pour : forme (5 matchs), xG, absences.
-            Réponse JSON UNIQUEMENT :
+            // IA Elite Protocol
+            const prompt = `[ROLE: WORLD-CLASS SPORTS ANALYST]
+            ANALYSE DEMANDÉE : ${team1} vs ${team2} (${sport}).
+            
+            1. Scanne SofaScore, Flashscore et WhoScored en TEMPS RÉEL.
+            2. Vérifie la date exacte du match. S'il est passé ou en cours, ALERTE-MOI dans "analysis".
+            3. Analyse : compositions probables, xG moyens sur 5 matchs, météo, blessures.
+            
+            RÉPONSE JSON UNIQUEMENT :
             {
-              "analysis": "Analyse technique courte.",
-              "probability": 75,
-              "keyData": ["Stat 1", "Stat 2", "Stat 3"],
-              "recommendedBet": "Le pari recommandé",
-              "recommendationReason": "Cause technique",
-              "matchDateTimeUTC": "${new Date().toISOString()}"
+              "analysis": "Analyse ultra-pointue incluant l'état de fraîcheur des équipes.",
+              "probability": 1-100,
+              "keyData": ["Point fort A", "Point faible B", "Stats H2H"],
+              "recommendedBet": "Pari suggéré",
+              "recommendationReason": "Pourquoi ce pari ?",
+              "matchDateTimeUTC": "ISO_TIMESTAMP_DU_COUP_D_ENVOI"
             }`;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-3-pro-preview',
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
@@ -57,7 +63,6 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
                 }
             });
 
-            // FIX: Accessing text property directly (not a method) as per guidelines
             const text = response.text || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             
@@ -85,10 +90,7 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
             onNewAnalysis({ result: res, sport, team1, team2, betType });
         } catch (err: any) {
             console.error(err);
-            const isQuota = err.message?.includes('429') || JSON.stringify(err).includes('429');
-            setError(isQuota 
-                ? "Quota API atteint. Activez le Billing Google Cloud pour un usage illimité." 
-                : "Synchronisation échouée avec les serveurs de statistiques.");
+            setError("Synchronisation échouée. Vérifiez l'orthographe des équipes ou réessayez.");
         } finally {
             setLoading(false);
         }
@@ -97,8 +99,11 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
     return (
         <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">ANALYSEUR EXPERT V8</h1>
-                <p className="mt-2 text-brand-light-gray text-[10px] uppercase tracking-widest font-black">SCANNER WHO SCORED • SOFA SCORE • TENNIS ABSTRACT</p>
+                <div className="inline-block bg-orange-500/10 border border-orange-500/20 px-4 py-1 rounded-full mb-4">
+                    <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">V9 ELITE ANALYZER ACTIVE</span>
+                </div>
+                <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic">SCANNER HAUTE FIDÉLITÉ</h1>
+                <p className="mt-2 text-brand-light-gray text-[10px] uppercase tracking-widest font-black">EXTRACTION DE DONNÉES SOFASCORE & WHOSCORED PAR IA</p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-10">
@@ -114,7 +119,7 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
                         </div>
                     </div>
                     <button onClick={handleAnalyze} disabled={loading} className="w-full bg-gradient-brand py-5 rounded-xl font-black text-white shadow-xl disabled:opacity-50 text-xs tracking-widest uppercase transition-all">
-                        {loading ? "EXTRACTION DES FLUX..." : "LANCER L'ANALYSE IA"}
+                        {loading ? "ANALYSE EN TEMPS RÉEL..." : "LANCER LE SCAN V9"}
                     </button>
                     {error && <p className="text-red-500 text-[10px] text-center font-black uppercase bg-red-500/10 p-4 rounded-lg border border-red-500/20">{error}</p>}
                 </div>
@@ -123,29 +128,36 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
                     {loading ? (
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500 mx-auto mb-6"></div>
-                            <span className="text-[10px] text-orange-400 font-black uppercase tracking-[0.4em] animate-pulse">Consultation des serveurs sportifs...</span>
+                            <span className="text-[10px] text-orange-400 font-black uppercase tracking-[0.4em] animate-pulse">Extraction des variables sportives...</span>
                         </div>
                     ) : result ? (
                         <div className="w-full z-10 animate-fade-in">
+                            <div className="flex justify-between items-start mb-6">
+                                <span className="bg-gray-900 border border-gray-800 text-gray-500 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
+                                    Coup d'envoi : {result.matchDate} - {result.matchTime}
+                                </span>
+                            </div>
                             <div className="text-center mb-10">
-                                <p className="text-[10px] uppercase text-brand-light-gray tracking-[0.4em] mb-4 font-black italic">PROBABILITÉ CALCULÉE</p>
+                                <p className="text-[10px] uppercase text-brand-light-gray tracking-[0.4em] mb-4 font-black italic">CONFIANCE IA</p>
                                 <p className="text-8xl font-black text-white tracking-tighter">{result.probability}%</p>
                             </div>
                             <div className="bg-orange-500/5 border border-orange-500/20 p-6 rounded-2xl text-center mb-8">
                                 <p className="text-white font-black text-2xl tracking-tighter uppercase italic">{result.recommendedBet}</p>
                             </div>
                             <div className="space-y-3">
-                                <p className="text-xs text-gray-400 leading-relaxed italic">"{result.analysis}"</p>
-                                {result.keyData.map((d, i) => (
-                                    <div key={i} className="text-[10px] bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-300 font-bold uppercase">
-                                        • {d}
-                                    </div>
-                                ))}
+                                <p className="text-xs text-gray-400 leading-relaxed italic border-l-2 border-orange-500 pl-4">"{result.analysis}"</p>
+                                <div className="grid grid-cols-2 gap-2 mt-6">
+                                    {result.keyData.map((d, i) => (
+                                        <div key={i} className="text-[9px] bg-gray-900 border border-gray-800 p-2 rounded-lg text-gray-300 font-bold uppercase truncate">
+                                            • {d}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ) : (
                         <div className="text-center opacity-20">
-                            <p className="text-brand-light-gray text-[10px] uppercase tracking-[0.5em] font-black">Moteur en veille</p>
+                            <p className="text-brand-light-gray text-[10px] uppercase tracking-[0.5em] font-black">Scanner en veille</p>
                         </div>
                     )}
                 </div>

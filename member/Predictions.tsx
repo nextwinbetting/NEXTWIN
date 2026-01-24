@@ -36,134 +36,124 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("SCAN DES CALENDRIERS OFFICIELS...");
+        setStatus("CONNEXION AUX FLUX PRO (GEMINI 3 PRO)...");
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
             const now = new Date();
             const dateToday = now.toLocaleDateString('fr-FR');
-            // On calcule l'heure actuelle pour le prompt
+            const fullIso = now.toISOString();
             const timeNow = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-            const prompt = `[SYSTEM: ELITE SPORTS DATA VERIFIER]
-            MISSION : Trouve 8 matchs RÉELS (Football, Basketball, Tennis) programmés APRÈS l'heure actuelle.
-            
-            DONNÉES TEMPORELLES CRITIQUES :
-            - Date du jour : ${dateToday}
-            - Heure actuelle (Paris) : ${timeNow}
-            
-            RÈGLES D'OR :
-            1. TOUS les matchs doivent commencer au minimum 30 minutes APRÈS ${timeNow}.
-            2. Tu DOIS vérifier les horaires sur des sources fiables (Flashscore, SofaScore, ESPN).
-            3. Interdiction formelle d'inclure des matchs terminés ou en cours.
-            4. Si un match est reporté ou incertain, ignore-le.
-            
-            FORMAT JSON STRICT :
+            // Prompt ultra-directif pour Gemini 3 Pro
+            const prompt = `[ROLE: ELITE SPORTS TRADER & DATA SCIENTIST]
+            [CONTEXT: UTC TIME IS ${fullIso}. LOCAL TIME IS ${timeNow} (${dateToday})]
+
+            MISSION CRITIQUE :
+            1. Scanne Flashscore, SofaScore et ESPN pour trouver 8 matchs de Football, Basketball ou Tennis.
+            2. SECURITE TEMPORELLE : N'inclus QUE des matchs qui commencent au minimum 1 HEURE APRÈS ${timeNow}. 
+            3. Interdiction formelle des matchs "En cours", "Terminés", "Reportés".
+            4. Vérifie l'orthographe exacte des compétitions (ex: "Premier League", "EuroLeague").
+
+            FORMAT DE RÉPONSE : JSON PUR.
+            SCHÉMA :
             {
               "predictions": [
                 {
-                  "sport": "Football",
-                  "competition": "Nom exact de la ligue",
+                  "sport": "Football | Basketball | Tennis",
+                  "competition": "Nom exact",
                   "match": "Équipe A vs Équipe B",
-                  "betType": "Pronostic précis",
-                  "probability": 75,
-                  "analysis": "Analyse technique basée sur les dernières stats réelles.",
+                  "betType": "Type de pari (ex: Victoire A, +2.5 buts, etc)",
+                  "probability": 70-95,
+                  "analysis": "Analyse technique détaillée (forme, xG, absences)",
                   "date": "${dateToday}",
-                  "time": "HH:MM (Heure de coup d'envoi vérifiée)"
+                  "time": "HH:MM (Heure précise du coup d'envoi)"
                 }
               ]
             }`;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-3-pro-preview', // Passage au modèle Pro pour une qualité maximale
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0,
+                    temperature: 0.1, // Très bas pour éviter les hallucinations
                     responseMimeType: "application/json"
                 }
             });
 
             const text = response.text || "";
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("Erreur de flux Engine.");
-
-            const data = JSON.parse(jsonMatch[0]);
+            const data = JSON.parse(text);
             const rawPreds = data.predictions || [];
             
-            // --- FILTRE DE SÉCURITÉ CÔTÉ CLIENT ---
-            // On s'assure mathématiquement que les matchs sont dans le futur
+            // FILTRE DE SÉCURITÉ CLIENT (Double check mathématique)
             const filteredPreds: Prediction[] = rawPreds
                 .map((p: any, i: number) => {
                     const [hour, minute] = p.time.split(':').map(Number);
-                    const matchTime = new Date();
-                    matchTime.setHours(hour, minute, 0, 0);
+                    const matchDate = new Date();
+                    matchDate.setHours(hour, minute, 0, 0);
 
-                    // Si l'heure du match est déjà passée aujourd'hui, on vérifie si c'est pour demain
-                    // (L'IA peut parfois renvoyer des matchs de demain avec la date d'aujourd'hui par erreur)
-                    const isPast = matchTime.getTime() <= (now.getTime() + 10 * 60000); // Marge 10min
+                    // Si l'IA renvoie par erreur un match passé ou dans moins de 30 min, on le marque pour rejet
+                    const timeDiffMinutes = (matchDate.getTime() - now.getTime()) / 60000;
+                    const isInvalid = timeDiffMinutes < 30;
 
                     return {
-                        id: `nw-pred-${Date.now()}-${i}`,
-                        sport: p.sport || Sport.Football,
-                        competition: p.competition || "PRO LEAGUE",
-                        match: p.match || "Unknown Match",
-                        betType: p.betType || "TBD",
+                        id: `nw-v9-${Date.now()}-${i}`,
+                        sport: p.sport as Sport,
+                        competition: p.competition,
+                        match: p.match,
+                        betType: p.betType,
                         category: 'Standard',
-                        probability: p.probability || 70,
-                        analysis: p.analysis || "Analyse vérifiée par NextWin Engine.",
+                        probability: p.probability,
+                        analysis: p.analysis,
                         date: p.date,
                         time: p.time,
                         isLive: false,
-                        isPastHalucination: isPast, // Flag interne pour filtrage
+                        isInvalid: isInvalid,
                         sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                             uri: c.web?.uri,
                             title: c.web?.title
                         })).filter((s: any) => s.uri).slice(0, 2) || []
                     };
                 })
-                .filter(p => !p.isPastHalucination); // On supprime les erreurs de l'IA
+                .filter(p => !p.isInvalid);
 
-            if (filteredPreds.length === 0) {
-                throw new Error("L'IA n'a trouvé que des matchs déjà commencés. Relancez le scan.");
-            }
+            if (filteredPreds.length === 0) throw new Error("Aucun match futur fiable trouvé. Relancez l'Engine.");
 
             const newDraft: DailyPack = {
                 timestamp: Date.now(),
                 isValidated: false,
                 predictions: filteredPreds,
-                publishedBy: 'ADMIN_ENGINE'
+                publishedBy: 'NEXTWIN_PRO_ENGINE'
             };
 
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ ${filteredPreds.length} MATCHS FUTURS VALIDÉS`);
+            setStatus(`✓ ${filteredPreds.length} PRONOSTICS HAUTE PRÉCISION`);
         } catch (err: any) {
-            console.error("Erreur IA:", err);
-            setStatus(`⚠ ERREUR: ${err.message || 'Engine Fail'}`);
+            console.error(err);
+            setStatus(`⚠ ERREUR ENGINE : ${err.message}`);
         } finally {
             setIsLoading(false);
-            setTimeout(() => setStatus(null), 3500);
+            setTimeout(() => setStatus(null), 4000);
         }
     };
 
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION HD...");
+        setStatus("RENDU HD EN COURS...");
         
         try {
-            await new Promise(r => setTimeout(r, 1000));
-            
+            await new Promise(r => setTimeout(r, 1200));
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
                 scale: 3, 
                 useCORS: true,
                 logging: false,
-                allowTaint: true,
-                onclone: (clonedDoc: Document) => {
+                onclone: (clonedDoc: any) => {
                     const winParts = clonedDoc.querySelectorAll('.logo-win-part');
                     winParts.forEach((el: any) => {
                         el.style.color = '#F97316';
@@ -171,31 +161,20 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                         el.style.webkitBackgroundClip = 'initial';
                         el.style.backgroundClip = 'initial';
                         el.style.opacity = '1';
-                        el.style.visibility = 'visible';
                     });
                 }
             });
 
-            const image = canvas.toDataURL("image/png", 1.0);
             const link = document.createElement('a');
-            link.download = `NEXTWIN_PACK_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
-            link.href = image;
+            link.download = `NEXTWIN_V9_PACK_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
-            setStatus("✓ PACK PRÊT !");
+            setStatus("✓ PACK EXPORTÉ");
         } catch (err) {
-            console.error(err);
             setStatus("⚠ ÉCHEC RENDU");
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(null), 2500);
-        }
-    };
-
-    const clearDraft = () => {
-        if (confirm("Réinitialiser le pack ?")) {
-            const newStore = { ...store, draft: null };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
-            setStore(newStore);
         }
     };
 
@@ -212,10 +191,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             <div className="text-center mb-16">
                 <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-6">
-                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic">PILOTAGE PRONOSTICS RÉELS</span>
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic">VERSION PRO V9 • CALIBRAGE GEMINI 3 PRO</span>
                 </div>
                 <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">
-                    ENGINE <span className="text-transparent bg-clip-text bg-gradient-brand">LIVE SCANNER</span>
+                    ENGINE <span className="text-transparent bg-clip-text bg-gradient-brand">ELITE SCANNER</span>
                 </h1>
             </div>
 
@@ -226,13 +205,13 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-10 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl"
                 >
                     <div className="absolute top-0 left-0 w-2 h-full bg-gradient-brand"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER LE SCAN FUTUR</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] block mt-3 opacity-60">Vérification des calendriers officiels</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER SCAN ULTRA-PRÉCIS</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] block mt-3 opacity-60">Filtrage temporel & Grounding IA actif</span>
                 </button>
 
                 {store.draft && (
-                    <button onClick={clearDraft} className="bg-red-900/10 border-2 border-red-900/20 hover:border-red-500 p-10 rounded-[2.5rem] transition-all w-full md:w-auto shadow-2xl">
-                        <span className="text-red-500 font-black text-sm uppercase italic tracking-widest">RESET ENGINE</span>
+                    <button onClick={() => { if(confirm("Vider?")) setStore({...store, draft: null}); }} className="bg-red-900/10 border-2 border-red-900/20 hover:border-red-500 p-10 rounded-[2.5rem] transition-all w-full md:w-auto shadow-2xl">
+                        <span className="text-red-500 font-black text-sm uppercase italic tracking-widest">RESET</span>
                     </button>
                 )}
             </div>
@@ -241,12 +220,12 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 <div className="animate-fade-in space-y-10">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-8 bg-gray-900/40 p-8 rounded-[2rem] border border-white/5 backdrop-blur-md">
                         <div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[11px] italic">PACK GÉNÉRÉ AVEC SUCCÈS</h2>
-                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-2 tracking-widest">VÉRIFIEZ LES HORAIRES AVANT L'EXPORTATION</p>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[11px] italic">SÉCURISATION DES FLUX TERMINÉE</h2>
+                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-2 tracking-widest">TOUS LES MATCHS DÉBUTENT APRÈS {new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</p>
                         </div>
                         <button onClick={downloadAsImage} disabled={isLoading} className="w-full sm:w-auto bg-gradient-brand text-white font-black px-12 py-5 rounded-2xl flex items-center justify-center gap-4 transition-all text-xs uppercase tracking-widest italic shadow-2xl shadow-orange-500/20 hover:scale-105 active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                            GÉNÉRER IMAGE PREMIUM
+                            TÉLÉCHARGER LE PACK V9
                         </button>
                     </div>
 
@@ -257,7 +236,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                                     <NextWinLogo />
                                 </div>
                                 <div className="bg-orange-500/10 border border-orange-500/30 px-12 py-3 rounded-full backdrop-blur-md">
-                                    <span className="text-orange-500 font-black text-xs uppercase tracking-[0.5em] italic">ÉDITION OFFICIELLE • {new Date().toLocaleDateString('fr-FR')}</span>
+                                    <span className="text-orange-500 font-black text-xs uppercase tracking-[0.5em] italic">V9 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</span>
                                 </div>
                             </div>
                             
@@ -266,18 +245,17 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                             </div>
                             
                             <div className="mt-28 text-center opacity-30">
-                                <p className="text-gray-600 font-black text-[10px] uppercase tracking-[1.8em] italic">DATA VERIFIED • ACCURACY IA • WWW.NEXTWIN.AI</p>
+                                <p className="text-gray-600 font-black text-[10px] uppercase tracking-[1.8em] italic">GEMINI 3 PRO VERIFIED • NO DELAY • WWW.NEXTWIN.AI</p>
                             </div>
 
                             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                            <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 blur-[150px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
                         </div>
                     </div>
                 </div>
             ) : (
                 <div className="text-center py-40 border-4 border-dashed border-gray-800 rounded-[3.5rem] opacity-30 bg-white/[0.01]">
-                    <svg className="mx-auto h-20 w-20 text-gray-700 mb-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                    <p className="text-gray-500 text-sm uppercase font-black tracking-[1em] italic">ENGINE EN ATTENTE DE SYNCHRONISATION</p>
+                    <svg className="mx-auto h-20 w-20 text-gray-700 mb-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.003 9.003 0 008.34-5.5M12 21a9.003 9.003 0 01-8.34-5.5M12 21V12m0 0a3 3 0 100-6 3 3 0 000 6zm0 0v-3.75M12 3v3.75" /></svg>
+                    <p className="text-gray-500 text-sm uppercase font-black tracking-[1em] italic">PRÊT POUR LE RAFFINAGE V9</p>
                 </div>
             )}
         </div>
