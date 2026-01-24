@@ -16,7 +16,6 @@ interface AdminStore {
 declare var html2canvas: any;
 
 const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ language, isAdmin }) => {
-    const t = translations[language];
     const [store, setStore] = useState<AdminStore>({ draft: null, history: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
@@ -130,23 +129,40 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
         setIsLoading(true);
         setStatus("OPTIMISATION DU RENDU...");
         try {
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 1200));
             const canvas = await html2canvas(previewContainerRef.current, {
-                backgroundColor: '#110f1f', scale: 3, useCORS: true,
+                backgroundColor: '#0f0f0f',
+                scale: 3, 
+                useCORS: true,
+                logging: false,
                 onclone: (cloned: any) => {
-                    cloned.querySelectorAll('.logo-win-part').forEach((el: any) => el.style.color = '#F97316');
+                    // FIX DU LOGO POUR L'EXPORT : html2canvas galère avec background-clip: text
+                    const logoWinPart = cloned.querySelector('.logo-win-part');
+                    if (logoWinPart) {
+                        logoWinPart.style.backgroundImage = 'none';
+                        logoWinPart.style.webkitBackgroundClip = 'initial';
+                        logoWinPart.style.backgroundClip = 'initial';
+                        logoWinPart.style.color = '#F97316'; // Couleur orange du thème
+                    }
                 }
             });
             const link = document.createElement('a');
-            link.download = `NEXTWIN_PACK_V10.png`;
-            link.href = canvas.toDataURL("image/png");
+            link.download = `NEXTWIN_V10_ELITE_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
             setStatus("✓ PACK EXPORTÉ");
-        } catch { setStatus("⚠ ÉCHEC RENDU"); }
-        finally { setIsLoading(false); setTimeout(() => setStatus(null), 2500); }
+        } catch (err) {
+            console.error(err);
+            setStatus("⚠ ÉCHEC RENDU");
+        } finally {
+            setIsLoading(false);
+            setTimeout(() => setStatus(null), 2500);
+        }
     };
 
     if (!isAdmin) return null;
+
+    const todayDate = new Date().toLocaleDateString('fr-FR');
 
     return (
         <div className="max-w-6xl mx-auto pb-20 px-4">
@@ -159,9 +175,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             <div className="text-center mb-16">
                 <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-6">
-                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic tracking-[0.3em]">GEMINI 3 PRO • ULTRA-FLOW</span>
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic tracking-[0.3em]">GEMINI 3 PRO • V10 ENGINE</span>
                 </div>
-                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">ENGINE <span className="text-transparent bg-clip-text bg-gradient-brand">ELITE PACK V10</span></h1>
+                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">ELITE <span className="text-transparent bg-clip-text bg-gradient-brand">PACK GENERATOR</span></h1>
             </div>
 
             <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
@@ -179,27 +195,44 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 <div className="animate-fade-in space-y-10">
                     <div className="bg-gray-900/40 p-8 rounded-[2rem] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
                         <div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] italic">FLUX DE DONNÉES SÉCURISÉ</h2>
-                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-1 tracking-widest">VÉRIFIEZ LES COTES AVANT L'EXPORTATION HD</p>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[11px] italic">FLUX DE DONNÉES SÉCURISÉ</h2>
+                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-1 tracking-widest">GÉNÉRATION HD DU PACK MEMBRES</p>
                         </div>
-                        <button onClick={downloadAsImage} disabled={isLoading} className="bg-gradient-brand text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 transition-all text-[10px] uppercase tracking-widest italic shadow-xl hover:scale-105">TÉLÉCHARGER LE PACK PREMIUM</button>
+                        <button onClick={downloadAsImage} disabled={isLoading} className="bg-gradient-brand text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 transition-all text-[10px] uppercase tracking-widest italic shadow-xl hover:scale-105 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                            TÉLÉCHARGER LE PACK V10
+                        </button>
                     </div>
 
+                    {/* ZONE DE CAPTURE - DESIGN IDENTIQUE À L'IMAGE MOCKUP */}
                     <div className="rounded-[3.5rem] overflow-hidden border-4 border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                        <div ref={previewContainerRef} className="bg-[#110f1f] p-16 relative overflow-hidden">
-                            <div className="flex flex-col items-center mb-24 relative z-10">
-                                <div className="mb-10 h-16 flex items-center justify-center"><NextWinLogo /></div>
-                                <div className="bg-orange-500/10 border border-orange-500/30 px-10 py-2.5 rounded-full backdrop-blur-md">
-                                    <span className="text-orange-500 font-black text-[10px] uppercase tracking-[0.6em] italic">V10 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</span>
+                        <div ref={previewContainerRef} className="bg-[#0f0f0f] p-16 relative overflow-hidden capture-zone">
+                            {/* Header Image */}
+                            <div className="flex flex-col items-center mb-16 relative z-10">
+                                <div className="mb-10 h-16 flex items-center justify-center scale-125">
+                                    <NextWinLogo />
+                                </div>
+                                <div className="bg-orange-500/10 border border-orange-500/30 px-16 py-3 rounded-full backdrop-blur-md">
+                                    <span className="text-orange-500 font-black text-xs uppercase tracking-[0.6em] italic">V10 ELITE EDITION • {todayDate}</span>
                                 </div>
                             </div>
+
+                            {/* Grid Predictions */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
-                                {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
+                                {store.draft.predictions.map(p => (
+                                    <PredictionCard key={p.id} prediction={p} />
+                                ))}
                             </div>
-                            <div className="mt-28 text-center opacity-30">
-                                <p className="text-gray-600 font-black text-[9px] uppercase tracking-[1.5em] italic">VERIFIED BY GEMINI 3 PRO • HIGH ACCURACY • WWW.NEXTWIN.AI</p>
+
+                            {/* Footer Image */}
+                            <div className="mt-24 text-center opacity-30">
+                                <p className="text-gray-600 font-black text-[10px] uppercase tracking-[1.5em] italic">VERIFIED BY GEMINI 3 PRO • HIGH ACCURACY</p>
+                                <p className="text-gray-700 font-black text-[10px] uppercase tracking-[1em] italic mt-4">WWW.NEXTWIN.AI</p>
                             </div>
-                            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+
+                            {/* Glows Backgrounds (Seulement visibles si l'export gère bien l'opacité) */}
+                            <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-orange-500/[0.03] blur-[180px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/[0.03] blur-[150px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
                         </div>
                     </div>
                 </div>
