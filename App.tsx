@@ -50,10 +50,12 @@ const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (user: User) => {
-    // SIMULATION ADMIN : Si le pseudo est "admin", on donne les droits de gestion
+    // SYSTEME ADMIN : Si le pseudo contient "admin" ou "NEXTWIN_BOSS", accès total
+    const isAdminAccount = user.username.toLowerCase().includes('admin') || user.username === 'NEXTWIN_BOSS';
+    
     const enhancedUser = {
         ...user,
-        isAdmin: user.username.toLowerCase() === 'admin'
+        isAdmin: isAdminAccount
     };
     setCurrentUser(enhancedUser);
     setIsSubscribed(true); 
