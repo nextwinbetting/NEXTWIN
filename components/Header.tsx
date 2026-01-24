@@ -18,13 +18,13 @@ const NavLink: React.FC<{ page: Page; currentPage: Page; onNavigate: (page: Page
     <div className="relative group flex flex-col items-center">
         <button
             onClick={() => onNavigate(page)}
-            className={`relative px-3 py-2 text-base font-bold transition-colors duration-300 ${currentPage === page ? 'text-white' : 'text-gray-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-brand'}`}
+            className={`relative px-2 py-2 text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-colors duration-300 ${currentPage === page ? 'text-white' : 'text-gray-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-brand'}`}
         >
             {children}
             <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-brand transition-transform duration-300 transform ${currentPage === page ? 'scale-x-100' : 'scale-x-0'}`}></span>
         </button>
         {hint && currentPage === page && (
-             <span className="absolute top-[110%] whitespace-nowrap text-[8px] font-black text-orange-500 uppercase tracking-[0.1em] bg-orange-500/5 border border-orange-500/20 px-3 py-1.5 rounded-full animate-pulse shadow-lg shadow-orange-500/5">
+             <span className="absolute top-[115%] whitespace-nowrap text-[8px] font-black text-orange-500 uppercase tracking-[0.05em] bg-orange-500/5 border border-orange-500/20 px-3 py-1.5 rounded-full animate-pulse shadow-xl">
                 {hint}
             </span>
         )}
@@ -34,7 +34,7 @@ const NavLink: React.FC<{ page: Page; currentPage: Page; onNavigate: (page: Page
 const MobileNavLink: React.FC<{ page: Page; currentPage: Page; onNavigate: (page: Page) => void; children: React.ReactNode }> = ({ page, currentPage, onNavigate, children }) => (
      <button
         onClick={() => onNavigate(page)}
-        className={`block w-full text-left rounded-md px-3 py-3 text-lg font-bold ${currentPage === page ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+        className={`block w-full text-left rounded-xl px-4 py-4 text-xs font-black uppercase tracking-widest ${currentPage === page ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
     >
         {children}
     </button>
@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
     
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 1024) { // lg breakpoint
+            if (window.innerWidth >= 1280) { // xl breakpoint adjusted for more items
                 setIsMenuOpen(false);
             }
         };
@@ -79,16 +79,16 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
     }
 
     return (
-        <header className="bg-brand-dark-blue/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
+        <header className="bg-brand-dark-blue/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-32">
+                <div className="flex items-center justify-between h-28 lg:h-32">
                     <div className="flex-shrink-0">
                          <button onClick={() => onNavigate(Page.Home)} className="focus:outline-none hover:scale-[1.02] transition-transform">
-                            <NextWinLogo className="h-10"/>
+                            <NextWinLogo className="h-8 lg:h-10"/>
                         </button>
                     </div>
 
-                    <nav className="hidden lg:flex items-center space-x-8">
+                    <nav className="hidden xl:flex items-center space-x-4 lg:space-x-6">
                         {isLoggedIn ? (
                             <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate} hint={t.nav_dashboard_hint}>
                                 {t.nav_dashboard}
@@ -98,46 +98,46 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                         )}
                     </nav>
                    
-                    <div className="flex items-center space-x-6">
-                        <div className="flex items-center border border-white/10 rounded-xl p-1 bg-gray-900/50">
-                            <button onClick={() => setLanguage('FR')} className={`px-4 py-1.5 rounded-lg transition-all text-[10px] font-black tracking-widest ${language === 'FR' ? 'bg-gradient-brand text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'}`}>FR</button>
-                            <button onClick={() => setLanguage('EN')} className={`px-4 py-1.5 rounded-lg transition-all text-[10px] font-black tracking-widest ${language === 'EN' ? 'bg-gradient-brand text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'}`}>EN</button>
+                    <div className="flex items-center space-x-3 lg:space-x-5">
+                        <div className="flex items-center border border-white/10 rounded-xl p-0.5 bg-gray-900/50 scale-90 lg:scale-100">
+                            <button onClick={() => setLanguage('FR')} className={`px-3 py-1.5 rounded-lg transition-all text-[9px] font-black tracking-widest ${language === 'FR' ? 'bg-gradient-brand text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'}`}>FR</button>
+                            <button onClick={() => setLanguage('EN')} className={`px-3 py-1.5 rounded-lg transition-all text-[9px] font-black tracking-widest ${language === 'EN' ? 'bg-gradient-brand text-white shadow-xl' : 'text-gray-500 hover:text-gray-300'}`}>EN</button>
                         </div>
-                        <div className="hidden lg:flex items-center">
+                        <div className="hidden lg:flex items-center space-x-4">
                             {isLoggedIn ? (
                                 <button
                                     onClick={onLogout}
-                                    className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-white bg-gray-800/80 hover:bg-gray-700 rounded-xl transition-all border border-white/5"
+                                    className="px-5 py-2.5 text-[9px] font-black uppercase tracking-widest text-white bg-gray-800 hover:bg-gray-700 rounded-xl transition-all border border-white/5"
                                 >
                                     {t.nav_logout}
                                 </button>
                             ) : (
-                                <div className="flex items-center space-x-6">
+                                <div className="flex items-center space-x-4">
                                     <button
                                         onClick={onShowLogin}
-                                        className="text-[11px] font-black uppercase tracking-widest text-white hover:text-orange-400 transition-colors"
+                                        className="text-[9px] font-black uppercase tracking-widest text-white hover:text-orange-400 transition-colors"
                                     >
                                         {t.nav_login}
                                     </button>
                                     <button
                                         onClick={() => onNavigate(Page.JoinUs)}
-                                        className="px-8 py-3.5 text-[11px] font-black uppercase tracking-widest text-white bg-gradient-brand hover:scale-105 rounded-xl transition-transform shadow-2xl shadow-orange-500/20"
+                                        className="px-6 py-3 text-[9px] font-black uppercase tracking-widest text-white bg-gradient-brand hover:scale-105 rounded-xl transition-transform shadow-2xl shadow-orange-500/10"
                                     >
                                         {t.nav_signup}
                                     </button>
                                 </div>
                             )}
                         </div>
-                         <div className="lg:hidden">
+                         <div className="xl:hidden">
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                                 type="button"
-                                className="inline-flex items-center justify-center p-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition-all"
+                                className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none transition-all"
                             >
                                 {isMenuOpen ? (
-                                    <svg className="block h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                                 ) : (
-                                    <svg className="block h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                                 )}
                             </button>
                         </div>
@@ -145,9 +145,9 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                 </div>
             </div>
 
-            {/* Mobile menu */}
-            <div className={`${isMenuOpen ? 'block' : 'hidden'} lg:hidden absolute left-0 w-full bg-brand-dark-blue/98 backdrop-blur-xl shadow-2xl z-50 border-b border-white/5`} id="mobile-menu">
-                <div className="px-6 pt-6 pb-8 space-y-2">
+            {/* Mobile menu - NON TRANSPARENT / SOLID BACKGROUND */}
+            <div className={`${isMenuOpen ? 'block' : 'hidden'} xl:hidden absolute left-0 w-full bg-[#110f1f] shadow-2xl z-50 border-b border-white/5 h-screen`} id="mobile-menu">
+                <div className="px-6 pt-6 pb-8 space-y-3">
                     {isLoggedIn ? (
                          <MobileNavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={() => handleMobileNav(Page.Dashboard)}>
                             {t.nav_dashboard}
@@ -160,12 +160,12 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                         ))
                     )}
                 </div>
-                 <div className="px-6 pb-10 border-t border-white/5 pt-8">
+                 <div className="px-6 pb-12 border-t border-white/5 pt-8">
                      <div className="space-y-4">
                          {isLoggedIn ? (
                              <button
                                 onClick={handleMobileLogout}
-                                className="block w-full text-center rounded-xl px-4 py-5 text-sm font-black uppercase tracking-widest text-gray-300 bg-gray-900 hover:bg-gray-800 transition-all"
+                                className="block w-full text-center rounded-xl px-4 py-5 text-xs font-black uppercase tracking-widest text-gray-300 bg-gray-900 hover:bg-gray-800 transition-all border border-white/5"
                             >
                                 {t.nav_logout}
                             </button>
@@ -173,13 +173,13 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                              <>
                                 <button
                                     onClick={handleMobileLogin}
-                                    className="block w-full text-center rounded-xl px-4 py-5 text-sm font-black uppercase tracking-widest text-gray-300 hover:text-white transition-all"
+                                    className="block w-full text-center rounded-xl px-4 py-5 text-xs font-black uppercase tracking-widest text-gray-300 hover:text-white transition-all border border-white/5"
                                 >
                                     {t.nav_login}
                                 </button>
                                 <button
                                     onClick={() => handleMobileNav(Page.JoinUs)}
-                                    className="block w-full text-center rounded-xl bg-gradient-brand px-4 py-5 text-sm font-black uppercase tracking-widest text-white shadow-2xl"
+                                    className="block w-full text-center rounded-xl bg-gradient-brand px-4 py-5 text-xs font-black uppercase tracking-widest text-white shadow-2xl"
                                 >
                                     {t.nav_signup}
                                 </button>

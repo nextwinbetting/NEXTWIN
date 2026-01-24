@@ -31,8 +31,8 @@ const NavItem: React.FC<{
             }`}
         >
             <div className={`absolute left-0 top-4 bottom-4 w-1 bg-gradient-brand rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
-            <div className={`w-5 h-5 mr-4 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
-            <span className="truncate text-[11px] font-black uppercase tracking-[0.1em]">{label}</span>
+            <div className={`w-4 h-4 mr-4 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
+            <span className="truncate text-[10px] font-black uppercase tracking-widest">{label}</span>
         </button>
     );
 };
@@ -46,11 +46,11 @@ const ExternalNavItem: React.FC<{
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center w-full px-5 py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1.5"
+        className="flex items-center w-full px-5 py-4 text-[10px] font-black uppercase tracking-widest rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1.5"
     >
-        <div className="w-5 h-5 mr-4 text-gray-600 group-hover:text-orange-400">{icon}</div>
+        <div className="w-4 h-4 mr-4 text-gray-600 group-hover:text-orange-400">{icon}</div>
         <span className="truncate">{label}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </a>
 );
 
@@ -137,7 +137,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
     return (
         <>
             <div 
-                className={`fixed inset-0 bg-black/80 z-40 md:hidden transition-opacity ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 bg-black z-40 md:hidden transition-opacity ${isSidebarOpen ? 'opacity-90' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setSidebarOpen(false)}
             ></div>
             <div className={`fixed top-0 left-0 h-full w-72 bg-brand-dark-blue border-r border-white/5 z-50 transform transition-transform md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
