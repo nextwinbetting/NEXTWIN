@@ -6,7 +6,7 @@ import { translations } from '../translations';
 import { GoogleGenAI } from "@google/genai";
 import NextWinLogo from '../components/NextWinLogo';
 
-const STORAGE_KEY = 'NEXTWIN_ADMIN_FLOW_V18_1';
+const STORAGE_KEY = 'NEXTWIN_ADMIN_FLOW_V19';
 
 interface AdminStore {
     draft: DailyPack | null;
@@ -36,7 +36,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("VÉRIFICATION DES CALENDRIERS RÉELS (FLASHSCORE/SOFASCORE)...");
+        setStatus("ANALYSE DES CALENDRIERS EN COURS...");
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
@@ -45,7 +45,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const dateToday = now.toLocaleDateString('fr-FR');
             const timeNow = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-            const prompt = `[SYSTEM: DEEP-SCHEDULE SCANNER V18.4]
+            const prompt = `[SYSTEM: SPORTS SCANNER]
             MISSION : Extraire les matchs RÉELS programmés.
             
             DONNÉES TEMPORELLES ACTUELLES :
@@ -55,8 +55,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             INSTRUCTIONS CRITIQUES :
             1. RECHERCHE WEB : Utilise l'outil Google Search pour trouver le "Calendrier Football", "Calendrier NBA" et "Tableau ATP/WTA" pour les dates du ${dateToday} et du lendemain.
             2. FILTRE DE RÉALITÉ : Ne propose QUE des matchs qui vont COMMENCER après ${timeNow} aujourd'hui ou demain.
-            3. HALLUCINATION INTERDITE : Si tu inventes un match ou que tu cites un match déjà terminé, c'est un échec critique. Vérifie l'état "Programmé" ou "À venir".
-            4. SITES DE RÉFÉRENCE : Flashscore.fr, SofaScore, LiveScore.in/fr/, ATPTour.com.
+            3. SITES DE RÉFÉRENCE : Flashscore.fr, SofaScore, LiveScore.in/fr/, ATPTour.com.
             
             FORMAT DE SORTIE (8 PRONOSTICS) :
             - 2 Football (Ligue réelle)
@@ -87,7 +86,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0 // Zéro créativité, 100% précision
+                    temperature: 0
                 }
             });
 
@@ -99,7 +98,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const rawPreds = data.predictions || [];
             
             const preds = rawPreds.map((p: any, i: number) => ({
-                id: `v18-4-${Date.now()}-${i}`,
+                id: `nw-pred-${Date.now()}-${i}`,
                 ...p,
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
@@ -117,9 +116,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ ${preds.length}/8 MATCHS RÉELS IDENTIFIÉS`);
+            setStatus(`✓ ${preds.length}/8 MATCHS IDENTIFIÉS`);
         } catch (err) {
-            setStatus("⚠ ERREUR DE SCAN CALENDRIER");
+            setStatus("⚠ ERREUR DE SCAN");
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -130,7 +129,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU VISUEL HD...");
+        setStatus("GÉNÉRATION DU VISUEL...");
         
         try {
             await new Promise(r => setTimeout(r, 800));
@@ -187,11 +186,14 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             )}
 
             <div className="text-center mb-16">
-                <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                    NEXTWIN <span className="text-orange-500">BOSS</span> V18.4
+                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-3 py-1 rounded-full mb-4">
+                    <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">PANNEAU ADMINISTRATEUR</span>
+                </div>
+                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">
+                    GÉNÉRATION DU <span className="text-orange-500">PACK</span> QUOTIDIEN
                 </h1>
-                <p className="mt-4 text-gray-500 text-[10px] uppercase tracking-[0.6em] font-black">
-                    DEEP-SCHEDULE SCANNER & HD EXPORT
+                <p className="mt-4 text-gray-500 text-[10px] uppercase tracking-[0.6em] font-black italic">
+                    SCAN DES FLUX ET EXPORT HD
                 </p>
             </div>
 
@@ -199,19 +201,19 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 <button 
                     onClick={generateIAPronostics} 
                     disabled={isLoading}
-                    className="bg-brand-card border-2 border-gray-800 hover:border-orange-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden"
+                    className="bg-brand-card border border-white/5 hover:border-orange-500/40 p-8 rounded-3xl transition-all group flex-1 max-w-lg relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block tracking-[0.1em]">SCANNER LES CALENDRIERS</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Vérification Réalité 100%</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER LE SCAN</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Vérification temps réel</span>
                 </button>
 
                 {store.draft && (
                     <button 
                         onClick={clearDraft}
-                        className="bg-red-900/10 border-2 border-red-900/30 hover:border-red-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-xs"
+                        className="bg-red-900/10 border border-red-900/20 hover:border-red-500 p-8 rounded-3xl transition-all group flex-1 max-w-xs"
                     >
-                        <span className="text-red-500 font-black text-xl uppercase italic tracking-tighter block uppercase">RESET</span>
+                        <span className="text-red-500 font-black text-xl uppercase italic tracking-tighter block">RESET</span>
                     </button>
                 )}
             </div>
@@ -220,55 +222,52 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 <div className="animate-fade-in">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
                         <div className="flex items-center gap-6 flex-1">
-                            <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">GRID 3-COLS PREMIUM (VISUEL HD)</h2>
-                            <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-orange-500/20"></div>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU DU VISUEL HD</h2>
+                            <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-orange-500/20"></div>
                         </div>
                         
                         <button 
                             onClick={downloadAsImage}
                             disabled={isLoading}
-                            className="bg-gradient-brand text-white font-black px-12 py-5 rounded-2xl flex items-center gap-4 transition-all transform hover:scale-105 shadow-[0_0_40px_rgba(249,115,22,0.4)] text-[11px] uppercase tracking-[0.2em] italic"
+                            className="bg-gradient-brand text-white font-black px-12 py-5 rounded-2xl flex items-center gap-4 transition-all transform hover:scale-105 shadow-xl text-[11px] uppercase tracking-[0.2em] italic"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            EXPORTER LE VISUEL HD
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            TÉLÉCHARGER LE PACK
                         </button>
                     </div>
 
                     <div 
                         ref={previewContainerRef} 
                         id="capture-target"
-                        className="bg-brand-dark-blue rounded-[5rem] p-12 border border-gray-800/50 relative overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]"
+                        className="bg-brand-dark-blue rounded-[3rem] p-12 border border-white/5 relative overflow-hidden shadow-2xl"
                     >
                         <div className="flex flex-col items-center mb-24 relative z-10">
-                            <NextWinLogo className="h-28 mb-8" />
-                            <div className="bg-orange-500/10 border-2 border-orange-500/30 px-12 py-3 rounded-full backdrop-blur-md">
-                                <span className="text-orange-500 font-black text-xs uppercase tracking-[0.6em] italic">PACK OFFICIEL IA • {new Date().toLocaleDateString('fr-FR')}</span>
+                            <NextWinLogo className="h-20 mb-8" />
+                            <div className="bg-orange-500/10 border border-orange-500/20 px-10 py-2 rounded-full backdrop-blur-md">
+                                <span className="text-orange-500 font-black text-[10px] uppercase tracking-[0.6em] italic">PACK OFFICIEL IA • {new Date().toLocaleDateString('fr-FR')}</span>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10 justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10 justify-center">
                             {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                         </div>
 
-                        <div className="mt-28 text-center pt-16 border-t border-gray-800/50 relative z-10">
-                            <p className="text-gray-500 font-black text-[11px] uppercase tracking-[1em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.4</p>
-                            <p className="text-gray-700 font-bold text-[8px] uppercase tracking-[0.3em] mt-8 px-32 leading-relaxed opacity-60">
-                                Les pronostics sont fournis à titre informatif. Le jeu comporte des risques : endettement, isolement, dépendance. Appelez le 09-74-75-13-13. Interdit aux mineurs.
-                            </p>
+                        <div className="mt-28 text-center pt-16 border-t border-white/5 relative z-10">
+                            <p className="text-gray-600 font-black text-[9px] uppercase tracking-[1em] italic leading-loose">ANALYSE PRÉDICTIVE • WWW.NEXTWIN.AI</p>
                         </div>
 
-                        <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-orange-500/5 rounded-full blur-[250px]"></div>
-                        <div className="absolute bottom-0 left-0 w-[900px] h-[900px] bg-purple-500/5 rounded-full blur-[250px]"></div>
+                        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[200px]"></div>
+                        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-[200px]"></div>
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-40 border-2 border-dashed border-gray-800 rounded-[5rem] bg-gray-900/10">
-                    <div className="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
-                        <svg className="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <div className="text-center py-40 border border-dashed border-gray-800 rounded-[3rem] bg-gray-900/10">
+                    <div className="w-20 h-20 bg-gray-800/30 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                        <svg className="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <h3 className="text-gray-600 font-black uppercase text-xl tracking-[0.3em] italic">DEEP SCANNER READY</h3>
-                    <p className="text-gray-800 text-xs uppercase font-bold tracking-[0.4em] mt-4 italic">Recherche de calendrier en direct sur le web</p>
+                    <h3 className="text-gray-600 font-black uppercase text-lg tracking-[0.3em] italic">EN ATTENTE DE GÉNÉRATION</h3>
+                    <p className="text-gray-800 text-[10px] uppercase font-bold tracking-[0.4em] mt-4 italic">Utilisez le bouton ci-dessus pour scanner les matchs</p>
                 </div>
             )}
         </div>
