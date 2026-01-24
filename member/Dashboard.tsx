@@ -10,6 +10,7 @@ import DashboardHome from './DashboardHome';
 import Support from './Support';
 import Analyzer from './Analyzer';
 import Archives from './Archives';
+import DailyPicks from './DailyPicks';
 import DashboardSidebar from './DashboardSidebar';
 import { Language, DashboardNav, Page, User, ArchivedAnalysis } from '../types';
 
@@ -52,6 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
+            [DashboardNav.DailyPicks]: isSubscribed ? <DailyPicks language={language} currentUser={currentUser} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Predictions]: currentUser.isAdmin ? <Predictions language={language} isAdmin={true} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Archives]: isSubscribed ? <Archives archives={archivedAnalyses} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,

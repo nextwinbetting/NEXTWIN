@@ -71,13 +71,21 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 label={t.dash_nav_home} 
                 icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>} 
             />
+
+            <NavItem 
+                page={DashboardNav.DailyPicks} 
+                activePage={activePage} 
+                setActivePage={setActivePage} 
+                label="PRONOSTICS DU JOUR" 
+                icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>} 
+            />
             
             {currentUser.isAdmin && (
                 <NavItem 
                     page={DashboardNav.Predictions} 
                     activePage={activePage} 
                     setActivePage={setActivePage} 
-                    label={t.dash_nav_predictions} 
+                    label="GÉNÉRATEUR V10 (ADMIN)" 
                     icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>} 
                 />
             )}
