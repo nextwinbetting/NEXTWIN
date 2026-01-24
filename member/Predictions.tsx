@@ -76,7 +76,6 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             });
 
             const text = response.text || "";
-            // Robust JSON extraction
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("Format de réponse invalide.");
 
@@ -87,7 +86,6 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 throw new Error("Aucun match trouvé.");
             }
 
-            // Fix type error by explicitly typing the array as Prediction[] to satisfy the literal union for 'category'
             const preds: Prediction[] = rawPreds.map((p: any, i: number) => ({
                 id: `nw-pred-${Date.now()}-${i}`,
                 sport: p.sport || Sport.Football,
@@ -128,22 +126,37 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("RENDU VISUEL HD...");
+        setStatus("GÉNÉRATION HD...");
         
         try {
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 1000));
+            
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
-                scale: 2.5, 
-                useCORS: true
+                scale: 3, 
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                onclone: (clonedDoc: Document) => {
+                    // FIX : On s'assure que la partie "Win" du logo est visible si le dégradé échoue
+                    const winParts = clonedDoc.querySelectorAll('.logo-win-part');
+                    winParts.forEach((el: any) => {
+                        el.style.color = '#F97316'; // Fallback orange solide pour l'export
+                        el.style.backgroundImage = 'none';
+                        el.style.webkitBackgroundClip = 'initial';
+                        el.style.backgroundClip = 'initial';
+                    });
+                }
             });
+
             const image = canvas.toDataURL("image/png", 1.0);
             const link = document.createElement('a');
-            link.download = `NextWin_Pack_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
+            link.download = `NEXTWIN_PACK_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
             link.href = image;
             link.click();
-            setStatus("✓ TÉLÉCHARGÉ");
+            setStatus("✓ PACK PRÊT !");
         } catch (err) {
+            console.error(err);
             setStatus("⚠ ÉCHEC RENDU");
         } finally {
             setIsLoading(false);
@@ -162,72 +175,85 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     if (!isAdmin) return null;
 
     return (
-        <div className="max-w-5xl mx-auto pb-20 animate-fade-in px-4">
+        <div className="max-w-6xl mx-auto pb-20 animate-fade-in px-4">
             {status && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#110f1f] border border-orange-500/40 text-white px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-2xl flex items-center gap-4">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#110f1f] border border-orange-500/40 text-white px-10 py-5 rounded-2xl shadow-2xl backdrop-blur-2xl flex items-center gap-4">
                     <div className="h-2 w-2 rounded-full bg-orange-500 animate-ping"></div>
-                    <span className="font-black text-[10px] uppercase tracking-[0.2em] italic">{status}</span>
+                    <span className="font-black text-[11px] uppercase tracking-[0.2em] italic">{status}</span>
                 </div>
             )}
 
-            <div className="text-center mb-12">
-                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-4 py-1.5 rounded-full mb-4">
-                    <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest italic">CONSOLE ADMIN ENGINE</span>
+            <div className="text-center mb-16">
+                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-6">
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic">CONSOLE ADMIN ENGINE</span>
                 </div>
-                <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">
-                    PILOTAGE DU <span className="text-orange-500">PACK PREMIUM</span>
+                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">
+                    PILOTAGE DU <span className="text-transparent bg-clip-text bg-gradient-brand">PACK PREMIUM</span>
                 </h1>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6 mb-16">
+            <div className="flex flex-col md:flex-row justify-center gap-8 mb-20">
                 <button 
                     onClick={generateIAPronostics} 
                     disabled={isLoading}
-                    className="bg-brand-card border border-white/5 hover:border-orange-500/40 p-8 rounded-3xl transition-all group flex-1 max-w-md relative overflow-hidden"
+                    className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-10 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl"
                 >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-brand"></div>
-                    <span className="text-white font-black text-lg uppercase italic tracking-tighter block">LANCER LE SCAN IA TEMPS RÉEL</span>
-                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-[0.3em] block mt-2 opacity-50 group-hover:opacity-100 transition-opacity">Vérification des calendriers mondiaux</span>
+                    <div className="absolute top-0 left-0 w-2 h-full bg-gradient-brand"></div>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER LE SCAN IA</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] block mt-3 opacity-60">Synchronisation mondiale active</span>
                 </button>
 
                 {store.draft && (
-                    <button onClick={clearDraft} className="bg-red-900/10 border border-red-900/20 hover:border-red-500 p-8 rounded-3xl transition-all w-full md:w-auto">
-                        <span className="text-red-500 font-black text-xs uppercase italic tracking-widest">RESET</span>
+                    <button onClick={clearDraft} className="bg-red-900/10 border-2 border-red-900/20 hover:border-red-500 p-10 rounded-[2.5rem] transition-all w-full md:w-auto shadow-2xl">
+                        <span className="text-red-500 font-black text-sm uppercase italic tracking-widest">RESET ENGINE</span>
                     </button>
                 )}
             </div>
 
             {store.draft ? (
-                <div className="animate-fade-in">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-10 bg-gray-900/50 p-6 rounded-3xl border border-white/5">
+                <div className="animate-fade-in space-y-10">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-8 bg-gray-900/40 p-8 rounded-[2rem] border border-white/5 backdrop-blur-md">
                         <div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.3em] text-[10px] italic">APERÇU DU PACK IA</h2>
-                            <p className="text-gray-500 text-[8px] font-bold uppercase mt-1 tracking-widest">{store.draft.predictions.length} ÉVÉNEMENTS DÉTECTÉS</p>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[11px] italic">PACK GÉNÉRÉ AVEC SUCCÈS</h2>
+                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-2 tracking-widest">VÉRIFIEZ LE RENDU AVANT LE TÉLÉCHARGEMENT</p>
                         </div>
-                        <button onClick={downloadAsImage} disabled={isLoading} className="w-full sm:w-auto bg-gradient-brand text-white font-black px-10 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all text-[10px] uppercase tracking-widest italic shadow-xl shadow-orange-500/20 hover:scale-105">
-                            TÉLÉCHARGER LE VISUEL HD
+                        <button onClick={downloadAsImage} disabled={isLoading} className="w-full sm:w-auto bg-gradient-brand text-white font-black px-12 py-5 rounded-2xl flex items-center justify-center gap-4 transition-all text-xs uppercase tracking-widest italic shadow-2xl shadow-orange-500/20 hover:scale-105 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                            TÉLÉCHARGER L'IMAGE HD
                         </button>
                     </div>
 
-                    <div ref={previewContainerRef} className="bg-[#110f1f] rounded-[3.5rem] p-12 border border-white/10 relative overflow-hidden shadow-2xl">
-                        <div className="flex flex-col items-center mb-20 relative z-10">
-                            <NextWinLogo className="h-12 mb-8" />
-                            <div className="bg-orange-500/10 border border-orange-500/30 px-10 py-2.5 rounded-full backdrop-blur-md">
-                                <span className="text-orange-500 font-black text-[10px] uppercase tracking-[0.4em] italic">ÉDITION OFFICIELLE • {new Date().toLocaleDateString('fr-FR')}</span>
+                    {/* Zone de capture HD */}
+                    <div className="rounded-[3.5rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] border-4 border-white/5">
+                        <div ref={previewContainerRef} className="bg-[#110f1f] p-16 relative overflow-hidden capture-zone">
+                            {/* Éléments de Branding Exportation */}
+                            <div className="flex flex-col items-center mb-24 relative z-10">
+                                <div className="mb-10 h-20 flex items-center justify-center">
+                                    <NextWinLogo />
+                                </div>
+                                <div className="bg-orange-500/10 border border-orange-500/30 px-12 py-3 rounded-full backdrop-blur-md">
+                                    <span className="text-orange-500 font-black text-xs uppercase tracking-[0.5em] italic">ÉDITION OFFICIELLE • {new Date().toLocaleDateString('fr-FR')}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
-                            {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
-                        </div>
-                        <div className="mt-24 text-center opacity-40">
-                            <p className="text-gray-600 font-black text-[9px] uppercase tracking-[1.5em] italic">ANALYSE PRÉDICTIVE • HAUTE PRÉCISION • WWW.NEXTWIN.AI</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
+                                {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
+                            </div>
+                            
+                            <div className="mt-28 text-center opacity-30">
+                                <p className="text-gray-600 font-black text-[10px] uppercase tracking-[1.8em] italic">PRECISION IA • ANALYSE PRO • WWW.NEXTWIN.AI</p>
+                            </div>
+
+                            {/* Décors subtils pour l'export */}
+                            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 blur-[150px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-32 border-2 border-dashed border-gray-800 rounded-[3rem] opacity-20 bg-white/[0.01]">
-                    <svg className="mx-auto h-16 w-16 text-gray-600 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9.75 17L9 21l-3.5-3.5L2 21l.75-7.25M21 3v6h-6m6-6L14 10" /></svg>
-                    <p className="text-gray-500 text-[11px] uppercase font-black tracking-[0.6em] italic">AUCUNE DONNÉE DANS LE FLUX ACTUEL</p>
+                <div className="text-center py-40 border-4 border-dashed border-gray-800 rounded-[3.5rem] opacity-30 bg-white/[0.01]">
+                    <svg className="mx-auto h-20 w-20 text-gray-700 mb-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                    <p className="text-gray-500 text-sm uppercase font-black tracking-[1em] italic">MOTEUR IA EN ATTENTE DE FLUX</p>
                 </div>
             )}
         </div>
