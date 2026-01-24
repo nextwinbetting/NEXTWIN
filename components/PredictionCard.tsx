@@ -22,9 +22,9 @@ const getProbabilityColor = (prob: number): string => {
 };
 
 const getBadgeText = (prob: number): string => {
-    if (prob >= 80) return 'VERY HIGH';
-    if (prob >= 70) return 'HIGH';
-    return 'MODERATE';
+    if (prob >= 80) return 'TRÈS ÉLEVÉ';
+    if (prob >= 70) return 'ÉLEVÉ';
+    return 'MODÉRÉ';
 }
 
 const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) => {
@@ -32,13 +32,9 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
         <div className="bg-brand-card border border-gray-800 rounded-xl p-5 flex flex-col h-full space-y-4 transition-all duration-300 hover:border-orange-500/50 hover:shadow-2xl hover:shadow-orange-900/20">
             <div className="flex justify-between items-start">
                 <div>
-                    <div className="flex items-center text-xs text-brand-light-gray space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                        <span>{prediction.date}</span>
-                    </div>
-                    <div className="flex items-center text-xs text-brand-light-gray space-x-2 mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span>{prediction.time} (Paris)</span>
+                    <div className="flex items-center text-[10px] text-brand-light-gray space-x-2 font-black uppercase tracking-widest">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <span>{prediction.date} • {prediction.time}</span>
                     </div>
                 </div>
                 <div className="flex items-center text-orange-400">
@@ -47,31 +43,44 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
             </div>
 
             <div>
-                <span className={`text-xs font-bold px-2 py-1 rounded-full ${getProbabilityColor(prediction.probability).replace('bg-', 'bg-').replace('500', '900/50')} ${getProbabilityColor(prediction.probability).replace('bg-', 'text-')}`}>{getBadgeText(prediction.probability)}</span>
+                <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${getProbabilityColor(prediction.probability).replace('bg-', 'bg-').replace('500', '900/50')} ${getProbabilityColor(prediction.probability).replace('bg-', 'text-')}`}>{getBadgeText(prediction.probability)}</span>
             </div>
 
             <div className="flex-grow">
-                <h3 className="text-lg font-bold text-white">{prediction.match}</h3>
-                <p className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-brand">{prediction.betType}</p>
+                <h3 className="text-xl font-black text-white italic tracking-tight">{prediction.match}</h3>
+                <p className="text-sm font-bold text-transparent bg-clip-text bg-gradient-brand uppercase mt-1 italic">{prediction.betType}</p>
             </div>
 
             <div className="space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                    <span className="text-brand-light-gray">PROBABILITÉ</span>
-                    <span className="font-bold text-white">{prediction.probability}%</span>
+                <div className="flex justify-between items-center text-[9px] font-black tracking-widest text-brand-light-gray">
+                    <span>INDICE DE CONFIANCE</span>
+                    <span className="text-white">{prediction.probability}%</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
                     <div
-                        className={`h-2 rounded-full ${getProbabilityColor(prediction.probability)}`}
+                        className={`h-full rounded-full transition-all duration-1000 ${getProbabilityColor(prediction.probability)} shadow-[0_0_10px_rgba(255,255,255,0.2)]`}
                         style={{ width: `${prediction.probability}%` }}
                     ></div>
                 </div>
             </div>
 
-            <div className="border-t border-gray-800 pt-3">
-                <p className="text-xs text-brand-light-gray font-semibold">ANALYSE FLASH</p>
-                <p className="text-sm text-gray-300 mt-1">{prediction.analysis}</p>
+            <div className="border-t border-gray-800/50 pt-3">
+                <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">Analyse Engine</p>
+                <p className="text-xs text-gray-300 leading-relaxed font-medium italic">"{prediction.analysis}"</p>
             </div>
+
+            {prediction.sources && prediction.sources.length > 0 && (
+                <div className="pt-2">
+                    <p className="text-[8px] text-gray-600 font-black uppercase mb-1">Sources de vérification :</p>
+                    <div className="flex flex-wrap gap-1">
+                        {prediction.sources.map((source, idx) => (
+                            <a key={idx} href={source.uri} target="_blank" rel="noopener noreferrer" className="text-[8px] bg-gray-900 border border-gray-800 px-2 py-1 rounded text-blue-500 hover:text-white transition-colors truncate max-w-[100px]">
+                                {source.title || "Vérifier source"}
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

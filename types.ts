@@ -1,3 +1,4 @@
+
 export enum Page {
   Home = 'ACCUEIL',
   HowItWorks = 'COMMENT ÇA MARCHE ?',
@@ -47,6 +48,11 @@ export interface User {
   email: string;
 }
 
+export interface GroundingSource {
+  uri: string;
+  title: string;
+}
+
 export interface Prediction {
   id: string;
   sport: Sport;
@@ -57,6 +63,7 @@ export interface Prediction {
   probability: number;
   analysis: string;
   status?: 'won' | 'lost' | 'pending';
+  sources?: GroundingSource[];
 }
 
 export interface Bankroll {
@@ -81,11 +88,6 @@ export interface Bet {
 export interface FaqItem {
     question: string;
     answer: string;
-}
-
-export interface GroundingSource {
-  uri: string;
-  title: string;
 }
 
 export interface AnalysisResult {
