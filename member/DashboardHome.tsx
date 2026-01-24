@@ -80,11 +80,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                 <InfoCard
                     featured
                     badge="FLUX ACTIF"
-                    title="PRONOSTICS DU JOUR"
-                    description="Accédez au pack officiel V10 certifié du jour. 6 Élite + 2 Bonus inclus."
-                    cta="VOIR LE PACK"
-                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>}
-                    onClick={() => setActivePage(DashboardNav.DailyPicks)}
+                    title={t.dash_home_card1_title}
+                    description={t.dash_home_card1_desc}
+                    cta={t.dash_home_card1_cta}
+                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>}
+                    onClick={() => setActivePage(DashboardNav.Predictions)}
                 />
                  <InfoCard
                     title={t.dash_home_card3_title}

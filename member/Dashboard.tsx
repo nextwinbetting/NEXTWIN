@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Predictions from './Predictions';
 import BankrollManagement from './BankrollManagement';
 import Subscription from './Subscription';
@@ -10,9 +10,11 @@ import DashboardHome from './DashboardHome';
 import Support from './Support';
 import Analyzer from './Analyzer';
 import Archives from './Archives';
-import DailyPicks from './DailyPicks';
 import DashboardSidebar from './DashboardSidebar';
 import { Language, DashboardNav, Page, User, ArchivedAnalysis } from '../types';
+
+// Lazy loading the new member predictions view
+const PredictionsMember = lazy(() => import('./PredictionsMember'));
 
 interface DashboardProps {
     currentUser: User;
@@ -45,7 +47,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             betType: data.betType,
             analysisDate: new Date().toLocaleDateString('fr-FR')
         };
-        const updated = [newArchive, ...archivedAnalyses].slice(0, 50); // Garder les 50 dernières
+        const updated = [newArchive, ...archivedAnalyses].slice(0, 50);
         setArchivedAnalyses(updated);
         localStorage.setItem(STORAGE_ARCHIVES, JSON.stringify(updated));
     };
@@ -53,8 +55,15 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
-            [DashboardNav.DailyPicks]: isSubscribed ? <DailyPicks language={language} currentUser={currentUser} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
-            [DashboardNav.Predictions]: currentUser.isAdmin ? <Predictions language={language} isAdmin={true} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            [DashboardNav.Predictions]: isSubscribed ? (
+                currentUser.isAdmin ? (
+                    <Predictions language={language} isAdmin={true} />
+                ) : (
+                    <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500"></div></div>}>
+                        <PredictionsMember language={language} />
+                    </Suspense>
+                )
+            ) : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Archives]: isSubscribed ? <Archives archives={archivedAnalyses} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,

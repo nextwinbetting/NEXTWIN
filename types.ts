@@ -22,8 +22,7 @@ export type Language = 'FR' | 'EN';
 
 export enum DashboardNav {
   DashboardHome = "TABLEAU DE BORD",
-  DailyPicks = "PRONOSTICS_DU_JOUR",
-  Predictions = "GÉNÉRATEUR_ADMIN",
+  Predictions = "PRONOSTICS",
   Analyzer = "ANALYSEUR",
   Strategy = "STRATÉGIE",
   Bankroll = "BANKROLL",
@@ -62,12 +61,12 @@ export interface Prediction {
   match: string;
   betType: string;
   marketType?: string;
-  category: 'Standard' | 'Bonus Football' | 'Bonus Basket';
+  category: 'Standard' | 'Bonus' | 'Gift';
   date: string;
   time: string;
   probability: number;
   analysis: string;
-  status?: 'won' | 'lost' | 'pending';
+  status?: 'won' | 'lost' | 'pending' | 'confirmed';
   sources?: GroundingSource[];
   isLive?: boolean;
 }
