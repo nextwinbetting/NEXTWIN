@@ -62,14 +62,14 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
               "predictions": [
                 {
                   "sport": "Football",
-                  "competition": "Nom exact de la ligue",
-                  "match": "Équipe A vs Équipe B",
-                  "betType": "Type de pari en français",
+                  "competition": "Ligue 1",
+                  "match": "PSG vs Marseille",
+                  "betType": "Victoire PSG",
                   "category": "Standard",
-                  "date": "JJ.MM.AAAA",
-                  "time": "HH:MM",
+                  "date": "25.05.2024",
+                  "time": "21:00",
                   "probability": 85,
-                  "analysis": "Analyse technique flash en français (2 phrases)."
+                  "analysis": "Analyse technique basée sur les derniers flux de données."
                 }
               ]
             }`;
@@ -120,7 +120,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU VISUEL PREMIUM HD...");
+        setStatus("GÉNÉRATION DU VISUEL PREMIUM HD (3x3)...");
         
         try {
             // Pause pour rendu parfait
@@ -128,7 +128,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
-                scale: 3, // Ultra HD pour réseaux sociaux
+                scale: 3, // Ultra HD
                 useCORS: true,
                 logging: false,
                 allowTaint: true,
@@ -136,7 +136,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     const el = clonedDoc.getElementById('capture-target');
                     if (el) {
                         el.style.padding = '80px';
-                        el.style.width = '1400px'; // Format large pro
+                        el.style.width = '1600px'; // Un peu plus large pour 3 colonnes
+                        el.style.borderRadius = '0px'; // Suppression pour l'export image pur
                     }
                 }
             });
@@ -211,7 +212,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
                         <div className="flex items-center gap-6 flex-1">
                             <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU ORIENTÉ CLIENT</h2>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU ORIENTÉ CLIENT (3 PAR RANGÉE)</h2>
                             <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
                         </div>
                         
@@ -225,7 +226,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                         </button>
                     </div>
 
-                    {/* SECTION DE CAPTURE RÉELLE */}
+                    {/* SECTION DE CAPTURE RÉELLE - MODIFIÉE POUR 3 COLONNES */}
                     <div 
                         ref={previewContainerRef} 
                         id="capture-target"
@@ -239,19 +240,20 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 relative z-10">
+                        {/* GRILLE : Passage à 3 colonnes (lg:grid-cols-3) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10 justify-center">
                             {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                         </div>
 
                         {/* Footer Export Pro */}
-                        <div className="mt-20 text-center pt-12 border-t border-gray-800/50 relative z-10">
+                        <div className="mt-24 text-center pt-12 border-t border-gray-800/50 relative z-10">
                             <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.8em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.1</p>
                             <p className="text-gray-700 font-bold text-[8px] uppercase tracking-[0.3em] mt-6 px-20 leading-relaxed">
                                 Les pronostics sont fournis à titre informatif. Le jeu comporte des risques : endettement, isolement, dépendance. Appelez le 09-74-75-13-13. Interdit aux mineurs.
                             </p>
                         </div>
 
-                        {/* Effets de fond stylisés pour l'image */}
+                        {/* Effets de fond stylisés */}
                         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[200px]"></div>
                         <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-[200px]"></div>
                     </div>
