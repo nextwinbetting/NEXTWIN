@@ -5,66 +5,55 @@ import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
 import { GoogleGenAI } from "@google/genai";
 
-// VERSION 14 - MASTER STORAGE SYSTEM
-const STORAGE_KEY = 'NEXTWIN_CMD_CONTROL_V14';
+// VERSION 15 - ADMIN CONSOLE ONLY
+const STORAGE_KEY = 'NEXTWIN_ADMIN_FLOW_V15';
 
-interface MasterStore {
+interface AdminStore {
     draft: DailyPack | null;
-    public: DailyPack | null;
-    lastUpdate: number;
+    history: DailyPack[];
 }
 
-const Predictions: React.FC<{ language: Language; isAdmin?: boolean }> = ({ language, isAdmin = false }) => {
+const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ language, isAdmin }) => {
     const t = translations[language];
-    const [activeSport, setActiveSport] = useState<Sport | 'ALL'>('ALL');
-    const [store, setStore] = useState<MasterStore>({ draft: null, public: null, lastUpdate: 0 });
+    const [store, setStore] = useState<AdminStore>({ draft: null, history: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
 
-    // 1. SYNCHRONISATION MASTER
-    const syncStore = () => {
+    const sync = () => {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            try {
-                const data = JSON.parse(raw);
-                setStore(data);
-            } catch (e) {
-                console.error("Store corrupt");
-            }
-        }
+        if (raw) setStore(JSON.parse(raw));
     };
 
     useEffect(() => {
-        syncStore();
-        window.addEventListener('storage', syncStore);
-        const interval = setInterval(syncStore, 2000);
-        return () => {
-            window.removeEventListener('storage', syncStore);
-            clearInterval(interval);
-        };
+        sync();
+        window.addEventListener('storage', sync);
+        return () => window.removeEventListener('storage', sync);
     }, []);
 
-    // 2. MOTEUR D'ANALYSE IA (ADMIN ONLY)
-    const runIAAnalysis = async () => {
+    // MOTEUR D'ANALYSE EXPERT V15
+    const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("CONNEXION AUX FLUX LIVESCORE / SOFASCORE...");
+        setStatus("SCAN DES FLUX LIVESCORE.IN (SCHEDULES)...");
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
             
-            const prompt = `[ROLE: CHIEF ANALYST NEXTWIN]
-            MISSION: Generate exactly 8 professional predictions for TODAY.
+            // PROMPT V15 : EXTRÊME PRÉCISION SUR LES DATES ET HEURES
+            const prompt = `[ROLE: CHIEF SPORTS DATA ANALYST]
+            GOAL: Generate 8 ultra-reliable sports predictions (6 Standard + 2 Bonus) for the next 24 hours.
             
-            STRUCTURE:
-            - 2 Football (Winners)
-            - 2 Basketball (Winners)
-            - 2 Tennis (Winners)
-            - 1 Bonus Football (BTTS Market)
-            - 1 Bonus Basketball (Total Points Market)
+            MANDATORY STEPS:
+            1. Access LiveScore.in/fr/ and SofaScore to find TODAYS exact matches and schedules.
+            2. Match times MUST be in Paris (CET/CEST) timezone. No fictional times.
+            3. Probability filter: min 70% per pick.
             
-            SOURCES: Use Google Search to verify exact match times (Paris Time) on LiveScore.in and probabilities on SofaScore.
-            FILTER: Only select outcomes with probability >= 70%.
+            PACK STRUCTURE:
+            - Football: 2 most probable winners.
+            - Basketball: 2 most probable winners.
+            - Tennis: 2 most probable winners.
+            - BONUS Football: 1 "Both Teams to Score - Yes" with prob >= 70%.
+            - BONUS Basketball: 1 "Total Points Over/Under" with prob >= 70%.
             
-            OUTPUT JSON:
+            JSON OUTPUT ONLY:
             {
               "predictions": [
                 {
@@ -74,14 +63,14 @@ const Predictions: React.FC<{ language: Language; isAdmin?: boolean }> = ({ lang
                   "category": "Standard",
                   "date": "DD.MM.YYYY",
                   "time": "HH:MM",
-                  "probability": 78,
-                  "analysis": "Short professional flash analysis."
+                  "probability": 75,
+                  "analysis": "Technical reason from stats."
                 }
               ]
             }`;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-3-pro-preview',
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
@@ -91,11 +80,11 @@ const Predictions: React.FC<{ language: Language; isAdmin?: boolean }> = ({ lang
 
             const text = response.text || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("Format IA Invalide");
+            if (!jsonMatch) throw new Error("Format Invalide");
 
             const data = JSON.parse(jsonMatch[0]);
             const preds = data.predictions.map((p: any, i: number) => ({
-                id: `v14-${Date.now()}-${i}`,
+                id: `v15-${Date.now()}-${i}`,
                 ...p,
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
@@ -110,136 +99,84 @@ const Predictions: React.FC<{ language: Language; isAdmin?: boolean }> = ({ lang
                 publishedBy: 'NEXTWIN_BOSS'
             };
 
-            const updatedStore = { ...store, draft: newDraft, lastUpdate: Date.now() };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedStore));
-            setStore(updatedStore);
-            setStatus("✓ BROUILLON 6+2 GÉNÉRÉ");
+            const newStore = { ...store, draft: newDraft };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
+            setStore(newStore);
+            setStatus("✓ PRONOSTICS RÉELS EXTRAITS AVEC SUCCÈS");
         } catch (err) {
-            setStatus("⚠ ERREUR DE SYNCHRONISATION");
+            setStatus("⚠ ÉCHEC DE SYNCHRONISATION LIVESCORE");
+            console.error(err);
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(null), 3000);
         }
     };
 
-    // 3. PUBLICATION FINALE (ADMIN ONLY)
-    const publishPack = () => {
-        if (!store.draft) return;
-        setStatus("PUBLICATION & ENVOI DES NOTIFICATIONS...");
-        
-        setTimeout(() => {
-            const publicPack = { ...store.draft!, isValidated: true, timestamp: Date.now() };
-            const finalStore = { draft: null, public: publicPack, lastUpdate: Date.now() };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(finalStore));
-            setStore(finalStore);
-            setStatus("🚀 PACK PUBLIÉ AVEC SUCCÈS");
-            setTimeout(() => setStatus(null), 3000);
-        }, 1500);
-    };
-
-    const resetSystem = () => {
-        if (confirm("Réinitialiser tout le système ?")) {
-            localStorage.removeItem(STORAGE_KEY);
-            setStore({ draft: null, public: null, lastUpdate: 0 });
+    const clearDraft = () => {
+        if (confirm("Supprimer le brouillon actuel ?")) {
+            const newStore = { ...store, draft: null };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
+            setStore(newStore);
         }
     };
 
-    const activePack = isAdmin ? (store.draft || store.public) : store.public;
-    const predictions = activePack?.predictions || [];
-    const filtered = useMemo(() => {
-        if (activeSport === 'ALL') return predictions;
-        return predictions.filter(p => p.sport.toString().toUpperCase().includes(activeSport.toUpperCase()));
-    }, [activeSport, predictions]);
+    if (!isAdmin) return null;
 
-    // RENDU ADMINISTRATEUR
-    if (isAdmin) {
-        return (
-            <div className="max-w-7xl mx-auto pb-20 px-4 animate-fade-in">
-                {status && (
-                    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-brand-dark-blue border border-orange-500 text-white px-8 py-4 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] backdrop-blur-xl">
-                        <span className="font-black text-[10px] uppercase tracking-widest italic">{status}</span>
-                    </div>
-                )}
-
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">NEXTWIN CONTROL V14</h1>
-                    <p className="mt-2 text-gray-500 text-[10px] uppercase tracking-widest font-black">Administration Sécurisée • NEXTWIN_BOSS</p>
+    return (
+        <div className="max-w-7xl mx-auto pb-20 animate-fade-in">
+            {status && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-brand-dark-blue border border-orange-500 text-white px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-4">
+                    {isLoading && <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent animate-spin rounded-full"></div>}
+                    <span className="font-black text-[10px] uppercase tracking-widest italic">{status}</span>
                 </div>
+            )}
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-                    <button onClick={runIAAnalysis} disabled={isLoading} className="bg-brand-card border-2 border-gray-800 hover:border-blue-500 p-10 rounded-[2.5rem] transition-all group relative overflow-hidden">
-                        <span className="text-white font-black text-lg uppercase italic tracking-tighter block">1. SCANNER EXPERT IA</span>
-                        <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest">Générer le flux 6+2</span>
-                    </button>
+            <div className="text-center mb-16">
+                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">PRONOSTICS IA : ESPACE BOSS</h1>
+                <p className="mt-2 text-gray-500 text-[10px] uppercase tracking-[0.5em] font-black">
+                    Interface de contrôle réservée à NEXTWIN_BOSS • Moteur Gemini 3 Pro
+                </p>
+            </div>
 
-                    <button onClick={publishPack} disabled={!store.draft} className="bg-brand-card border-2 border-gray-800 hover:border-green-500 p-10 rounded-[2.5rem] transition-all group disabled:opacity-20">
-                        <span className="text-white font-black text-lg uppercase italic tracking-tighter block">2. VALIDER & PUBLIER</span>
-                        <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest">Rendre public (Espace Membres)</span>
-                    </button>
-
-                    <button onClick={resetSystem} className="bg-brand-card border-2 border-gray-800 hover:border-red-500 p-10 rounded-[2.5rem] transition-all group">
-                        <span className="text-white font-black text-lg uppercase italic tracking-tighter block">RESET SYSTEM</span>
-                        <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest">Nettoyer les données</span>
-                    </button>
-                </div>
+            <div className="flex justify-center gap-6 mb-16">
+                <button 
+                    onClick={generateIAPronostics} 
+                    disabled={isLoading}
+                    className="bg-brand-card border-2 border-gray-800 hover:border-orange-500 p-10 rounded-[2.5rem] transition-all group w-full max-w-sm"
+                >
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER L'EXTRACTION</span>
+                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-widest block mt-2">Grounding LiveScore.in + SofaScore</span>
+                </button>
 
                 {store.draft && (
-                    <div className="mb-20">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="h-0.5 flex-1 bg-yellow-500/20"></div>
-                            <h2 className="text-yellow-500 font-black uppercase text-[10px] tracking-[0.4em] italic">BROUILLON EN ATTENTE DE VALIDATION</h2>
-                            <div className="h-0.5 flex-1 bg-yellow-500/20"></div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
-                        </div>
-                    </div>
-                )}
-
-                {store.public && (
-                    <div>
-                         <div className="flex items-center gap-4 mb-8">
-                            <div className="h-0.5 flex-1 bg-green-500/20"></div>
-                            <h2 className="text-green-500 font-black uppercase text-[10px] tracking-[0.4em] italic">PACK ACTUELLEMENT EN LIGNE</h2>
-                            <div className="h-0.5 flex-1 bg-green-500/20"></div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 opacity-40 grayscale">
-                            {store.public.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
-                        </div>
-                    </div>
+                    <button 
+                        onClick={clearDraft}
+                        className="bg-red-900/10 border-2 border-red-900/30 hover:border-red-500 p-10 rounded-[2.5rem] transition-all group w-full max-w-sm"
+                    >
+                        <span className="text-red-500 font-black text-xl uppercase italic tracking-tighter block">EFFACER BROUILLON</span>
+                        <span className="text-red-900 text-[9px] font-black uppercase tracking-widest block mt-2">Réinitialiser la session</span>
+                    </button>
                 )}
             </div>
-        );
-    }
 
-    // RENDU MEMBRE
-    return (
-        <div className="max-w-7xl mx-auto pb-20 px-4 animate-fade-in">
-            <div className="text-center mb-16">
-                <h1 className="text-6xl md:text-8xl font-black text-white italic tracking-tighter uppercase leading-none">{t.predictions_title}</h1>
-                <p className="mt-8 text-brand-light-gray text-[11px] md:text-[14px] uppercase tracking-[0.8em] font-black opacity-30">{t.predictions_subtitle}</p>
-            </div>
-
-            {store.public ? (
-                <div>
-                    <div className="flex justify-center gap-4 mb-16 flex-wrap">
-                        {['ALL', 'FOOTBALL', 'BASKETBALL', 'TENNIS'].map(s => (
-                            <button key={s} onClick={() => setActiveSport(s as any)} className={`px-10 py-4 rounded-xl text-[10px] font-black transition-all uppercase tracking-[0.2em] border ${activeSport === s ? 'bg-orange-500 border-orange-500 text-white shadow-lg' : 'bg-brand-dark border-gray-800 text-gray-500 hover:text-white'}`}>
-                                {s === 'ALL' ? 'TOUS' : s}
-                            </button>
-                        ))}
+            {store.draft ? (
+                <div className="animate-fade-in">
+                    <div className="flex items-center gap-4 mb-10">
+                        <div className="h-[2px] flex-1 bg-orange-500/20"></div>
+                        <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] italic">APERÇU DU PACK IA SÉCURISÉ</h2>
+                        <div className="h-[2px] flex-1 bg-orange-500/20"></div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {filtered.map(p => <PredictionCard key={p.id} prediction={p} />)}
+                        {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-32 bg-brand-card border-2 border-gray-800 rounded-[4rem] max-w-4xl mx-auto shadow-2xl">
-                     <div className="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-10 animate-pulse border border-orange-500/20">
-                        <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                     </div>
-                     <h3 className="text-4xl font-black text-white mb-6 uppercase italic tracking-tighter">{t.pred_waiting_title}</h3>
-                     <p className="text-gray-500 uppercase tracking-widest text-xs font-black italic max-w-sm mx-auto">{t.pred_waiting_desc}</p>
+                <div className="text-center py-20 border-2 border-dashed border-gray-800 rounded-[3rem]">
+                    <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <h3 className="text-gray-500 font-black uppercase text-sm tracking-widest italic">Aucun pronostic généré</h3>
+                    <p className="text-gray-700 text-[10px] uppercase font-bold tracking-widest mt-2">Appuyez sur 'Lancer l'extraction' pour débuter le scan</p>
                 </div>
             )}
         </div>

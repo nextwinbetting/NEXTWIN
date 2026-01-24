@@ -44,7 +44,8 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
-            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} isAdmin={currentUser.isAdmin} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            // SÉCURITÉ : Seul NEXTWIN_BOSS peut accéder à cet onglet
+            [DashboardNav.Predictions]: currentUser.isAdmin ? <Predictions language={language} isAdmin={true} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Bankroll]: <BankrollManagement />,
@@ -65,6 +66,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
                 isSidebarOpen={isSidebarOpen}
                 setSidebarOpen={setSidebarOpen}
                 language={language}
+                currentUser={currentUser}
             />
 
             <div className="flex-1 md:ml-64 transition-all duration-300">
