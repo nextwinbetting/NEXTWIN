@@ -18,7 +18,7 @@ const NavLink: React.FC<{ page: Page; currentPage: Page; onNavigate: (page: Page
     <div className="relative group flex flex-col items-center">
         <button
             onClick={() => onNavigate(page)}
-            className={`relative px-2 py-2 text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-colors duration-300 ${currentPage === page ? 'text-white' : 'text-gray-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-brand'}`}
+            className={`relative px-2 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${currentPage === page ? 'text-white' : 'text-gray-400 hover:text-transparent hover:bg-clip-text hover:bg-gradient-brand'}`}
         >
             {children}
             <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-brand transition-transform duration-300 transform ${currentPage === page ? 'scale-x-100' : 'scale-x-0'}`}></span>
@@ -68,27 +68,17 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
         setIsMenuOpen(false);
     };
 
-    const handleMobileLogin = () => {
-        onShowLogin();
-        setIsMenuOpen(false);
-    };
-
-    const handleMobileLogout = () => {
-        onLogout();
-        setIsMenuOpen(false);
-    }
-
     return (
-        <header className="bg-brand-dark-blue/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
+        <header className="bg-[#110f1f] sticky top-0 z-50 border-b border-white/5 shadow-2xl">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-28 lg:h-32">
+                <div className="flex items-center justify-between h-24 lg:h-32">
                     <div className="flex-shrink-0">
                          <button onClick={() => onNavigate(Page.Home)} className="focus:outline-none hover:scale-[1.02] transition-transform">
-                            <NextWinLogo className="h-8 lg:h-10"/>
+                            <NextWinLogo className="h-7 lg:h-9"/>
                         </button>
                     </div>
 
-                    <nav className="hidden xl:flex items-center space-x-4 lg:space-x-6">
+                    <nav className="hidden xl:flex items-center space-x-3 lg:space-x-5">
                         {isLoggedIn ? (
                             <NavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={onNavigate} hint={t.nav_dashboard_hint}>
                                 {t.nav_dashboard}
@@ -145,8 +135,8 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                 </div>
             </div>
 
-            {/* Mobile menu - NON TRANSPARENT / SOLID BACKGROUND */}
-            <div className={`${isMenuOpen ? 'block' : 'hidden'} xl:hidden absolute left-0 w-full bg-[#110f1f] shadow-2xl z-50 border-b border-white/5 h-screen`} id="mobile-menu">
+            {/* Mobile menu - TOTALEMENT OPAQUE */}
+            <div className={`${isMenuOpen ? 'block' : 'hidden'} xl:hidden absolute left-0 w-full bg-[#110f1f] shadow-2xl z-50 border-b border-white/5 h-screen overflow-y-auto`} id="mobile-menu">
                 <div className="px-6 pt-6 pb-8 space-y-3">
                     {isLoggedIn ? (
                          <MobileNavLink page={Page.Dashboard} currentPage={currentPage} onNavigate={() => handleMobileNav(Page.Dashboard)}>
@@ -160,11 +150,11 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                         ))
                     )}
                 </div>
-                 <div className="px-6 pb-12 border-t border-white/5 pt-8">
+                 <div className="px-6 pb-24 border-t border-white/5 pt-8">
                      <div className="space-y-4">
                          {isLoggedIn ? (
                              <button
-                                onClick={handleMobileLogout}
+                                onClick={onLogout}
                                 className="block w-full text-center rounded-xl px-4 py-5 text-xs font-black uppercase tracking-widest text-gray-300 bg-gray-900 hover:bg-gray-800 transition-all border border-white/5"
                             >
                                 {t.nav_logout}
@@ -172,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                          ) : (
                              <>
                                 <button
-                                    onClick={handleMobileLogin}
+                                    onClick={onShowLogin}
                                     className="block w-full text-center rounded-xl px-4 py-5 text-xs font-black uppercase tracking-widest text-gray-300 hover:text-white transition-all border border-white/5"
                                 >
                                     {t.nav_login}
