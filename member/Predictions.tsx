@@ -7,6 +7,8 @@ import { GoogleGenAI } from "@google/genai";
 import NextWinLogo from '../components/NextWinLogo';
 
 const STORAGE_KEY = 'NEXTWIN_ADMIN_FLOW_ACTIVE';
+const STORAGE_IMAGE_KEY = 'NEXTWIN_DAILY_PACK_IMAGE';
+const STORAGE_TIME_KEY = 'NEXTWIN_DAILY_PACK_TIME';
 
 interface AdminStore {
     draft: DailyPack | null;
@@ -39,38 +41,33 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            
-            // Gestion précise du fuseau horaire Paris
             const now = new Date();
             const parisTime = now.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
             const [datePart, timePart] = parisTime.split(' ');
 
             const prompt = `[ROLE: SENIOR SPORTS TRADER - PARIS HUB]
             [LOCAL_TIME_PARIS: ${parisTime}]
-            [TIMEZONE_CHECK: GMT+1/GMT+2 (Summer/Winter)]
-            
-            MISSION : Générer 8 pronostics RÉELS futurs.
-            CONSIGNE TEMPORELLE CRITIQUE : Le coup d'envoi doit avoir lieu au minimum 1h30 APRÈS ${timePart}. 
-            Vérifie bien le décalage horaire des sources (SofaScore/Flashscore) pour ne pas proposer de matchs déjà commencés.
+            MISSION : Générer 8 pronostics RÉELS futurs pour le ${datePart}.
+            Le coup d'envoi doit avoir lieu au minimum 2h APRÈS ${timePart}. 
 
             RÉPARTITION (8 MATCHS TOTAL) :
-            1. 6 Matchs "Standard" : Football/Basket/Tennis (Sélection Élite).
-            2. 1 Match "Bonus Football" : Marché BTTS (Les deux équipes marquent) UNIQUEMENT.
-            3. 1 Match "Bonus Basket" : Marché "Points de joueurs" ou "Points total" UNIQUEMENT.
+            1. 6 Matchs "Standard" : Football/Basket/Tennis.
+            2. 1 Match "Bonus Football" : Marché BTTS.
+            3. 1 Match "Bonus Basket" : Marché Points total.
 
-            STRUCTURE JSON ATTENDUE :
+            STRUCTURE JSON :
             {
               "predictions": [
                 {
                   "category": "Standard | Bonus Football | Bonus Basket",
                   "sport": "Football | Basketball | Tennis",
-                  "competition": "Nom de la ligue",
-                  "match": "Équipe A vs Équipe B",
-                  "betType": "Type de pari exact",
+                  "competition": "Ligue",
+                  "match": "A vs B",
+                  "betType": "Pari",
                   "probability": 70-95,
-                  "analysis": "Argument technique court",
+                  "analysis": "Argument court",
                   "date": "${datePart}",
-                  "time": "HH:MM (Heure Paris)"
+                  "time": "HH:MM"
                 }
               ]
             }`;
@@ -87,24 +84,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             const text = response.text || "";
             const data = JSON.parse(text);
-            const rawPreds = data.predictions || [];
             
-            const filtered: Prediction[] = rawPreds.map((p: any, i: number) => ({
+            const filtered: Prediction[] = data.predictions.map((p: any, i: number) => ({
+                ...p,
                 id: `nw-v10-${Date.now()}-${i}`,
-                sport: p.sport as Sport,
-                competition: p.competition,
-                match: p.match,
-                betType: p.betType,
-                category: p.category as any,
-                probability: p.probability,
-                analysis: p.analysis,
-                date: p.date,
-                time: p.time,
-                isLive: false,
-                sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
-                    uri: c.web?.uri,
-                    title: c.web?.title
-                })).filter((s: any) => s.uri).slice(0, 2) || []
             }));
 
             const newDraft: DailyPack = {
@@ -117,51 +100,45 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ PACK GÉNÉRÉ : 6 ÉLITE + 2 BONUS`);
+            setStatus(`✓ PACK PRÊT POUR DIFFUSION`);
         } catch (err: any) {
-            setStatus(`⚠ ERREUR : ${err.message}`);
+            setStatus(`⚠ ERREUR ENGINE`);
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(null), 3000);
         }
     };
 
-    const downloadAsImage = async () => {
+    const publishToClientArea = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("OPTIMISATION DU RENDU...");
+        setStatus("DIFFUSION SUR L'ESPACE CLIENT...");
         try {
-            await new Promise(r => setTimeout(r, 1500));
+            // Attendre un peu pour s'assurer que les styles sont appliqués
+            await new Promise(r => setTimeout(r, 800));
+            
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#0f0f0f',
-                scale: 3, 
-                useCORS: true,
-                onclone: (clonedDoc: any) => {
-                    // Fix bug logo "Win" masqué lors de l'export
-                    const winParts = clonedDoc.querySelectorAll('.logo-win-part');
-                    winParts.forEach((el: any) => {
-                        el.style.backgroundImage = 'none';
-                        el.style.webkitBackgroundClip = 'initial';
-                        el.style.backgroundClip = 'initial';
-                        el.style.color = '#F97316'; // Couleur de la marque
-                        el.style.opacity = '1';
-                        el.style.visibility = 'visible';
-                        el.style.display = 'inline-block';
-                        el.style.webkitTextFillColor = '#F97316';
-                    });
-                }
+                scale: 2, 
+                useCORS: true
             });
-            const link = document.createElement('a');
-            link.download = `NEXTWIN_V10_ELITE_PACK_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
-            link.href = canvas.toDataURL("image/png", 1.0);
-            link.click();
-            setStatus("✓ EXPORT PNG RÉUSSI");
+            
+            const imageData = canvas.toDataURL("image/png");
+            const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            // Sauvegarde dans les clés utilisées par DailyPicks.tsx
+            localStorage.setItem(STORAGE_IMAGE_KEY, imageData);
+            localStorage.setItem(STORAGE_TIME_KEY, time);
+            
+            // Déclencher l'événement pour les autres onglets
+            window.dispatchEvent(new Event('storage'));
+            
+            setStatus("🚀 PACK PROPULSÉ AVEC SUCCÈS !");
         } catch (err) {
-            console.error(err);
-            setStatus("⚠ ÉCHEC RENDU");
+            setStatus("⚠ ÉCHEC DE DIFFUSION");
         } finally {
             setIsLoading(false);
-            setTimeout(() => setStatus(null), 2500);
+            setTimeout(() => setStatus(null), 3000);
         }
     };
 
@@ -174,77 +151,67 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
         <div className="max-w-7xl mx-auto pb-20 px-4">
             {status && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#110f1f] border border-orange-500/40 text-white px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-4">
-                    <div className="h-2 w-2 rounded-full bg-orange-500 animate-ping"></div>
+                    <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></div>
                     <span className="font-black text-[10px] uppercase tracking-[0.2em] italic">{status}</span>
                 </div>
             )}
 
             <div className="text-center mb-16">
                 <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-6">
-                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic tracking-[0.3em]">ADMIN PANEL • NEXTWIN V10</span>
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] italic">CONSOLE ADMINISTRATIVE V10</span>
                 </div>
-                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">ELITE <span className="text-transparent bg-clip-text bg-gradient-brand">GENERATOR</span></h1>
+                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">PILOTAGE <span className="text-transparent bg-clip-text bg-gradient-brand">DES FLUX</span></h1>
             </div>
 
             <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
-                <button onClick={generateIAPronostics} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl">
+                <button onClick={generateIAPronostics} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-sm relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-brand"></div>
-                    <span className="text-white font-black text-lg uppercase italic tracking-tighter block">SCANNER LE MARCHÉ (6+2)</span>
-                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-[0.3em] block mt-2 opacity-60">Sourcing Paris Time GMT+1</span>
+                    <span className="text-white font-black text-xs uppercase italic tracking-widest block">1. SCANNER LE MARCHÉ</span>
+                    <span className="text-gray-500 text-[8px] font-black uppercase tracking-[0.3em] block mt-2 opacity-60">Générer le pack IA</span>
                 </button>
+                
                 {store.draft && (
-                    <button onClick={downloadAsImage} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-green-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl text-white font-black uppercase italic tracking-widest">
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-green-500"></div>
-                        EXPORTER LE PACK (PNG)
+                    <button onClick={publishToClientArea} disabled={isLoading} className="bg-orange-500 text-white p-8 rounded-[2rem] transition-all hover:scale-105 group flex-1 max-w-sm relative overflow-hidden shadow-2xl shadow-orange-500/20">
+                        <span className="font-black text-xs uppercase italic tracking-widest block">2. PROPULSER AUX CLIENTS</span>
+                        <span className="text-white/60 text-[8px] font-black uppercase tracking-[0.3em] block mt-2">Mise à jour instantanée</span>
                     </button>
                 )}
             </div>
 
             {store.draft && (
-                <div ref={previewContainerRef} className="bg-[#0f0f0f] p-12 rounded-[4rem] border border-white/5 relative overflow-hidden shadow-inner">
-                    {/* Header Image */}
-                    <div className="flex flex-col items-center mb-16">
-                         <NextWinLogo className="h-14 mb-8" />
-                         <div className="bg-orange-500/10 border border-orange-500/20 px-10 py-2 rounded-full">
-                             <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.6em] italic tracking-widest">V10 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</p>
-                         </div>
-                    </div>
+                <div className="space-y-10">
+                    <p className="text-center text-[10px] font-black text-gray-500 uppercase tracking-[0.5em] italic">Aperçu du pack avant diffusion :</p>
+                    <div ref={previewContainerRef} className="bg-[#0f0f0f] p-12 rounded-[4rem] border border-white/5 relative overflow-hidden">
+                        <div className="flex flex-col items-center mb-16">
+                             <NextWinLogo className="h-14 mb-8" />
+                             <div className="bg-orange-500/10 border border-orange-500/20 px-10 py-2 rounded-full">
+                                 <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.6em] italic">V10 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</p>
+                             </div>
+                        </div>
 
-                    {/* SECTION 1 : SELECTION ELITE (6) */}
-                    <div className="mb-20">
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent to-white/10"></div>
-                            <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Sélection <span className="text-orange-500">Élite</span></h2>
-                            <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-white/10"></div>
+                        <div className="mb-20">
+                            <h2 className="text-center text-2xl font-black text-white italic uppercase tracking-tighter mb-10 underline decoration-orange-500 decoration-4 underline-offset-8">SÉLECTION ÉLITE</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {elitePicks.map(p => <PredictionCard key={p.id} prediction={p} />)}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {elitePicks.map(p => <PredictionCard key={p.id} prediction={p} />)}
-                        </div>
-                    </div>
 
-                    {/* SECTION 2 : LES BONUS SEPARÉS (2) */}
-                    <div>
-                        <div className="flex items-center gap-4 mb-10">
-                            <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent to-white/10"></div>
-                            <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Offre <span className="text-purple-500">Bonus</span> Client</h2>
-                            <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-white/10"></div>
+                        <div>
+                            <h2 className="text-center text-2xl font-black text-white italic uppercase tracking-tighter mb-10 underline decoration-purple-500 decoration-4 underline-offset-8">OFFRE BONUS CLIENT</h2>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                {bonusPicks.map(p => (
+                                    <div key={p.id} className="relative">
+                                        <div className="absolute -top-4 -right-4 bg-orange-500 text-white font-black text-[10px] px-4 py-1.5 rounded-full z-20 shadow-xl rotate-12">GIFT</div>
+                                        <PredictionCard prediction={p} />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                            {bonusPicks.map(p => (
-                                <div key={p.id} className="relative">
-                                    <div className="absolute -top-4 -right-4 bg-orange-500 text-white font-black text-[10px] px-4 py-1.5 rounded-full z-20 shadow-xl rotate-12">GIFT</div>
-                                    <PredictionCard prediction={p} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    <div className="mt-24 text-center opacity-30 pt-10 border-t border-white/5">
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[1em] italic">VERIFIED BY GEMINI 3 PRO • HIGH ACCURACY • WWW.NEXTWIN.AI</p>
+                        <div className="mt-24 text-center opacity-30 pt-10 border-t border-white/5">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-[1em] italic">VERIFIED BY GEMINI 3 PRO • WWW.NEXTWIN.AI</p>
+                        </div>
                     </div>
-                    
-                    {/* Background decoration for PNG */}
-                    <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                 </div>
             )}
         </div>
