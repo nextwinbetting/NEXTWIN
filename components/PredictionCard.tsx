@@ -1,60 +1,92 @@
 
 import React from 'react';
-import { Prediction, Sport } from '../types';
+import { Prediction } from '../types';
 
 const SportIcon: React.FC<{ sport: any }> = ({ sport }) => {
     const s = (sport || 'Football').toString().toUpperCase();
-    if (s.includes('FOOT')) return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15.6 3.4-2.2 2.2"/><path d="M10.2 6.8 6.8 10.2"/><path d="m3.4 8.4 2.2 2.2"/><path d="M8.4 20.6l2.2-2.2"/><path d="m13.8 17.2 3.4-3.4"/><path d="m20.6 15.6-2.2-2.2"/><path d="m17.2 10.2 3.4-3.4"/><path d="m11.6 3.4-2.2 2.2"/><path d="M6.8 13.8l-3.4 3.4"/><path d="M3.4 11.6 5.6 9.4"/><path d="M20.6 8.4l-2.2 2.2"/><path d="M9.4 18.4l-2.2 2.2"/></svg>;
-    if (s.includes('BASKET')) return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5"/><path d="M22 12c0-4.42-2.87-8.17-6.84-9.5"/><path d="M2 12h20"/><path d="M12 22a10 10 0 0 0 10-10"/></svg>;
-    return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 12a5 5 0 0 0 5-5"/><path d="m12 12a5 5 0 0 1 5 5"/><path d="M12 12a5 5 0 0 0-5 5"/><path d="m12 12a5 5 0 0 1-5-5"/></svg>;
+    if (s.includes('FOOT')) return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15.6 3.4-2.2 2.2"/><path d="M10.2 6.8 6.8 10.2"/><path d="m3.4 8.4 2.2 2.2"/><path d="M8.4 20.6l2.2-2.2"/><path d="m13.8 17.2 3.4-3.4"/><path d="m20.6 15.6-2.2-2.2"/><path d="m17.2 10.2 3.4-3.4"/><path d="m11.6 3.4-2.2 2.2"/><path d="M6.8 13.8l-3.4 3.4"/><path d="M3.4 11.6 5.6 9.4"/><path d="M20.6 8.4l-2.2 2.2"/><path d="M9.4 18.4l-2.2 2.2"/></svg>;
+    if (s.includes('BASKET')) return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0-10 10c0 4.42 2.87 8.17 6.84 9.5"/><path d="M22 12c0-4.42-2.87-8.17-6.84-9.5"/><path d="M2 12h20"/><path d="M12 22a10 10 0 0 0 10-10"/></svg>;
+    return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/></svg>;
 }
 
 const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) => {
     if (!prediction) return null;
     
-    const category = prediction.category || 'Standard';
-    const isBonus = category.includes('Bonus');
-    
-    return (
-        <div className={`bg-brand-card border-2 ${isBonus ? 'border-orange-500/40 shadow-[0_0_40px_rgba(249,115,22,0.15)]' : 'border-gray-800'} rounded-3xl p-7 flex flex-col h-full space-y-5 transition-all duration-500 hover:border-orange-500 group relative overflow-hidden`}>
-            {isBonus && (
-                <div className="absolute top-0 right-0">
-                    <div className="bg-orange-500 text-white px-5 py-2 text-[9px] font-black uppercase tracking-widest italic rounded-bl-xl shadow-lg">BONUS</div>
-                </div>
-            )}
+    const prob = prediction.probability || 0;
+    const confidence = prob >= 85 ? 'VERY HIGH' : 'HIGH';
+    const confidenceColor = prob >= 85 ? 'bg-green-600' : 'bg-green-800/60';
 
+    return (
+        <div className="bg-brand-card border-2 border-gray-800 rounded-3xl p-6 flex flex-col h-full space-y-4 transition-all duration-500 hover:border-orange-500/50 hover:bg-gray-800/40 group relative overflow-hidden shadow-2xl">
+            {/* Header: Date & Time */}
             <div className="flex justify-between items-start">
-                <div className="flex items-center text-[10px] text-gray-500 space-x-2 font-black uppercase tracking-[0.2em]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
-                    <span>{prediction.date || '--'} • {prediction.time || '--'}</span>
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest italic">
+                        <svg className="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" strokeWidth="2" strokeLinecap="round"/></svg>
+                        {prediction.date}
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest italic">
+                        <svg className="w-3 h-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth="2" strokeLinecap="round"/></svg>
+                        {prediction.time}
+                    </div>
                 </div>
-                <div className="text-orange-500 group-hover:scale-110 transition-transform">
+                <div className="text-orange-500 group-hover:rotate-12 transition-transform">
                     <SportIcon sport={prediction.sport} />
                 </div>
             </div>
 
+            {/* Confidence Badge */}
+            <div className="pt-2">
+                 <span className={`${confidenceColor} text-white px-3 py-1 rounded-full text-[8px] font-black tracking-[0.2em] italic uppercase`}>
+                    {confidence}
+                </span>
+            </div>
+
+            {/* Match & Bet */}
             <div className="flex-grow">
-                <div className="flex items-center space-x-2 mb-3">
-                    <span className={`text-[9px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest border italic ${isBonus ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-gray-800 text-gray-400 border-gray-700'}`}>
-                        {category}
-                    </span>
-                </div>
-                <h3 className="text-2xl font-black text-white italic tracking-tighter leading-tight group-hover:text-orange-500 transition-colors uppercase">{prediction.match || 'Chargement...'}</h3>
-                <p className="text-sm font-black text-transparent bg-clip-text bg-gradient-brand uppercase mt-2 italic tracking-widest">{prediction.betType || 'Analyse...'}</p>
+                <h3 className="text-xl font-black text-white italic tracking-tighter uppercase leading-tight group-hover:text-orange-500 transition-colors">
+                    {prediction.match}
+                </h3>
+                <p className="text-xs font-black text-orange-500 uppercase mt-2 italic tracking-widest">
+                    {prediction.betType}
+                </p>
             </div>
 
-            <div className="pt-5 border-t border-gray-800">
-                <div className="flex justify-between items-end mb-4">
-                    <p className="text-[10px] text-orange-500 font-black uppercase tracking-[0.3em] italic">Synthèse IA V8</p>
-                    <span className="text-white font-black text-xl tracking-tighter">{prediction.probability || 0}%</span>
+            {/* Probability Progress */}
+            <div className="pt-4">
+                <div className="flex justify-between items-end mb-2">
+                    <p className="text-[9px] text-gray-500 font-black uppercase tracking-[0.2em]">PROBABILITÉ</p>
+                    <span className="text-white font-black text-lg tracking-tighter">{prob}%</span>
                 </div>
-                <p className="text-[11px] text-gray-400 leading-relaxed font-bold italic">"{prediction.analysis || 'Pas d\'analyse disponible.'}"</p>
+                <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
+                    <div 
+                        className="h-full bg-gradient-brand transition-all duration-1000 ease-out" 
+                        style={{ width: `${prob}%` }}
+                    ></div>
+                </div>
             </div>
 
+            {/* Analysis Block */}
+            <div className="pt-4 border-t border-gray-800/50">
+                <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.3em] mb-2 italic">ANALYSE FLASH</p>
+                <div className="bg-brand-dark/30 p-3 rounded-xl border border-gray-800/50">
+                    <p className="text-[10px] text-gray-300 leading-relaxed font-bold italic">
+                        "{prediction.analysis}"
+                    </p>
+                </div>
+            </div>
+
+            {/* Sources Links */}
             {prediction.sources && prediction.sources.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-4">
+                <div className="flex flex-wrap gap-2 pt-2">
                     {prediction.sources.map((source, idx) => (
-                        <a key={idx} href={source.uri} target="_blank" rel="noopener noreferrer" className="text-[8px] bg-brand-dark px-3 py-1.5 rounded-lg text-blue-400 hover:text-white transition-all truncate max-w-[120px] font-black uppercase tracking-tighter border border-gray-800">
+                        <a 
+                            key={idx} 
+                            href={source.uri} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-[8px] bg-brand-dark px-2 py-1 rounded-lg text-blue-400 hover:bg-blue-400 hover:text-white transition-all font-black uppercase tracking-tighter border border-gray-800 truncate max-w-[100px]"
+                        >
                             {source.title || "SOURCE"}
                         </a>
                     ))}
