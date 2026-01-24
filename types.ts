@@ -68,6 +68,7 @@ export interface Prediction {
   analysis: string;
   status?: 'won' | 'lost' | 'pending';
   sources?: GroundingSource[];
+  isLive?: boolean;
 }
 
 export interface DailyPack {

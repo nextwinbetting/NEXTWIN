@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Language, AnalysisResult } from '../types';
 import { translations } from '../translations';
@@ -34,7 +33,8 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
         setResult(null);
 
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+            // FIX: Initialized GoogleGenAI according to strict guidelines (named parameter, direct env access)
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
             const prompt = `EXPERT ANALYSTE : ${team1} vs ${team2} (${sport}).
             Scraper SofaScore/Flashscore pour : forme (5 matchs), xG, absences.
@@ -57,6 +57,7 @@ const Analyzer: React.FC<{ language: Language; onNewAnalysis: (d: any) => void }
                 }
             });
 
+            // FIX: Accessing text property directly (not a method) as per guidelines
             const text = response.text || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             

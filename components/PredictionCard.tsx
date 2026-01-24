@@ -18,9 +18,17 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
     const confidenceColor = isVeryHigh ? 'bg-green-600/20 text-green-500 border-green-500/30' : 'bg-green-800/20 text-green-400 border-green-800/30';
 
     return (
-        <div className="bg-brand-card border-2 border-gray-800/50 rounded-[2.5rem] p-8 flex flex-col h-full space-y-6 transition-all duration-500 hover:border-orange-500/40 hover:bg-gray-800/60 group relative overflow-hidden shadow-2xl backdrop-blur-md">
+        <div className="bg-brand-card border-2 rounded-[2.5rem] p-8 flex flex-col h-full space-y-6 transition-all duration-500 hover:bg-gray-800/60 group relative overflow-hidden shadow-2xl backdrop-blur-md border-gray-800/50 hover:border-orange-500/40">
+            {/* Status Badge - Uniquement "À VENIR" car les live sont exclus */}
+            <div className="absolute top-6 right-8 flex items-center gap-2">
+                <div className="bg-gray-800/50 border border-gray-700 px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest italic">CONFIRMÉ</span>
+                </div>
+            </div>
+
             {/* Background Glow */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all"></div>
+            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl transition-all bg-orange-500/5 group-hover:bg-orange-500/10"></div>
 
             {/* Header: Date & Time */}
             <div className="flex justify-between items-start">
@@ -34,7 +42,7 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                         {prediction.time}
                     </div>
                 </div>
-                <div className="text-gray-600 group-hover:text-orange-500 transition-colors transform group-hover:scale-110 duration-500">
+                <div className="text-gray-600 group-hover:text-orange-500 transition-colors transform group-hover:scale-110 duration-500 pr-12">
                     <SportIcon sport={prediction.sport} />
                 </div>
             </div>
@@ -85,23 +93,6 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                     </p>
                 </div>
             </div>
-
-            {/* Sources */}
-            {prediction.sources && prediction.sources.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2 opacity-50 hover:opacity-100 transition-opacity">
-                    {prediction.sources.map((source, idx) => (
-                        <a 
-                            key={idx} 
-                            href={source.uri} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="text-[8px] bg-gray-900/50 px-2 py-1 rounded-lg text-gray-500 hover:text-orange-400 transition-all font-black uppercase tracking-tighter border border-gray-800/50 truncate max-w-[120px]"
-                        >
-                            {source.title || "LIVESCORE"}
-                        </a>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

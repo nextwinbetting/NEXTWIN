@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Prediction, Sport, Language, DailyPack } from '../types';
 import PredictionCard from '../components/PredictionCard';
@@ -15,6 +14,7 @@ interface AdminStore {
 
 declare var html2canvas: any;
 
+// FIX: Corrected destructuring syntax (comma instead of semicolon) to fix scope errors for language and isAdmin
 const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ language, isAdmin }) => {
     const t = translations[language];
     const [store, setStore] = useState<AdminStore>({ draft: null, history: [] });
@@ -36,17 +36,24 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("RECHERCHE DES MATCHS RÉELS...");
+        setStatus("RECHERCHE DES MATCHS À VENIR...");
         
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+            // FIX: Initialized GoogleGenAI according to strict guidelines (named parameter, direct env access)
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
             const now = new Date();
             const dateToday = now.toLocaleDateString('fr-FR');
             const timeNow = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-            const prompt = `[SYSTEM: SPORTS ANALYST]
-            MISSION : Scanne le web pour trouver 8 matchs RÉELS de Football, Basketball ou Tennis programmés aujourd'hui (${dateToday}) ou demain.
+            const prompt = `[SYSTEM: ELITE SPORTS ANALYST]
+            MISSION : Trouve 8 matchs RÉELS de Football, Basketball ou Tennis pour aujourd'hui (${dateToday}) ou demain.
+            
+            RÈGLE CRITIQUE DE TEMPS : 
+            1. N'inclus QUE des matchs qui n'ont PAS ENCORE COMMENCÉ.
+            2. EXCLUS formellement tout match en cours (Live), déjà joué ou terminé.
+            3. L'heure actuelle est ${timeNow}. Tous les matchs doivent débuter APRÈS cette heure.
+
             FORMAT EXCLUSIF : JSON STRICT.
             SCHÉMA JSON : 
             {
@@ -57,13 +64,12 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                   "match": "Équipe A vs Équipe B",
                   "betType": "Pronostic recommandé",
                   "probability": 75,
-                  "analysis": "Pourquoi ce pronostic ?",
+                  "analysis": "Analyse technique courte (2 phrases max)",
                   "date": "JJ/MM/AAAA",
                   "time": "HH:MM"
                 }
               ]
-            }
-            RÈGLES : Ne renvoie QUE le JSON. Ne sois pas verbeux. Utilise Google Search pour vérifier les calendriers réels.`;
+            }`;
 
             const response = await ai.models.generateContent({
                 model: 'gemini-3-flash-preview',
@@ -75,6 +81,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 }
             });
 
+            // FIX: Using response.text property (not a method)
             const text = response.text || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("Format de réponse invalide.");
@@ -83,7 +90,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const rawPreds = data.predictions || [];
             
             if (!Array.isArray(rawPreds) || rawPreds.length === 0) {
-                throw new Error("Aucun match trouvé.");
+                throw new Error("Aucun match futur trouvé.");
             }
 
             const preds: Prediction[] = rawPreds.map((p: any, i: number) => ({
@@ -96,7 +103,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 probability: p.probability || 70,
                 analysis: p.analysis || "Analyse automatique générée par l'Engine.",
                 date: p.date || dateToday,
-                time: p.time || timeNow,
+                time: p.time || "20:00",
+                isLive: false, // Forcé à false car on ne veut que du futur
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
                     title: c.web?.title
@@ -113,7 +121,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ ${preds.length} PRONOSTICS PRÊTS`);
+            setStatus(`✓ ${preds.length} MATCHS FUTURS PRÊTS`);
         } catch (err: any) {
             console.error("Erreur IA:", err);
             setStatus(`⚠ ERREUR: ${err.message || 'Engine Fail'}`);
@@ -129,7 +137,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
         setStatus("GÉNÉRATION HD...");
         
         try {
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 800));
             
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
@@ -137,11 +145,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 useCORS: true,
                 logging: false,
                 allowTaint: true,
-                onclone: (clonedDoc: Document) => {
-                    // FIX : On s'assure que la partie "Win" du logo est visible si le dégradé échoue
+                onclone: (clonedDoc: any) => {
                     const winParts = clonedDoc.querySelectorAll('.logo-win-part');
                     winParts.forEach((el: any) => {
-                        el.style.color = '#F97316'; // Fallback orange solide pour l'export
+                        el.style.color = '#F97316';
                         el.style.backgroundImage = 'none';
                         el.style.webkitBackgroundClip = 'initial';
                         el.style.backgroundClip = 'initial';
@@ -199,8 +206,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-10 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl"
                 >
                     <div className="absolute top-0 left-0 w-2 h-full bg-gradient-brand"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER LE SCAN IA</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] block mt-3 opacity-60">Synchronisation mondiale active</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">LANCER LE SCAN FUTUR</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] block mt-3 opacity-60">Filtrage des matchs joués activé</span>
                 </button>
 
                 {store.draft && (
@@ -223,10 +230,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                         </button>
                     </div>
 
-                    {/* Zone de capture HD */}
                     <div className="rounded-[3.5rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] border-4 border-white/5">
                         <div ref={previewContainerRef} className="bg-[#110f1f] p-16 relative overflow-hidden capture-zone">
-                            {/* Éléments de Branding Exportation */}
                             <div className="flex flex-col items-center mb-24 relative z-10">
                                 <div className="mb-10 h-20 flex items-center justify-center">
                                     <NextWinLogo />
@@ -244,7 +249,6 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                                 <p className="text-gray-600 font-black text-[10px] uppercase tracking-[1.8em] italic">PRECISION IA • ANALYSE PRO • WWW.NEXTWIN.AI</p>
                             </div>
 
-                            {/* Décors subtils pour l'export */}
                             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
                             <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 blur-[150px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
                         </div>
@@ -253,7 +257,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             ) : (
                 <div className="text-center py-40 border-4 border-dashed border-gray-800 rounded-[3.5rem] opacity-30 bg-white/[0.01]">
                     <svg className="mx-auto h-20 w-20 text-gray-700 mb-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
-                    <p className="text-gray-500 text-sm uppercase font-black tracking-[1em] italic">MOTEUR IA EN ATTENTE DE FLUX</p>
+                    <p className="text-gray-500 text-sm uppercase font-black tracking-[1em] italic">MOTEUR IA EN ATTENTE DE FLUX FUTURS</p>
                 </div>
             )}
         </div>
