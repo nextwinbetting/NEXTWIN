@@ -22,7 +22,6 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
     
-    // Ref pour capturer l'aperçu client exact
     const previewContainerRef = useRef<HTMLDivElement>(null);
 
     const sync = () => {
@@ -38,38 +37,49 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("SCAN LIVESCORE.IN/FR/ - SYNC HORAIRES...");
+        setStatus("CONNEXION SERVEURS TEMPS RÉEL...");
+        
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
             
-            const prompt = `[ROLE: CHIEF ANALYST NEXTWIN V18.1]
-            OBJECTIF: Générer 8 pronostics sportifs réels (6 Standards + 2 Bonus) pour les prochaines 24h.
+            // Injection de la date et heure réelle pour le grounding
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+            const prompt = `[ROLE: CHIEF ANALYST NEXTWIN V18.3]
+            CONTEXTE TEMPOREL CRITIQUE :
+            - NOUS SOMMES LE : ${dateStr}
+            - IL EST ACTUELLEMENT : ${timeStr} (Heure de Paris)
             
-            CONSIGNE CRITIQUE HORAIRE :
-            - Tu DOIS utiliser les horaires EXACTS affichés sur LiveScore.in/fr/ (Heure française).
-            - Ne fais aucune conversion UTC. Si le site dit 21:00, tu écris 21:00.
-            - Langue : Français intégral.
+            MISSION : Générer 8 pronostics RÉELS pour des matchs se déroulant dans les prochaines 24 heures (donc après ${timeStr}).
             
-            STRUCTURE DU PACK (8 PRONOS) :
-            1. Football (Standard) : 2 matchs (Nom de la Ligue/Coupe obligatoire).
-            2. Basketball (Standard) : 2 matchs (NBA, Euroleague, etc.).
-            3. Tennis (Standard) : 2 matchs (Nom du tournoi ATP/WTA).
-            4. BONUS Football : 1 prono "Les deux équipes marquent" (Ligue précise).
-            5. BONUS Basketball : 1 prono "Total Points" (Ligue précise).
+            CONSIGNES DE VÉRIFICATION :
+            1. RECHERCHE OBLIGATOIRE : Utilise l'outil Google Search pour vérifier les calendriers sur LiveScore.in/fr/, Flashscore.fr ou SofaScore.
+            2. EXISTENCE : Si un match n'existe pas ou n'est pas confirmé à 100% sur ces sites, NE LE PROPOSE PAS.
+            3. HORAIRES : Utilise l'heure exacte affichée sur LiveScore.in/fr/ (Heure française). Pas de décalage.
+            4. LANGUE : Français uniquement.
+            
+            STRUCTURE (8 PRONOS) :
+            - 2 Football (Ligue précise)
+            - 2 Basketball (NBA ou Europe)
+            - 2 Tennis (Tournoi précis)
+            - 1 BONUS Football (Les deux équipes marquent)
+            - 1 BONUS Basketball (Total Points)
             
             JSON OUTPUT ONLY:
             {
               "predictions": [
                 {
                   "sport": "Football",
-                  "competition": "Ligue 1",
-                  "match": "PSG vs Marseille",
-                  "betType": "Victoire PSG",
+                  "competition": "Nom exact de la ligue",
+                  "match": "Équipe A vs Équipe B",
+                  "betType": "Type de pari précis",
                   "category": "Standard",
-                  "date": "25.05.2024",
-                  "time": "21:00",
-                  "probability": 85,
-                  "analysis": "Analyse technique basée sur les derniers flux de données."
+                  "date": "JJ.MM.AAAA",
+                  "time": "HH:MM",
+                  "probability": 82,
+                  "analysis": "Analyse technique de 2 phrases basée sur les dernières stats réelles."
                 }
               ]
             }`;
@@ -79,7 +89,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0.1
+                    temperature: 0
                 }
             });
 
@@ -88,8 +98,11 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             if (!jsonMatch) throw new Error("Flux corrompu");
 
             const data = JSON.parse(jsonMatch[0]);
-            const preds = data.predictions.map((p: any, i: number) => ({
-                id: `v18-1-${Date.now()}-${i}`,
+            
+            // On s'assure qu'on a bien nos 8 pronos
+            const rawPreds = data.predictions || [];
+            const preds = rawPreds.map((p: any, i: number) => ({
+                id: `v18-3-${Date.now()}-${i}`,
                 ...p,
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
@@ -107,9 +120,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus("✓ PACK 8/8 SYNCHRONISÉ");
+            setStatus(`✓ ${preds.length}/8 MATCHS VÉRIFIÉS`);
         } catch (err) {
-            setStatus("⚠ ERREUR DE SYNCHRONISATION");
+            setStatus("⚠ ERREUR DE SYNC RÉELLE");
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -120,24 +133,29 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU VISUEL PREMIUM HD (3x3)...");
+        setStatus("GÉNÉRATION DU VISUEL PREMIUM HD...");
         
         try {
-            // Pause pour rendu parfait
-            await new Promise(r => setTimeout(r, 600));
+            await new Promise(r => setTimeout(r, 800));
             
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
-                scale: 3, // Ultra HD
+                scale: 3, 
                 useCORS: true,
                 logging: false,
                 allowTaint: true,
                 onclone: (clonedDoc: Document) => {
                     const el = clonedDoc.getElementById('capture-target');
                     if (el) {
-                        el.style.padding = '80px';
-                        el.style.width = '1600px'; // Un peu plus large pour 3 colonnes
-                        el.style.borderRadius = '0px'; // Suppression pour l'export image pur
+                        el.style.padding = '100px'; 
+                        el.style.width = '1650px'; 
+                        el.style.borderRadius = '0px';
+                        
+                        const gradientTexts = clonedDoc.querySelectorAll('.bg-clip-text');
+                        gradientTexts.forEach((text: any) => {
+                            text.classList.remove('text-transparent', 'bg-clip-text', 'bg-gradient-brand');
+                            text.style.color = '#F97316'; 
+                        });
                     }
                 }
             });
@@ -179,10 +197,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             <div className="text-center mb-16">
                 <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                    NEXTWIN <span className="text-orange-500">BOSS</span> V18.1
+                    NEXTWIN <span className="text-orange-500">BOSS</span> V18.3
                 </h1>
                 <p className="mt-4 text-gray-500 text-[10px] uppercase tracking-[0.6em] font-black">
-                    EXPORT VISUEL HAUTE DÉFINITION & SYNC LIVESCORE
+                    REAL-TIME MATCH SYNC & HD EXPORT
                 </p>
             </div>
 
@@ -193,8 +211,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     className="bg-brand-card border-2 border-gray-800 hover:border-orange-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block tracking-[0.1em]">GÉNÉRER LE PACK</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Sync Horaires LiveScore FR</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block tracking-[0.1em]">GÉNÉRER LE PACK RÉEL</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Basé sur LiveScore ${new Date().toLocaleDateString()}</span>
                 </button>
 
                 {store.draft && (
@@ -212,7 +230,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
                         <div className="flex items-center gap-6 flex-1">
                             <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU ORIENTÉ CLIENT (3 PAR RANGÉE)</h2>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU RÉEL (3 PAR RANGÉE)</h2>
                             <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
                         </div>
                         
@@ -226,36 +244,31 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                         </button>
                     </div>
 
-                    {/* SECTION DE CAPTURE RÉELLE - MODIFIÉE POUR 3 COLONNES */}
                     <div 
                         ref={previewContainerRef} 
                         id="capture-target"
                         className="bg-brand-dark-blue rounded-[5rem] p-12 border border-gray-800/50 relative overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]"
                     >
-                        {/* Éléments de Branding Export */}
-                        <div className="flex flex-col items-center mb-20 relative z-10">
-                            <NextWinLogo className="h-24 mb-6" />
+                        <div className="flex flex-col items-center mb-24 relative z-10">
+                            <NextWinLogo className="h-28 mb-8" />
                             <div className="bg-orange-500/10 border-2 border-orange-500/30 px-12 py-3 rounded-full backdrop-blur-md">
                                 <span className="text-orange-500 font-black text-xs uppercase tracking-[0.6em] italic">PACK OFFICIEL IA • {new Date().toLocaleDateString('fr-FR')}</span>
                             </div>
                         </div>
 
-                        {/* GRILLE : Passage à 3 colonnes (lg:grid-cols-3) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10 justify-center">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10 justify-center">
                             {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                         </div>
 
-                        {/* Footer Export Pro */}
-                        <div className="mt-24 text-center pt-12 border-t border-gray-800/50 relative z-10">
-                            <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.8em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.1</p>
-                            <p className="text-gray-700 font-bold text-[8px] uppercase tracking-[0.3em] mt-6 px-20 leading-relaxed">
+                        <div className="mt-28 text-center pt-16 border-t border-gray-800/50 relative z-10">
+                            <p className="text-gray-500 font-black text-[11px] uppercase tracking-[1em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.3</p>
+                            <p className="text-gray-700 font-bold text-[8px] uppercase tracking-[0.3em] mt-8 px-32 leading-relaxed opacity-60">
                                 Les pronostics sont fournis à titre informatif. Le jeu comporte des risques : endettement, isolement, dépendance. Appelez le 09-74-75-13-13. Interdit aux mineurs.
                             </p>
                         </div>
 
-                        {/* Effets de fond stylisés */}
-                        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[200px]"></div>
-                        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-[200px]"></div>
+                        <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-orange-500/5 rounded-full blur-[250px]"></div>
+                        <div className="absolute bottom-0 left-0 w-[900px] h-[900px] bg-purple-500/5 rounded-full blur-[250px]"></div>
                     </div>
                 </div>
             ) : (
