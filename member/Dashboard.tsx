@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Predictions from './Predictions';
 import Analyzer from './Analyzer';
@@ -43,11 +44,10 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
-            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            [DashboardNav.Predictions]: isSubscribed ? <Predictions language={language} isAdmin={currentUser.isAdmin} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Bankroll]: <BankrollManagement />,
-            // FIX: Add LiveScores to satisfy TypeScript. This case is handled by an external link in the sidebar, so it won't be rendered here.
             [DashboardNav.LiveScores]: null,
             [DashboardNav.Archives]: <Archives archives={archives} />,
             [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,

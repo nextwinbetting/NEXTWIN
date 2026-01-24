@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -49,8 +50,12 @@ const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (user: User) => {
-    setCurrentUser(user);
-    // Pour la phase de test, toute connexion donne un accès "Pro".
+    // SIMULATION ADMIN : Si le pseudo est "admin", on donne les droits de gestion
+    const enhancedUser = {
+        ...user,
+        isAdmin: user.username.toLowerCase() === 'admin'
+    };
+    setCurrentUser(enhancedUser);
     setIsSubscribed(true); 
     handleNavigation(Page.Dashboard);
   };
