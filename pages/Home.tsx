@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Page, Language } from '../types';
 import { translations } from '../translations';
@@ -100,20 +101,22 @@ const CTAIllustration: React.FC<{ className?: string }> = ({ className }) => (
 
 const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
     const t = translations[language];
-    const testimonials = t.home_testimonials;
+    // SÉCURITÉ : Valeur par défaut pour éviter testimonials is not iterable
+    const testimonials = t.home_testimonials || [];
     
     // Duplicate testimonials for seamless infinite scroll
-    const allTestimonials = [...testimonials, ...testimonials];
+    const allTestimonials = testimonials.length > 0 ? [...testimonials, ...testimonials] : [];
 
     return (
         <>
             <style>{`
                 @keyframes infinite-scroll {
                     from { transform: translateX(0); }
-                    to { transform: translateX(-100%); }
+                    to { transform: translateX(-50%); }
                 }
                 .animate-infinite-scroll {
-                    animation: infinite-scroll 80s linear infinite;
+                    animation: infinite-scroll 40s linear infinite;
+                    width: max-content;
                 }
             `}</style>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 sm:pt-32 sm:pb-20">
@@ -147,7 +150,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
                 </div>
             </div>
 
-            {/* NEW HERO ILLUSTRATION SECTION */}
+            {/* HERO ILLUSTRATION SECTION */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-12 md:my-20">
                 <HeroIllustration className="w-full h-auto max-w-5xl mx-auto" />
             </div>
@@ -175,7 +178,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
                 />
             </div>
             
-            {/* New Articles Section */}
+            {/* Articles Section */}
             <div className="py-20 bg-brand-dark">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold text-white">{t.home_articles_title}</h2>
@@ -203,48 +206,35 @@ const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
             </div>
 
             {/* Testimonials section */}
-            <div className="py-20">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="py-20 overflow-hidden">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
                     <h2 className="text-3xl sm:text-4xl font-bold text-white">{t.home_testimonials_title}</h2>
                     <p className="mt-4 text-lg text-brand-light-gray max-w-2xl mx-auto">{t.join_testimonials_subtitle}</p>
                 </div>
-                <div className="mt-12 w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear_gradient(to_right,transparent_0,_black_48px,_black_calc(100%-48px),transparent_100%)]">
-                    <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-infinite-scroll">
-                        {allTestimonials.map((testimonial, index) => (
-                           <li key={index} className="w-80 flex-shrink-0">
-                                <div className="bg-brand-card border border-gray-800 rounded-2xl p-6 h-full flex flex-col justify-between">
-                                    <p className="text-white italic text-base">"{testimonial.quote}"</p>
-                                    <div className="mt-6 flex items-center">
-                                        <UserAvatar />
-                                        <div className="ml-4 text-left">
-                                            <p className="font-bold text-transparent bg-clip-text bg-gradient-brand">{testimonial.name}</p>
-                                            <p className="text-sm text-gray-500">{testimonial.role}</p>
+                
+                {allTestimonials.length > 0 && (
+                    <div className="flex w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_48px,_black_calc(100%-48px),transparent_100%)]">
+                        <ul className="flex items-center animate-infinite-scroll">
+                            {allTestimonials.map((testimonial, index) => (
+                            <li key={index} className="w-[350px] mx-4 flex-shrink-0">
+                                    <div className="bg-brand-card border border-gray-800 rounded-2xl p-8 h-full flex flex-col justify-between shadow-xl">
+                                        <p className="text-white italic text-base leading-relaxed">"{testimonial.quote}"</p>
+                                        <div className="mt-8 flex items-center border-t border-gray-800 pt-6">
+                                            <UserAvatar />
+                                            <div className="ml-4 text-left">
+                                                <p className="font-bold text-transparent bg-clip-text bg-gradient-brand">{testimonial.name}</p>
+                                                <p className="text-xs text-gray-500 uppercase tracking-widest">{testimonial.role}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                     <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-infinite-scroll" aria-hidden="true">
-                        {allTestimonials.map((testimonial, index) => (
-                           <li key={index} className="w-80 flex-shrink-0">
-                                <div className="bg-brand-card border border-gray-800 rounded-2xl p-6 h-full flex flex-col justify-between">
-                                    <p className="text-white italic text-base">"{testimonial.quote}"</p>
-                                    <div className="mt-6 flex items-center">
-                                        <UserAvatar />
-                                        <div className="ml-4 text-left">
-                                            <p className="font-bold text-transparent bg-clip-text bg-gradient-brand">{testimonial.name}</p>
-                                            <p className="text-sm text-gray-500">{testimonial.role}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
             
-             {/* New CTA Section */}
+             {/* CTA Section */}
             <div className="py-20">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-brand-card border border-gray-800 rounded-2xl p-8 lg:p-12 relative overflow-hidden">
