@@ -13,7 +13,7 @@ interface AdminStore {
     history: DailyPack[];
 }
 
-// Déclaration globale pour html2canvas chargé via CDN
+// Déclaration globale pour html2canvas chargé via CDN dans index.html
 declare var html2canvas: any;
 
 const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ language, isAdmin }) => {
@@ -21,7 +21,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const [store, setStore] = useState<AdminStore>({ draft: null, history: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
-    const exportRef = useRef<HTMLDivElement>(null);
+    
+    // Ref pour capturer l'aperçu client exact
+    const previewContainerRef = useRef<HTMLDivElement>(null);
 
     const sync = () => {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -44,12 +46,12 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             OBJECTIF: Générer 8 pronostics sportifs réels (6 Standards + 2 Bonus) pour les prochaines 24h.
             
             INSTRUCTIONS CRITIQUES :
-            1. UTILISE Google Search pour consulter LiveScore.in/fr/ (Section Football, Basketball, Tennis).
+            1. UTILISE Google Search pour consulter LiveScore.in/fr/.
             2. RÉCUPÈRE : Nom de la Compétition (ex: Ligue 1, NBA, Roland Garros), Équipes, Date et Heure (Paris).
             3. LANGUE : Tout le contenu JSON doit être en FRANÇAIS.
             4. FILTRE : Probabilité minimale de 70%.
             
-            PACK STRUCTURE (8 PRONOS) :
+            STRUCTURE DU PACK (8 PRONOS) :
             - Football : 2 vainqueurs (inclure la ligue).
             - Basketball : 2 vainqueurs (inclure la ligue).
             - Tennis : 2 vainqueurs (inclure le tournoi).
@@ -61,14 +63,14 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
               "predictions": [
                 {
                   "sport": "Football",
-                  "competition": "Nom de la Ligue/Tournoi",
-                  "match": "Équipe A vs Équipe B",
-                  "betType": "Victoire Équipe A",
+                  "competition": "Ligue 1",
+                  "match": "PSG vs Marseille",
+                  "betType": "Victoire PSG",
                   "category": "Standard",
-                  "date": "JJ.MM.AAAA",
-                  "time": "HH:MM",
-                  "probability": 75,
-                  "analysis": "Analyse flash technique en français."
+                  "date": "25.05.2024",
+                  "time": "21:00",
+                  "probability": 82,
+                  "analysis": "Analyse technique basée sur les derniers flux de données."
                 }
               ]
             }`;
@@ -88,7 +90,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             const data = JSON.parse(jsonMatch[0]);
             const preds = data.predictions.map((p: any, i: number) => ({
-                id: `v17-${Date.now()}-${i}`,
+                id: `v18-${Date.now()}-${i}`,
                 ...p,
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
@@ -106,7 +108,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus("✓ PACK 6+2 GÉNÉRÉ AVEC COMPÉTITIONS");
+            setStatus("✓ PACK GÉNÉRÉ AVEC SUCCÈS");
         } catch (err) {
             setStatus("⚠ ÉCHEC DU SCAN DES COMPÉTITIONS");
             console.error(err);
@@ -117,31 +119,37 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     };
 
     const downloadAsImage = async () => {
-        if (!exportRef.current) return;
+        if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU VISUEL HD...");
+        setStatus("CONVERSION DE L'APERÇU EN IMAGE HD...");
         
         try {
-            // Un petit délai pour s'assurer que le rendu est stable
-            await new Promise(r => setTimeout(r, 500));
+            // Petit temps d'attente pour stabiliser les animations
+            await new Promise(r => setTimeout(r, 400));
             
-            const canvas = await html2canvas(exportRef.current, {
-                backgroundColor: '#110f1f',
-                scale: 2, // Haute définition
+            const canvas = await html2canvas(previewContainerRef.current, {
+                backgroundColor: '#110f1f', // Correspond au fond du site
+                scale: 2.5, // Très haute définition pour export pro
                 useCORS: true,
                 logging: false,
+                allowTaint: true,
+                onclone: (clonedDoc: Document) => {
+                    // Optionnel: On peut ajuster des styles sur le clone avant capture
+                    const el = clonedDoc.getElementById('capture-target');
+                    if (el) el.style.padding = '60px'; // Plus d'espace pour l'image finale
+                }
             });
             
-            const image = canvas.toDataURL("image/png");
+            const image = canvas.toDataURL("image/png", 1.0);
             const link = document.createElement('a');
             const date = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
-            link.download = `NextWin_Pack_IA_${date}.png`;
+            link.download = `NextWin_Pronos_IA_${date}.png`;
             link.href = image;
             link.click();
-            setStatus("✓ VISUEL TÉLÉCHARGÉ");
+            setStatus("✓ VISUEL GÉNÉRÉ ET TÉLÉCHARGÉ");
         } catch (err) {
             console.error(err);
-            setStatus("⚠ ÉCHEC DE LA GÉNÉRATION");
+            setStatus("⚠ ERREUR LORS DE LA CAPTURE");
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(null), 3000);
@@ -159,7 +167,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     if (!isAdmin) return null;
 
     return (
-        <div className="max-w-7xl mx-auto pb-20 animate-fade-in">
+        <div className="max-w-7xl mx-auto pb-20 animate-fade-in px-4">
             {status && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-brand-dark-blue border border-orange-500 text-white px-8 py-4 rounded-2xl shadow-[0_0_50px_rgba(249,115,22,0.4)] backdrop-blur-xl flex items-center gap-4">
                     {isLoading && <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent animate-spin rounded-full"></div>}
@@ -169,124 +177,91 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             <div className="text-center mb-16">
                 <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                    NEXTWIN <span className="text-orange-500">BOSS</span> V17
+                    NEXTWIN <span className="text-orange-500">BOSS</span> V18
                 </h1>
                 <p className="mt-4 text-gray-500 text-[10px] uppercase tracking-[0.6em] font-black">
-                    CONTRÔLE DES COMPÉTITIONS & ANALYSE RÉELLE LIVESCORE
+                    CONSOLE DE GÉNÉRATION & EXPORT VISUEL PRO
                 </p>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6 mb-16 px-4">
+            <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
                 <button 
                     onClick={generateIAPronostics} 
                     disabled={isLoading}
                     className="bg-brand-card border-2 border-gray-800 hover:border-orange-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">SCANNER LIVESCORE</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 transition-colors italic">Extraire Compétitions + Matchs</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block">SCANNER LES MATCHS</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Extraction LiveScore V18</span>
                 </button>
 
                 {store.draft && (
-                    <>
-                        <button 
-                            onClick={downloadAsImage}
-                            disabled={isLoading}
-                            className="bg-brand-card border-2 border-orange-500/40 hover:border-orange-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent"></div>
-                            <span className="text-orange-500 font-black text-xl uppercase italic tracking-tighter block">TÉLÉCHARGER LE VISUEL</span>
-                            <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest block mt-2 italic">Générer image pro HD</span>
-                        </button>
-                        
-                        <button 
-                            onClick={clearDraft}
-                            className="bg-red-900/10 border-2 border-red-900/30 hover:border-red-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-xs"
-                        >
-                            <span className="text-red-500 font-black text-xl uppercase italic tracking-tighter block">RÉINITIALISER</span>
-                        </button>
-                    </>
+                    <button 
+                        onClick={clearDraft}
+                        className="bg-red-900/10 border-2 border-red-900/30 hover:border-red-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-xs"
+                    >
+                        <span className="text-red-500 font-black text-xl uppercase italic tracking-tighter block uppercase">EFFACER TOUT</span>
+                    </button>
                 )}
             </div>
 
             {store.draft ? (
-                <div className="animate-fade-in px-4">
-                    <div className="flex items-center gap-6 mb-12">
-                        <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
-                        <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic">APERÇU DU PACK ORIENTÉ CLIENT</h2>
-                        <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
+                <div className="animate-fade-in">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
+                        <div className="flex items-center gap-6 flex-1">
+                            <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU RÉEL ORIENTÉ CLIENT</h2>
+                            <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
+                        </div>
+                        
+                        <button 
+                            onClick={downloadAsImage}
+                            disabled={isLoading}
+                            className="bg-orange-500 hover:bg-orange-400 text-white font-black px-10 py-4 rounded-2xl flex items-center gap-3 transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(249,115,22,0.3)] text-xs uppercase tracking-widest italic"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            TÉLÉCHARGER L'IMAGE PRO
+                        </button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
+
+                    {/* SECTION DE CAPTURE - C'est ce bloc qui sera transformé en image */}
+                    <div 
+                        ref={previewContainerRef} 
+                        id="capture-target"
+                        className="bg-brand-dark-blue rounded-[4rem] p-10 border border-gray-800/50 relative overflow-hidden"
+                    >
+                        {/* Éléments de Branding pour l'image exportée */}
+                        <div className="flex flex-col items-center mb-16">
+                            <NextWinLogo className="h-16 mb-4" />
+                            <div className="bg-orange-500/10 border border-orange-500/30 px-6 py-2 rounded-full">
+                                <span className="text-orange-500 font-black text-[9px] uppercase tracking-[0.4em] italic">PACK OFFICIEL IA • {new Date().toLocaleDateString('fr-FR')}</span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
+                        </div>
+
+                        {/* Footer Branding pour l'image exportée */}
+                        <div className="mt-16 text-center pt-10 border-t border-gray-800/50">
+                            <p className="text-gray-600 font-black text-[8px] uppercase tracking-[0.6em] italic">WWW.NEXTWIN.AI • STRATÉGIE RIGUREUSE • RISK MANAGEMENT 5%</p>
+                            <p className="text-gray-700 font-bold text-[7px] uppercase tracking-widest mt-4">Interdit aux mineurs. Jouer comporte des risques : 09-74-75-13-13.</p>
+                        </div>
+
+                        {/* Background Effects for the image */}
+                        <div className="absolute -top-40 -right-40 w-96 h-96 bg-orange-500/5 rounded-full blur-[120px]"></div>
+                        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]"></div>
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-32 border-2 border-dashed border-gray-800 rounded-[5rem] bg-gray-900/10 mx-4">
-                    <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-8">
-                        <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                <div className="text-center py-40 border-2 border-dashed border-gray-800 rounded-[5rem] bg-gray-900/10">
+                    <div className="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                        <svg className="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <h3 className="text-gray-500 font-black uppercase text-lg tracking-widest italic">Aucun flux actif</h3>
-                    <p className="text-gray-700 text-[11px] uppercase font-bold tracking-[0.4em] mt-3">Prêt pour l'extraction V17</p>
+                    <h3 className="text-gray-600 font-black uppercase text-xl tracking-[0.3em] italic">Système V18 prêt</h3>
+                    <p className="text-gray-800 text-xs uppercase font-bold tracking-[0.4em] mt-4 italic">Lancez le scan pour générer votre pack visuel</p>
                 </div>
             )}
-
-            {/* TEMPLATE D'EXPORTATION CACHÉ (Invisible à l'œil mais capturable par html2canvas) */}
-            <div className="fixed -left-[2000px] top-0">
-                <div 
-                    ref={exportRef} 
-                    className="w-[1200px] bg-brand-dark-blue p-16 font-sans relative overflow-hidden"
-                    style={{ minHeight: '1600px' }}
-                >
-                    {/* Branded Background elements */}
-                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[150px]"></div>
-                    <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px]"></div>
-
-                    {/* Header Export */}
-                    <div className="flex flex-col items-center mb-16 relative z-10">
-                        <NextWinLogo className="h-24 mb-6" />
-                        <div className="bg-orange-500/10 border-2 border-orange-500/30 px-10 py-3 rounded-full">
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.6em] italic text-sm">
-                                PACK OFFICIEL IA • {new Date().toLocaleDateString('fr-FR')}
-                            </h2>
-                        </div>
-                    </div>
-
-                    {/* Grid Export 4x2 */}
-                    <div className="grid grid-cols-2 gap-10 relative z-10">
-                        {store.draft?.predictions.map(p => (
-                            <div key={p.id} className="bg-gray-900/80 border-2 border-gray-800 rounded-[3rem] p-10 flex flex-col space-y-6">
-                                <div className="flex justify-between items-center">
-                                    <span className="bg-orange-500/10 border border-orange-500/30 text-orange-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase italic">
-                                        {p.competition}
-                                    </span>
-                                    <div className="text-white/40 font-black text-sm italic">{p.time}</div>
-                                </div>
-                                <div className="flex-grow">
-                                    <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase mb-4">{p.match}</h3>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
-                                        <p className="text-xl font-black text-white/90 uppercase italic tracking-wider">{p.betType}</p>
-                                    </div>
-                                </div>
-                                <div className="pt-6 border-t border-gray-800/50 flex justify-between items-center">
-                                    <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest italic">Analyse IA Probabilité</div>
-                                    <div className="text-3xl font-black text-green-400">{p.probability}%</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Footer Export */}
-                    <div className="mt-20 text-center border-t-2 border-gray-800 pt-10 relative z-10">
-                        <p className="text-gray-600 font-black uppercase text-xs tracking-[0.8em] italic">
-                            WWW.NEXTWIN.AI • STRATÉGIE RIGUREUSE 5% ACTIVE
-                        </p>
-                        <p className="mt-6 text-gray-700 text-[10px] font-bold uppercase tracking-widest">
-                            Interdit aux mineurs. Jouer comporte des risques : 09-74-75-13-13.
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
