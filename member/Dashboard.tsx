@@ -27,21 +27,24 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
-            // SÉCURITÉ : Seul NEXTWIN_BOSS peut accéder à cet onglet
+            // SÉCURITÉ : Seul Administrateur peut accéder à cet onglet
             [DashboardNav.Predictions]: currentUser.isAdmin ? <Predictions language={language} isAdmin={true} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Bankroll]: <BankrollManagement />,
             [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
             [DashboardNav.Profile]: <Profile />,
-            // Pass setActivePage to Support component to fix prop error after Support.tsx update
             [DashboardNav.Support]: <Support language={language} setActivePage={setActivePage} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
-            // Pages retirées mais conservées dans l'enum pour compatibilité
             [DashboardNav.Analyzer]: null,
             [DashboardNav.Archives]: null,
             [DashboardNav.LiveScores]: null,
         };
         return pageMapping[activePage];
     }
+
+    const handleHomeReturn = () => {
+        setActivePage(DashboardNav.DashboardHome);
+        setSidebarOpen(false);
+    };
 
     return (
         <div className="flex min-h-screen bg-brand-dark">
@@ -57,7 +60,12 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             <div className="flex-1 md:ml-64 transition-all duration-300">
                  {/* Mobile Header */}
                 <div className="md:hidden sticky top-0 z-30 flex items-center justify-between p-4 bg-brand-dark-blue/80 backdrop-blur-sm border-b border-gray-800">
-                    <span className="text-white font-bold tracking-tighter italic">NEXTWIN</span>
+                    <button 
+                        onClick={handleHomeReturn}
+                        className="text-white font-bold tracking-tighter italic text-lg"
+                    >
+                        NEXTWIN
+                    </button>
                     <button onClick={() => setSidebarOpen(true)} className="text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />

@@ -24,14 +24,14 @@ const NavItem: React.FC<{
     return (
         <button
             onClick={() => setActivePage(page)}
-            className={`flex items-center w-full px-4 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 relative group mb-1 ${
+            className={`flex items-center w-full px-4 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 relative group mb-1.5 ${
                 isActive
                     ? 'bg-gradient-to-r from-orange-500/10 to-purple-500/10 text-white border border-orange-500/20'
                     : 'text-gray-500 hover:bg-white/5 hover:text-white'
             }`}
         >
-            <div className={`absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-brand rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
-            <div className={`w-3.5 h-3.5 mr-3 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
+            <div className={`absolute left-0 top-3 bottom-3 w-0.5 bg-gradient-brand rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
+            <div className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
             <span className="truncate">{label}</span>
         </button>
     );
@@ -46,11 +46,11 @@ const ExternalNavItem: React.FC<{
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center w-full px-4 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1"
+        className="flex items-center w-full px-4 py-3 text-xs font-bold uppercase tracking-widest rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1.5"
     >
-        <div className="w-3.5 h-3.5 mr-3 text-gray-600 group-hover:text-orange-400">{icon}</div>
+        <div className="w-4 h-4 mr-3 text-gray-600 group-hover:text-orange-400">{icon}</div>
         <span className="truncate">{label}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </a>
 );
 
@@ -59,8 +59,8 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
 
     const navLinks = (
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
-            <div className="px-4 py-2 mb-4">
-                <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic mb-2 opacity-50">{t.dash_nav_menu}</p>
+            <div className="px-4 py-2 mb-6">
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest italic mb-2 opacity-60">{t.dash_nav_menu}</p>
                 <div className="h-[1px] w-full bg-gradient-to-r from-gray-800 to-transparent"></div>
             </div>
 
@@ -104,7 +104,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>} 
             />
             
-            <div className="px-4 py-4">
+            <div className="px-4 py-5">
                  <div className="h-[1px] w-full bg-gradient-to-r from-gray-800 to-transparent"></div>
             </div>
 
@@ -131,6 +131,10 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 label={t.dash_nav_support} 
                 icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" /></svg>} 
             />
+            
+            <div className="mt-8 px-4 py-3 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+                 <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest text-center">Version Pro Active</p>
+            </div>
         </nav>
     );
 
@@ -142,20 +146,30 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
             ></div>
             <div className={`fixed top-0 left-0 h-full w-64 bg-brand-dark-blue border-r border-white/5 z-50 transform transition-transform md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex flex-col h-full">
-                    <div className="p-8 border-b border-white/5">
-                        <NextWinLogo className="h-6"/>
-                    </div>
+                    <button 
+                        onClick={() => setActivePage(DashboardNav.DashboardHome)}
+                        className="p-8 border-b border-white/5 text-left hover:bg-white/5 transition-colors"
+                    >
+                        <NextWinLogo className="h-7"/>
+                    </button>
                     {navLinks}
                 </div>
             </div>
 
             <div className="hidden md:flex md:fixed md:top-28 md:bottom-0 md:left-0 md:w-64 md:flex-col bg-brand-dark-blue border-r border-white/5">
                 <div className="flex flex-col h-full">
+                    <button 
+                        onClick={() => setActivePage(DashboardNav.DashboardHome)}
+                        className="p-8 border-b border-white/5 text-left hover:bg-white/5 transition-colors hidden"
+                    >
+                         {/* Hidden because header already has logo, but logic kept for structure */}
+                        <NextWinLogo className="h-7"/>
+                    </button>
                     {navLinks}
                 </div>
             </div>
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
             `}</style>
