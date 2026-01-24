@@ -50,8 +50,11 @@ const App: React.FC = () => {
   };
 
   const handleLoginSuccess = (user: User) => {
-    // SYSTEME ADMIN : Si le pseudo contient "admin" ou "NEXTWIN_BOSS", accès total
-    const isAdminAccount = user.username.toLowerCase().includes('admin') || user.username === 'NEXTWIN_BOSS';
+    if (!user) return;
+    
+    // SYSTEME ADMIN : Sécurisation du pseudo
+    const username = (user.username || "").toLowerCase();
+    const isAdminAccount = username.includes('admin') || username === 'nextwin_boss';
     
     const enhancedUser = {
         ...user,
