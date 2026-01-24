@@ -13,15 +13,13 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
     if (!prediction) return null;
     
     const prob = prediction.probability || 0;
+    const isBonus = prediction.category && prediction.category.includes('Bonus');
     const isVeryHigh = prob >= 85;
     const confidence = isVeryHigh ? 'TRÈS ÉLEVÉE' : 'ÉLEVÉE';
     const confidenceColor = isVeryHigh ? 'text-green-500' : 'text-green-400';
 
     return (
-        <div className="bg-[#171717]/60 border border-white/5 rounded-[2rem] p-8 flex flex-col h-full space-y-7 transition-all duration-500 hover:border-orange-500/30 group relative overflow-hidden shadow-2xl backdrop-blur-xl">
-            {/* Background Glow */}
-            <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-3xl transition-all bg-orange-500/5 group-hover:bg-orange-500/10"></div>
-
+        <div className={`bg-[#171717]/60 border ${isBonus ? 'border-orange-500/20' : 'border-white/5'} rounded-[2rem] p-8 flex flex-col h-full space-y-7 transition-all duration-500 hover:border-orange-500/30 group relative overflow-hidden shadow-2xl backdrop-blur-xl`}>
             {/* Header: Date, Time & Sport */}
             <div className="flex justify-between items-start">
                 <div className="space-y-1.5">
@@ -36,21 +34,26 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                 </div>
                 
                 <div className="flex flex-col items-end gap-3">
+                    {isBonus && (
+                        <div className="bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full">
+                            <span className="text-[7px] font-black text-orange-500 uppercase tracking-widest italic">PACK BONUS</span>
+                        </div>
+                    )}
                     <div className="bg-gray-900/50 border border-white/5 px-3 py-1 rounded-full flex items-center gap-2">
                         <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
                         <span className="text-[7px] font-black text-gray-300 uppercase tracking-widest italic">CONFIRMÉ</span>
                     </div>
-                    <div className="text-gray-700 group-hover:text-orange-500 transition-colors transform group-hover:scale-110 duration-500">
-                        <SportIcon sport={prediction.sport} />
-                    </div>
                 </div>
             </div>
 
-            {/* Competition Badge */}
-            <div className="inline-block">
-                <span className="bg-orange-500/5 border border-orange-500/20 text-orange-500/70 px-4 py-1.5 rounded-lg text-[8px] font-black tracking-[0.25em] uppercase italic">
+            {/* Competition & Sport */}
+            <div className="flex items-center justify-between">
+                <span className="bg-white/5 border border-white/5 text-gray-400 px-4 py-1.5 rounded-lg text-[8px] font-black tracking-[0.25em] uppercase italic">
                     {prediction.competition || "PRO LEAGUE"}
                 </span>
+                <div className="text-gray-700 group-hover:text-orange-500 transition-colors transform group-hover:scale-110 duration-500">
+                    <SportIcon sport={prediction.sport} />
+                </div>
             </div>
 
             {/* Match & Bet */}
@@ -59,7 +62,7 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                     {prediction.match}
                 </h3>
                 <div className="flex items-center gap-3">
-                    <div className="h-4 w-1 bg-orange-500 rounded-full"></div>
+                    <div className="h-4 w-1 bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
                     <p className="text-[12px] font-black text-white uppercase italic tracking-[0.1em]">
                         {prediction.betType}
                     </p>
