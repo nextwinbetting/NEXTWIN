@@ -57,6 +57,7 @@ export interface GroundingSource {
 export interface Prediction {
   id: string;
   sport: Sport;
+  competition: string;
   match: string;
   betType: string;
   marketType?: string;

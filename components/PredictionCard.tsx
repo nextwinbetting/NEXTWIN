@@ -14,7 +14,7 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
     
     const prob = prediction.probability || 0;
     const isVeryHigh = prob >= 85;
-    const confidence = isVeryHigh ? 'VERY HIGH' : 'HIGH';
+    const confidence = isVeryHigh ? 'TRÈS ÉLEVÉE' : 'ÉLEVÉE';
     const confidenceColor = isVeryHigh ? 'bg-green-600/20 text-green-500 border-green-500/30' : 'bg-green-800/20 text-green-400 border-green-800/30';
 
     return (
@@ -39,27 +39,33 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                 </div>
             </div>
 
-            {/* Confidence Badge */}
-            <div>
-                 <span className={`${confidenceColor} border px-3 py-1 rounded-full text-[9px] font-black tracking-[0.3em] italic uppercase inline-block`}>
-                    {confidence}
+            {/* Competition Badge */}
+            <div className="mt-2">
+                <span className="bg-orange-500/10 border border-orange-500/30 text-orange-400 px-4 py-1.5 rounded-xl text-[9px] font-black tracking-[0.2em] uppercase italic inline-block">
+                    {prediction.competition || "LIGUE"}
                 </span>
             </div>
 
             {/* Match & Bet */}
-            <div className="flex-grow space-y-2">
-                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none group-hover:text-orange-500 transition-colors duration-500">
+            <div className="flex-grow space-y-3">
+                <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-tight group-hover:text-orange-500 transition-colors duration-500">
                     {prediction.match}
                 </h3>
-                <p className="text-[11px] font-black text-orange-500 uppercase italic tracking-[0.3em]">
-                    {prediction.betType}
-                </p>
+                <div className="flex items-center gap-2">
+                    <div className="h-4 w-1 bg-orange-500 rounded-full"></div>
+                    <p className="text-[11px] font-black text-white/80 uppercase italic tracking-[0.2em]">
+                        {prediction.betType}
+                    </p>
+                </div>
             </div>
 
             {/* Probability Progress */}
             <div className="pt-2">
                 <div className="flex justify-between items-end mb-3">
-                    <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.4em]">PROBABILITÉ</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-[9px] text-gray-600 font-black uppercase tracking-[0.4em]">FIABILITÉ</p>
+                        <span className={`${confidenceColor} text-[8px] font-black px-2 py-0.5 rounded-md`}>{confidence}</span>
+                    </div>
                     <span className="text-white font-black text-xl tracking-tighter">{prob}%</span>
                 </div>
                 <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
@@ -80,18 +86,18 @@ const PredictionCard: React.FC<{ prediction: Prediction }> = ({ prediction }) =>
                 </div>
             </div>
 
-            {/* Sources Links (Optionnel visuellement mais présent dans les données) */}
+            {/* Sources */}
             {prediction.sources && prediction.sources.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-2 pt-2 opacity-50 hover:opacity-100 transition-opacity">
                     {prediction.sources.map((source, idx) => (
                         <a 
                             key={idx} 
                             href={source.uri} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="text-[8px] bg-gray-900/50 px-2 py-1 rounded-lg text-gray-500 hover:text-blue-400 transition-all font-black uppercase tracking-tighter border border-gray-800/50 truncate max-w-[120px]"
+                            className="text-[8px] bg-gray-900/50 px-2 py-1 rounded-lg text-gray-500 hover:text-orange-400 transition-all font-black uppercase tracking-tighter border border-gray-800/50 truncate max-w-[120px]"
                         >
-                            {source.title || "LIVESCORE.IN"}
+                            {source.title || "LIVESCORE"}
                         </a>
                     ))}
                 </div>
