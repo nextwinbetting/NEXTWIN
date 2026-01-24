@@ -6,7 +6,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const getAiClient = () => {
     const apiKey = process.env.API_KEY;
-    if (!apiKey) throw new Error("La clé API n'est pas configurée dans les variables d'environnement.");
+    if (!apiKey) throw new Error("La clé API n'est pas configurée.");
     return new GoogleGenAI({ apiKey });
 };
 
@@ -72,17 +72,26 @@ const LoadingComponent: React.FC = () => {
     );
 };
 
-const ErrorComponent: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => (
-    <div className="text-center flex flex-col items-center justify-center min-h-[400px] text-red-400 bg-brand-card border border-red-500/30 rounded-xl p-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <h3 className="text-xl font-bold mt-4 text-white">Erreur de Synchronisation</h3>
-        <p className="text-sm mt-2 max-w-sm text-gray-300">NEXTWIN Engine n'a pas pu récupérer les données en temps réel.</p>
-        <p className="text-[10px] mt-4 opacity-50 font-mono">{message}</p>
-        <button onClick={onRetry} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
-            RÉESSAYER
-        </button>
-    </div>
-);
+const ErrorComponent: React.FC<{ message: string; onRetry: () => void }> = ({ message, onRetry }) => {
+    const isQuotaError = message.includes('429') || message.includes('quota');
+    
+    return (
+        <div className="text-center flex flex-col items-center justify-center min-h-[400px] text-red-400 bg-brand-card border border-red-500/30 rounded-xl p-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <h3 className="text-xl font-bold mt-4 text-white">
+                {isQuotaError ? "Moteur en surcharge" : "Erreur de Synchronisation"}
+            </h3>
+            <p className="text-sm mt-2 max-w-sm text-gray-300">
+                {isQuotaError 
+                    ? "NEXTWIN Engine reçoit trop de demandes. Veuillez patienter une minute avant de réessayer." 
+                    : "NEXTWIN Engine n'a pas pu récupérer les données en temps réel."}
+            </p>
+            <button onClick={onRetry} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
+                RÉESSAYER
+            </button>
+        </div>
+    );
+};
 
 const Predictions: React.FC<PredictionsProps> = ({ language }) => {
     const t = translations[language];
@@ -99,7 +108,7 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             const ai = getAiClient();
             
             const response = await ai.models.generateContent({
-                model: 'gemini-3-pro-preview',
+                model: 'gemini-3-flash-preview',
                 contents: `Générer 6 pronostics sportifs réels (2 Football, 2 Basketball, 2 Tennis) pour des matchs après ${currentUTC}. Utilise Google Search pour les horaires exacts (Flashscore).`,
                 config: { 
                     tools: [{googleSearch: {}}],

@@ -74,7 +74,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             const ai = getAiClient();
             
             const response = await ai.models.generateContent({
-                model: "gemini-3-pro-preview",
+                model: "gemini-3-flash-preview",
                 contents: `Analyser le match à venir entre ${team1} et ${team2} pour ${sport} (Pari: ${betType}). Référence: ${currentUTC}. Vérifie Flashscore.`,
                 config: { 
                     tools: [{ googleSearch: {} }],
@@ -112,7 +112,8 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
             onNewAnalysis({ result: analysisResult, sport, team1, team2, betType });
         } catch (err: any) {
             console.error("Analysis failed:", err);
-            setError(err.message || "Erreur d'analyse");
+            const isQuotaError = err.message.includes('429') || err.message.includes('quota');
+            setError(isQuotaError ? "Serveur en surcharge, veuillez patienter 1 min." : (err.message || "Erreur d'analyse"));
             setStatus(AnalysisStatus.Error);
         }
     };
@@ -184,7 +185,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
                             </div>
                         </div>
                     )}
-                    {status === AnalysisStatus.Error && <div className="text-center text-red-400">Une erreur est survenue lors de la synchronisation.<br/><span className="text-[10px] opacity-50">{error}</span></div>}
+                    {status === AnalysisStatus.Error && <div className="text-center text-red-400">Une erreur est survenue.<br/><span className="text-[12px] opacity-70 mt-2 block">{error}</span></div>}
                 </div>
             </div>
         </div>
