@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Language, GroundingSource, AnalysisResult } from '../types';
+import { Language, AnalysisResult } from '../types';
 import { translations } from '../translations';
-import { GoogleGenAI } from "@google/genai";
-
-// --- AI LOGIC ---
-const extractJson = (rawText: string): string => {
-    const match = rawText.match(/```json\s*([\sS]*?)\s*```/);
-    if (match && match[1]) return match[1];
-    const startIndex = rawText.indexOf('{');
-    const endIndex = rawText.lastIndexOf('}');
-    if (startIndex > -1 && endIndex > -1) return rawText.substring(startIndex, endIndex + 1);
-    throw new Error("Aucun objet JSON valide n'a été trouvé.");
-};
+import { GoogleGenAI, Type } from "@google/genai";
 
 const getAiClient = () => {
     const apiKey = process.env.API_KEY;
@@ -19,23 +9,26 @@ const getAiClient = () => {
     return new GoogleGenAI({ apiKey });
 };
 
-// Formateur de date/heure partagé (DOIT être identique à Predictions.tsx)
 const formatMatchDateTime = (isoString: string) => {
-    const date = new Date(isoString);
-    const dateStr = date.toLocaleDateString('fr-FR', { 
-        timeZone: 'Europe/Paris', 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-    }).replace(/\//g, '.');
-    
-    const timeStr = date.toLocaleTimeString('fr-FR', { 
-        timeZone: 'Europe/Paris', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
-    
-    return { dateStr, timeStr };
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) throw new Error("Invalid date");
+        const dateStr = date.toLocaleDateString('fr-FR', { 
+            timeZone: 'Europe/Paris', 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        }).replace(/\//g, '.');
+        
+        const timeStr = date.toLocaleTimeString('fr-FR', { 
+            timeZone: 'Europe/Paris', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        return { dateStr, timeStr };
+    } catch (e) {
+        return { dateStr: '--.--.----', timeStr: '--:--' };
+    }
 };
 
 enum AnalysisStatus { Idle, Loading, Success, Error }
@@ -78,54 +71,30 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
         
         try {
             const currentUTC = new Date().toISOString();
-            const prompt = `
-            Tu es NEXTWIN AI ENGINE, un moteur automatisé d'analyse sportive de haute précision.
-    
-            INSTRUCTIONS SYSTÈME :
-            - Répond uniquement avec du JSON valide.
-            - Référence temporelle actuelle : ${currentUTC}.
-    
-            OBJECTIF :
-            Analyser le PROCHAIN match officiel à venir entre ${team1} et ${team2} pour le sport ${sport} et le pari "${betType}".
-    
-            CONTRAINTE DE SYNCHRONISATION (CRITIQUE) :
-            - Vérifie l'horaire exact via Google Search (doit correspondre à Flashscore.fr).
-            - Fournit l'heure au format ISO 8601 UTC STRICT (ex: "2024-02-15T20:00:00Z").
-            - Ne pas inventer de match. Si aucun match futur n'est programmé, retourne {"error": "Aucun match trouvé"}.
-    
-            FORMAT JSON :
-            {
-              "analysis": "...",
-              "probability": integer,
-              "keyData": ["...", "..."],
-              "recommendedBet": "Pari suggéré",
-              "recommendationReason": "...",
-              "matchDateTimeUTC": "ISO 8601 UTC String"
-            }
-            `;
-            
             const ai = getAiClient();
+            
             const response = await ai.models.generateContent({
                 model: "gemini-3-pro-preview",
-                contents: prompt,
-                config: { tools: [{ googleSearch: {} }] },
+                contents: `Analyser le match à venir entre ${team1} et ${team2} pour ${sport} (Pari: ${betType}). Référence: ${currentUTC}. Vérifie Flashscore.`,
+                config: { 
+                    tools: [{ googleSearch: {} }],
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            analysis: { type: Type.STRING },
+                            probability: { type: Type.INTEGER },
+                            keyData: { type: Type.ARRAY, items: { type: Type.STRING } },
+                            recommendedBet: { type: Type.STRING },
+                            recommendationReason: { type: Type.STRING },
+                            matchDateTimeUTC: { type: Type.STRING }
+                        },
+                        required: ["analysis", "probability", "keyData", "recommendedBet", "recommendationReason", "matchDateTimeUTC"]
+                    }
+                },
             });
     
-            const rawText = response.text?.trim();
-            if (!rawText) throw new Error("Réponse vide.");
-            const jsonText = extractJson(rawText);
-            const parsed = JSON.parse(jsonText);
-            
-            if (parsed.error) throw new Error(parsed.error);
-    
-            const sources: GroundingSource[] = [];
-            const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-            if (groundingChunks) {
-                for (const chunk of groundingChunks) {
-                    if (chunk.web) sources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
-                }
-            }
-            
+            const parsed = JSON.parse(response.text || '{}');
             const { dateStr, timeStr } = formatMatchDateTime(parsed.matchDateTimeUTC);
     
             const analysisResult: AnalysisResult = {
@@ -136,15 +105,14 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
                 recommendationReason: parsed.recommendationReason,
                 matchDate: dateStr,
                 matchTime: timeStr,
-                sources: sources,
             };
 
             setResult(analysisResult);
             setStatus(AnalysisStatus.Success);
             onNewAnalysis({ result: analysisResult, sport, team1, team2, betType });
-        } catch (err) {
+        } catch (err: any) {
             console.error("Analysis failed:", err);
-            setError((err as Error).message);
+            setError(err.message || "Erreur d'analyse");
             setStatus(AnalysisStatus.Error);
         }
     };
@@ -216,7 +184,7 @@ const Analyzer: React.FC<AnalyzerProps> = ({ language, onNewAnalysis }) => {
                             </div>
                         </div>
                     )}
-                    {status === AnalysisStatus.Error && <div className="text-center text-red-400">Une erreur est survenue lors de la synchronisation.</div>}
+                    {status === AnalysisStatus.Error && <div className="text-center text-red-400">Une erreur est survenue lors de la synchronisation.<br/><span className="text-[10px] opacity-50">{error}</span></div>}
                 </div>
             </div>
         </div>

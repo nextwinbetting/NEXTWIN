@@ -2,25 +2,11 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Prediction, Sport, GroundingSource, Language } from '../types';
 import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
-import { GoogleGenAI } from "@google/genai";
-
-// --- AI LOGIC ---
-const extractJson = (rawText: string): string => {
-    const match = rawText.match(/```json\s*([\sS]*?)\s*```/);
-    if (match && match[1]) {
-        return match[1];
-    }
-    const startIndex = rawText.indexOf('{');
-    const endIndex = rawText.lastIndexOf('}');
-    if (startIndex > -1 && endIndex > -1) {
-        return rawText.substring(startIndex, endIndex + 1);
-    }
-    throw new Error("Aucun objet JSON valide n'a été trouvé.");
-};
+import { GoogleGenAI, Type } from "@google/genai";
 
 const getAiClient = () => {
     const apiKey = process.env.API_KEY;
-    if (!apiKey) throw new Error("La clé API n'est pas configurée.");
+    if (!apiKey) throw new Error("La clé API n'est pas configurée dans les variables d'environnement.");
     return new GoogleGenAI({ apiKey });
 };
 
@@ -35,24 +21,26 @@ const mapStringToSport = (sport: string): Sport => {
     return Sport.Football;
 };
 
-// Formateur de date/heure partagé pour la cohérence
 const formatMatchDateTime = (isoString: string) => {
-    const date = new Date(isoString);
-    // Formatage strict en heure de Paris (Europe/Paris) comme Flashscore
-    const dateStr = date.toLocaleDateString('fr-FR', { 
-        timeZone: 'Europe/Paris', 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric' 
-    }).replace(/\//g, '.');
-    
-    const timeStr = date.toLocaleTimeString('fr-FR', { 
-        timeZone: 'Europe/Paris', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
-    
-    return { dateStr, timeStr };
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) throw new Error("Invalid date");
+        const dateStr = date.toLocaleDateString('fr-FR', { 
+            timeZone: 'Europe/Paris', 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        }).replace(/\//g, '.');
+        
+        const timeStr = date.toLocaleTimeString('fr-FR', { 
+            timeZone: 'Europe/Paris', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        return { dateStr, timeStr };
+    } catch (e) {
+        return { dateStr: '--.--.----', timeStr: '--:--' };
+    }
 };
 
 interface PredictionsProps {
@@ -89,6 +77,7 @@ const ErrorComponent: React.FC<{ message: string; onRetry: () => void }> = ({ me
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <h3 className="text-xl font-bold mt-4 text-white">Erreur de Synchronisation</h3>
         <p className="text-sm mt-2 max-w-sm text-gray-300">NEXTWIN Engine n'a pas pu récupérer les données en temps réel.</p>
+        <p className="text-[10px] mt-4 opacity-50 font-mono">{message}</p>
         <button onClick={onRetry} className="mt-6 rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
             RÉESSAYER
         </button>
@@ -101,69 +90,51 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [predictions, setPredictions] = useState<Prediction[]>([]);
-    const [sources, setSources] = useState<GroundingSource[]>([]);
 
     const fetchPredictions = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
             const currentUTC = getCurrentUTCISO();
-            const prompt = `
-            Tu es NEXTWIN AI ENGINE, un moteur automatisé de pronostics sportifs de haute précision.
-    
-            INSTRUCTIONS SYSTÈME (OBLIGATOIRES ET STRICTES) :
-            - Tu DOIS répondre UNIQUEMENT avec du JSON valide.
-            - TA RÉPONSE DOIT COMMENCER PAR \`{\` ET SE TERMINER PAR \`}\`.
-            - AUCUN texte ou markdown ne doit être présent en dehors du JSON.
-    
-            OBJECTIF :
-            Générer 6 pronostics sportifs pour des matchs réels, officiellement programmés (2 Football, 2 Basketball, 2 Tennis).
-
-            CONTRAINTE DE TEMPS ET DE SYNCHRONISATION (CRITIQUE) :
-            - L'heure actuelle de référence est ${currentUTC}. Sélectionne uniquement des matchs POSTÉRIEURS à cette heure.
-            - Utilise Google Search pour vérifier l'horaire exact du coup d'envoi.
-            - FOURNIT L'HEURE AU FORMAT ISO 8601 UTC STRICT (ex: "2024-02-15T20:00:00Z").
-            - SOIS EXTRÊMEMENT PRÉCIS : l'horaire doit correspondre à celui de Flashscore.fr. Si un match NBA a lieu à 20h à New York, l'heure UTC doit être correctement calculée (01h UTC le lendemain).
-    
-            FORMAT JSON :
-            {
-              "predictions": [
-                {
-                  "sport": "Football" | "Basketball" | "Tennis",
-                  "league": "Nom de la ligue",
-                  "match": "Équipe A vs Équipe B",
-                  "betType": "Pronostic précis (ex: France Gagnant)",
-                  "matchDateTimeUTC": "ISO 8601 UTC String",
-                  "probability": integer (>= 70),
-                  "analysis": "Analyse factuelle courte"
-                }
-              ]
-            }
-            `;
-    
             const ai = getAiClient();
+            
             const response = await ai.models.generateContent({
                 model: 'gemini-3-pro-preview',
-                contents: prompt,
-                config: { tools: [{googleSearch: {}}] },
+                contents: `Générer 6 pronostics sportifs réels (2 Football, 2 Basketball, 2 Tennis) pour des matchs après ${currentUTC}. Utilise Google Search pour les horaires exacts (Flashscore).`,
+                config: { 
+                    tools: [{googleSearch: {}}],
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            predictions: {
+                                type: Type.ARRAY,
+                                items: {
+                                    type: Type.OBJECT,
+                                    properties: {
+                                        sport: { type: Type.STRING },
+                                        league: { type: Type.STRING },
+                                        match: { type: Type.STRING },
+                                        betType: { type: Type.STRING },
+                                        matchDateTimeUTC: { type: Type.STRING },
+                                        probability: { type: Type.INTEGER },
+                                        analysis: { type: Type.STRING }
+                                    },
+                                    required: ["sport", "league", "match", "betType", "matchDateTimeUTC", "probability", "analysis"]
+                                }
+                            }
+                        },
+                        required: ["predictions"]
+                    }
+                },
             });
-    
-            const rawText = response.text?.trim();
-            if (!rawText) throw new Error("Réponse vide.");
-    
-            const jsonText = extractJson(rawText);
-            const parsed = JSON.parse(jsonText);
+
+            const parsed = JSON.parse(response.text || '{}');
             
-            if (!parsed.predictions || !Array.isArray(parsed.predictions)) throw new Error("Format invalide.");
-    
-            const newSources: GroundingSource[] = [];
-            const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-            if (groundingChunks) {
-                for (const chunk of groundingChunks) {
-                    if (chunk.web) newSources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
-                }
+            if (!parsed.predictions || !Array.isArray(parsed.predictions)) {
+                throw new Error("Format de données reçu invalide.");
             }
-    
+
             const newPredictions: Prediction[] = parsed.predictions.map((p: any, index: number) => {
                 const { dateStr, timeStr } = formatMatchDateTime(p.matchDateTimeUTC);
                 return {
@@ -179,10 +150,9 @@ const Predictions: React.FC<PredictionsProps> = ({ language }) => {
             });
 
             setPredictions(newPredictions);
-            setSources(newSources);
-        } catch (err) {
+        } catch (err: any) {
             console.error("Fetch failed:", err);
-            setError((err as Error).message);
+            setError(err.message || "Erreur inconnue");
         } finally {
             setIsLoading(false);
         }
