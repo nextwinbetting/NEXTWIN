@@ -24,14 +24,14 @@ const NavItem: React.FC<{
     return (
         <button
             onClick={() => setActivePage(page)}
-            className={`flex items-center w-full px-4 py-3 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 relative group mb-1 ${
+            className={`flex items-center w-full px-4 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 relative group mb-1 ${
                 isActive
                     ? 'bg-gradient-to-r from-orange-500/10 to-purple-500/10 text-white border border-orange-500/20'
                     : 'text-gray-500 hover:bg-white/5 hover:text-white'
             }`}
         >
-            <div className={`absolute left-0 top-3 bottom-3 w-0.5 bg-gradient-brand rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
-            <div className={`w-4 h-4 mr-3 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
+            <div className={`absolute left-0 top-2 bottom-2 w-0.5 bg-gradient-brand rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
+            <div className={`w-3.5 h-3.5 mr-3 transition-colors ${isActive ? 'text-orange-500' : 'text-gray-600 group-hover:text-orange-400'}`}>{icon}</div>
             <span className="truncate">{label}</span>
         </button>
     );
@@ -46,11 +46,11 @@ const ExternalNavItem: React.FC<{
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center w-full px-4 py-3 text-[10px] font-bold uppercase tracking-widest rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1"
+        className="flex items-center w-full px-4 py-2.5 text-[9px] font-bold uppercase tracking-widest rounded-xl text-gray-500 hover:bg-white/5 hover:text-white transition-all duration-300 group mb-1"
     >
-        <div className="w-4 h-4 mr-3 text-gray-600 group-hover:text-orange-400">{icon}</div>
+        <div className="w-3.5 h-3.5 mr-3 text-gray-600 group-hover:text-orange-400">{icon}</div>
         <span className="truncate">{label}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 ml-auto text-gray-700 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </a>
 );
 
@@ -60,7 +60,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
     const navLinks = (
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
             <div className="px-4 py-2 mb-4">
-                <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest italic mb-2 opacity-50">{t.dash_nav_menu}</p>
+                <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest italic mb-2 opacity-50">{t.dash_nav_menu}</p>
                 <div className="h-[1px] w-full bg-gradient-to-r from-gray-800 to-transparent"></div>
             </div>
 
@@ -78,7 +78,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                     activePage={activePage} 
                     setActivePage={setActivePage} 
                     label={t.dash_nav_predictions} 
-                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>} 
+                    icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>} 
                 />
             )}
 
@@ -95,7 +95,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 activePage={activePage} 
                 setActivePage={setActivePage} 
                 label={t.dash_nav_bankroll} 
-                icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.75A.75.75 0 013 4.5h.75m0 0a.75.75 0 00-.75-.75h-.75m7.5-1.5V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.75m0 0h3.75m-3.75 0a2.25 2.25 0 01-2.25 2.25V15m1.5 0v.75a2.25 2.25 0 002.25 2.25h3a2.25 2.25 0 002.25-2.25v-.75" /></svg>} 
+                icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>} 
             />
             
             <ExternalNavItem 
@@ -104,7 +104,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>} 
             />
             
-            <div className="px-4 py-6">
+            <div className="px-4 py-4">
                  <div className="h-[1px] w-full bg-gradient-to-r from-gray-800 to-transparent"></div>
             </div>
 
@@ -113,7 +113,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 activePage={activePage} 
                 setActivePage={setActivePage} 
                 label={t.dash_nav_subscription} 
-                icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 110 6H9m9-13.5H5.25A2.25 2.25 0 003 6.75v10.5A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V6.75A2.25 2.25 0 0018.75 4.5H5.25z" /></svg>} 
+                icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>} 
             />
             
             <NavItem 
@@ -143,7 +143,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
             <div className={`fixed top-0 left-0 h-full w-64 bg-brand-dark-blue border-r border-white/5 z-50 transform transition-transform md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex flex-col h-full">
                     <div className="p-8 border-b border-white/5">
-                        <NextWinLogo className="h-8"/>
+                        <NextWinLogo className="h-6"/>
                     </div>
                     {navLinks}
                 </div>
@@ -155,7 +155,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, i
                 </div>
             </div>
             <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 3px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
             `}</style>
