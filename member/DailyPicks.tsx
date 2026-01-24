@@ -54,7 +54,7 @@ const DailyPicks: React.FC<DailyPicksProps> = ({ language, currentUser }) => {
             {/* Header Section - Uniquement le badge et la date */}
             <div className="text-center mb-10">
                 <div className="inline-block bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-full mb-4 backdrop-blur-md">
-                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em] italic">SESSION OFFICIELLE V10</span>
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.4em] italic">PRONOSTICS OFFICIELS</span>
                 </div>
                 <p className="text-gray-500 text-xs font-bold uppercase tracking-[0.5em] italic">Analyse du {todayDate}</p>
             </div>
