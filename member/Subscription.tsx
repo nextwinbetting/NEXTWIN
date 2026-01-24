@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
@@ -17,14 +18,14 @@ const CheckIcon: React.FC = () => (
 );
 
 const InfoCard: React.FC<{ title: string; value: string; icon: React.ReactNode; valueColor?: string; }> = ({ title, value, icon, valueColor = 'text-white' }) => (
-    <div className="bg-brand-card border border-gray-800 rounded-xl p-6">
+    <div className="bg-brand-card border border-white/5 rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/20">
         <div className="flex items-center">
-            <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-gray-800 text-gray-400">
+            <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-xl bg-gray-900 border border-white/10 text-orange-500">
                 {icon}
             </div>
-            <div className="ml-4">
-                <p className="text-sm text-brand-light-gray">{title}</p>
-                <p className={`text-lg font-bold ${valueColor}`}>{value}</p>
+            <div className="ml-5">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">{title}</p>
+                <p className={`text-xl font-black italic tracking-tighter uppercase ${valueColor}`}>{value}</p>
             </div>
         </div>
     </div>
@@ -42,13 +43,16 @@ const Subscription: React.FC<SubscriptionProps> = ({ isSubscribed, onSubscribe, 
     if (isSubscribed) {
         return (
             <>
-                <div className="max-w-4xl mx-auto">
-                    <div className="text-center">
-                        <h1 className="text-4xl sm:text-5xl font-bold text-white">{t.sub_manage_title}</h1>
-                        <p className="mt-4 text-lg text-brand-light-gray">{t.sub_manage_subtitle}</p>
+                <div className="max-w-5xl mx-auto pb-24">
+                    <div className="text-center mb-16">
+                        <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-8">
+                            <span className="text-xs font-black text-orange-500 uppercase tracking-[0.4em] italic">SÉCURITÉ DU COMPTE</span>
+                        </div>
+                        <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-[1.1] mb-6">{t.sub_manage_title}</h1>
+                        <p className="text-sm sm:text-xl font-bold text-gray-500 uppercase tracking-[0.4em] italic leading-relaxed">{t.sub_manage_subtitle}</p>
                     </div>
 
-                    <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <InfoCard 
                             title={t.sub_card_type_title}
                             value={t.sub_card_type_value}
@@ -67,33 +71,34 @@ const Subscription: React.FC<SubscriptionProps> = ({ isSubscribed, onSubscribe, 
                         />
                     </div>
                     
-                    <div className="mt-10 bg-brand-card border border-gray-800 rounded-xl p-8 text-center">
-                        <h3 className="text-xl font-bold text-white">Zone de gestion</h3>
+                    <div className="mt-16 bg-brand-card border border-white/5 rounded-[2.5rem] p-12 text-center relative overflow-hidden">
+                        <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-8">ZONE DE GESTION ADMINISTRATIVE</h3>
                          <button 
                             onClick={() => setShowCancelModal(true)}
-                            className="mt-6 w-full max-w-sm mx-auto rounded-md bg-red-800/80 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-red-700/80 border border-red-600/50 transition-colors"
+                            className="w-full max-w-md mx-auto rounded-xl bg-red-900/20 border border-red-500/30 px-8 py-5 text-xs font-black uppercase italic tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all duration-500"
                         >
                            {t.sub_cancel_button}
                         </button>
                     </div>
 
-                    <div className="mt-8 text-center">
-                        <button onClick={onNavigateToFaq} className="text-brand-light-gray hover:text-white transition-colors text-sm font-semibold">
+                    <div className="mt-12 text-center">
+                        <button onClick={onNavigateToFaq} className="text-gray-500 hover:text-orange-500 transition-colors text-[10px] font-black uppercase tracking-widest italic">
                            👉 {t.sub_faq_link}
                         </button>
                     </div>
                 </div>
 
                 {showCancelModal && (
-                    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-                        <div className="bg-brand-dark-blue border border-gray-800 rounded-2xl max-w-md w-full p-8 shadow-2xl">
-                             <h2 className="text-2xl font-bold text-white">{t.sub_modal_title}</h2>
-                             <p className="mt-4 text-brand-light-gray">{t.sub_modal_text}</p>
-                             <div className="mt-8 flex justify-end space-x-4">
-                                <button onClick={() => setShowCancelModal(false)} className="px-6 py-2 text-sm font-semibold text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors">
+                    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 backdrop-blur-xl">
+                        <div className="bg-brand-dark-blue border border-white/10 rounded-[2.5rem] max-w-lg w-full p-12 shadow-2xl">
+                             <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-6">{t.sub_modal_title}</h2>
+                             <p className="text-gray-400 text-sm font-bold uppercase tracking-widest leading-loose mb-10">{t.sub_modal_text}</p>
+                             <div className="flex flex-col sm:flex-row gap-4">
+                                <button onClick={() => setShowCancelModal(false)} className="flex-1 px-8 py-4 text-xs font-black text-white bg-gray-800 hover:bg-gray-700 rounded-xl transition-all uppercase tracking-widest">
                                     {t.sub_modal_cancel}
                                 </button>
-                                 <button onClick={handleConfirmCancel} className="px-6 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-500 rounded-md transition-colors">
+                                 <button onClick={handleConfirmCancel} className="flex-1 px-8 py-4 text-xs font-black text-white bg-red-600 hover:bg-red-500 rounded-xl transition-all uppercase tracking-widest shadow-lg shadow-red-500/20">
                                     {t.sub_modal_confirm}
                                 </button>
                              </div>
@@ -105,28 +110,31 @@ const Subscription: React.FC<SubscriptionProps> = ({ isSubscribed, onSubscribe, 
     }
 
     return (
-         <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white">{t.sub_inactive_title}</h1>
-             <p className="mt-4 text-lg text-brand-light-gray">
+         <div className="text-center pb-24">
+            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase mb-6">{t.sub_inactive_title}</h1>
+             <p className="text-sm sm:text-xl font-bold text-gray-500 uppercase tracking-[0.4em] italic mb-16">
                 {t.sub_inactive_subtitle}
             </p>
 
-            <div className="mt-8 flex justify-center">
-                 <div className="max-w-md w-full bg-brand-card border border-gray-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-gradient-to-r from-orange-600 to-purple-600 rounded-full opacity-20 blur-3xl"></div>
+            <div className="flex justify-center">
+                 <div className="max-w-lg w-full bg-brand-card border border-white/10 rounded-[3rem] p-12 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-gradient-to-r from-orange-600 to-purple-600 rounded-full opacity-20 blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
                     <div className="relative z-10 text-center">
-                        <span className="inline-block bg-gray-800 text-sm font-semibold text-transparent bg-clip-text bg-gradient-brand px-3 py-1 rounded-full">{t.join_pass}</span>
-                        <h2 className="mt-4 text-5xl font-bold text-white">12,99€<span className="text-2xl text-brand-light-gray"> {t.join_price}</span></h2>
-                        <p className="mt-2 text-sm text-yellow-400 bg-yellow-900/50 inline-block px-3 py-1 rounded-full">{t.join_commitment}</p>
-                        <ul className="text-left mt-8 space-y-3 text-brand-light-gray">
-                            <li className="flex items-center"><CheckIcon /><span className="ml-3">{t.join_feature_list_1}</span></li>
-                            <li className="flex items-center"><CheckIcon /><span className="ml-3">{t.join_feature_list_2}</span></li>
-                            <li className="flex items-center"><CheckIcon /><span className="ml-3">{t.join_feature_list_3}</span></li>
+                        <span className="inline-block bg-gray-900 border border-white/10 text-[10px] font-black text-orange-500 uppercase tracking-[0.4em] italic px-6 py-2 rounded-full mb-8">{t.join_pass}</span>
+                        <h2 className="text-6xl font-black text-white italic tracking-tighter uppercase mb-2">12,99€<span className="text-2xl text-gray-500 italic"> {t.join_price}</span></h2>
+                        <p className="text-[10px] font-black text-yellow-500/60 uppercase tracking-[0.2em] italic bg-yellow-500/5 inline-block px-4 py-1 rounded-full mb-10 border border-yellow-500/10">{t.join_commitment}</p>
+                        <ul className="text-left space-y-4 mb-12">
+                            {[t.join_feature_list_1, t.join_feature_list_2, t.join_feature_list_3].map((feat, i) => (
+                                <li key={i} className="flex items-center gap-4 bg-white/[0.03] p-4 rounded-xl border border-white/5">
+                                    <CheckIcon />
+                                    <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{feat}</span>
+                                </li>
+                            ))}
                         </ul>
-                        <button onClick={onSubscribe} className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
+                        <button onClick={onSubscribe} className="w-full rounded-2xl bg-gradient-brand px-8 py-5 text-xs font-black uppercase italic tracking-[0.2em] text-white shadow-xl shadow-orange-500/20 hover:scale-105 transition-transform">
                             {t.join_cta}
                         </button>
-                        <p className="mt-4 text-xs text-gray-500">{t.join_info}</p>
+                        <p className="mt-6 text-[10px] font-black text-gray-600 uppercase tracking-widest italic">{t.join_info}</p>
                     </div>
                 </div>
             </div>
