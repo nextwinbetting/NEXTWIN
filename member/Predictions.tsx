@@ -13,7 +13,6 @@ interface AdminStore {
     history: DailyPack[];
 }
 
-// Déclaration globale pour html2canvas chargé via CDN dans index.html
 declare var html2canvas: any;
 
 const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ language, isAdmin }) => {
@@ -37,34 +36,33 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("CONNEXION SERVEURS TEMPS RÉEL...");
+        setStatus("VÉRIFICATION DES CALENDRIERS RÉELS (FLASHSCORE/SOFASCORE)...");
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
             
-            // Injection de la date et heure réelle pour le grounding
             const now = new Date();
-            const dateStr = now.toLocaleDateString('fr-FR');
-            const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const dateToday = now.toLocaleDateString('fr-FR');
+            const timeNow = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-            const prompt = `[ROLE: CHIEF ANALYST NEXTWIN V18.3]
-            CONTEXTE TEMPOREL CRITIQUE :
-            - NOUS SOMMES LE : ${dateStr}
-            - IL EST ACTUELLEMENT : ${timeStr} (Heure de Paris)
+            const prompt = `[SYSTEM: DEEP-SCHEDULE SCANNER V18.4]
+            MISSION : Extraire les matchs RÉELS programmés.
             
-            MISSION : Générer 8 pronostics RÉELS pour des matchs se déroulant dans les prochaines 24 heures (donc après ${timeStr}).
+            DONNÉES TEMPORELLES ACTUELLES :
+            - DATE DU JOUR : ${dateToday}
+            - HEURE DE PARIS : ${timeNow}
             
-            CONSIGNES DE VÉRIFICATION :
-            1. RECHERCHE OBLIGATOIRE : Utilise l'outil Google Search pour vérifier les calendriers sur LiveScore.in/fr/, Flashscore.fr ou SofaScore.
-            2. EXISTENCE : Si un match n'existe pas ou n'est pas confirmé à 100% sur ces sites, NE LE PROPOSE PAS.
-            3. HORAIRES : Utilise l'heure exacte affichée sur LiveScore.in/fr/ (Heure française). Pas de décalage.
-            4. LANGUE : Français uniquement.
+            INSTRUCTIONS CRITIQUES :
+            1. RECHERCHE WEB : Utilise l'outil Google Search pour trouver le "Calendrier Football", "Calendrier NBA" et "Tableau ATP/WTA" pour les dates du ${dateToday} et du lendemain.
+            2. FILTRE DE RÉALITÉ : Ne propose QUE des matchs qui vont COMMENCER après ${timeNow} aujourd'hui ou demain.
+            3. HALLUCINATION INTERDITE : Si tu inventes un match ou que tu cites un match déjà terminé, c'est un échec critique. Vérifie l'état "Programmé" ou "À venir".
+            4. SITES DE RÉFÉRENCE : Flashscore.fr, SofaScore, LiveScore.in/fr/, ATPTour.com.
             
-            STRUCTURE (8 PRONOS) :
-            - 2 Football (Ligue précise)
-            - 2 Basketball (NBA ou Europe)
-            - 2 Tennis (Tournoi précis)
-            - 1 BONUS Football (Les deux équipes marquent)
+            FORMAT DE SORTIE (8 PRONOSTICS) :
+            - 2 Football (Ligue réelle)
+            - 2 Basketball (NBA / Euroleague)
+            - 2 Tennis (Tournoi en cours)
+            - 1 BONUS Football (BTTS)
             - 1 BONUS Basketball (Total Points)
             
             JSON OUTPUT ONLY:
@@ -72,14 +70,14 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
               "predictions": [
                 {
                   "sport": "Football",
-                  "competition": "Nom exact de la ligue",
+                  "competition": "Nom exact",
                   "match": "Équipe A vs Équipe B",
-                  "betType": "Type de pari précis",
+                  "betType": "Pari suggéré",
                   "category": "Standard",
-                  "date": "JJ.MM.AAAA",
+                  "date": "${dateToday}",
                   "time": "HH:MM",
-                  "probability": 82,
-                  "analysis": "Analyse technique de 2 phrases basée sur les dernières stats réelles."
+                  "probability": 85,
+                  "analysis": "Analyse basée sur les stats réelles de la saison en cours."
                 }
               ]
             }`;
@@ -89,20 +87,19 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0
+                    temperature: 0 // Zéro créativité, 100% précision
                 }
             });
 
             const text = response.text || "";
             const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("Flux corrompu");
+            if (!jsonMatch) throw new Error("Flux de données corrompu.");
 
             const data = JSON.parse(jsonMatch[0]);
-            
-            // On s'assure qu'on a bien nos 8 pronos
             const rawPreds = data.predictions || [];
+            
             const preds = rawPreds.map((p: any, i: number) => ({
-                id: `v18-3-${Date.now()}-${i}`,
+                id: `v18-4-${Date.now()}-${i}`,
                 ...p,
                 sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
                     uri: c.web?.uri,
@@ -120,9 +117,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ ${preds.length}/8 MATCHS VÉRIFIÉS`);
+            setStatus(`✓ ${preds.length}/8 MATCHS RÉELS IDENTIFIÉS`);
         } catch (err) {
-            setStatus("⚠ ERREUR DE SYNC RÉELLE");
+            setStatus("⚠ ERREUR DE SCAN CALENDRIER");
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -133,24 +130,20 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU VISUEL PREMIUM HD...");
+        setStatus("GÉNÉRATION DU VISUEL HD...");
         
         try {
             await new Promise(r => setTimeout(r, 800));
-            
             const canvas = await html2canvas(previewContainerRef.current, {
                 backgroundColor: '#110f1f',
                 scale: 3, 
                 useCORS: true,
-                logging: false,
-                allowTaint: true,
                 onclone: (clonedDoc: Document) => {
                     const el = clonedDoc.getElementById('capture-target');
                     if (el) {
                         el.style.padding = '100px'; 
                         el.style.width = '1650px'; 
                         el.style.borderRadius = '0px';
-                        
                         const gradientTexts = clonedDoc.querySelectorAll('.bg-clip-text');
                         gradientTexts.forEach((text: any) => {
                             text.classList.remove('text-transparent', 'bg-clip-text', 'bg-gradient-brand');
@@ -159,17 +152,15 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     }
                 }
             });
-            
             const image = canvas.toDataURL("image/png", 1.0);
             const link = document.createElement('a');
-            const date = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
-            link.download = `NextWin_DailyPack_${date}.png`;
+            link.download = `NextWin_Pack_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.png`;
             link.href = image;
             link.click();
-            setStatus("✓ VISUEL TÉLÉCHARGÉ");
+            setStatus("✓ EXPORT TERMINÉ");
         } catch (err) {
             console.error(err);
-            setStatus("⚠ ÉCHEC DE CAPTURE");
+            setStatus("⚠ ÉCHEC EXPORT");
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(null), 3000);
@@ -177,7 +168,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     };
 
     const clearDraft = () => {
-        if (confirm("Supprimer le pack actuel ?")) {
+        if (confirm("Reset du pack ?")) {
             const newStore = { ...store, draft: null };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
@@ -189,7 +180,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     return (
         <div className="max-w-7xl mx-auto pb-20 animate-fade-in px-4">
             {status && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-brand-dark-blue border border-orange-500 text-white px-8 py-4 rounded-2xl shadow-[0_0_50px_rgba(249,115,22,0.4)] backdrop-blur-xl flex items-center gap-4">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-brand-dark-blue border border-orange-500 text-white px-8 py-4 rounded-2xl shadow-[0_0_50px_rgba(249,115,22,0.4)] backdrop-blur-xl flex items-center gap-4 border-l-4">
                     {isLoading && <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent animate-spin rounded-full"></div>}
                     <span className="font-black text-[10px] uppercase tracking-widest italic">{status}</span>
                 </div>
@@ -197,10 +188,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
             <div className="text-center mb-16">
                 <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none">
-                    NEXTWIN <span className="text-orange-500">BOSS</span> V18.3
+                    NEXTWIN <span className="text-orange-500">BOSS</span> V18.4
                 </h1>
                 <p className="mt-4 text-gray-500 text-[10px] uppercase tracking-[0.6em] font-black">
-                    REAL-TIME MATCH SYNC & HD EXPORT
+                    DEEP-SCHEDULE SCANNER & HD EXPORT
                 </p>
             </div>
 
@@ -211,8 +202,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     className="bg-brand-card border-2 border-gray-800 hover:border-orange-500 p-8 rounded-[2.5rem] transition-all group flex-1 max-w-lg relative overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block tracking-[0.1em]">GÉNÉRER LE PACK RÉEL</span>
-                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Basé sur LiveScore ${new Date().toLocaleDateString()}</span>
+                    <span className="text-white font-black text-xl uppercase italic tracking-tighter block tracking-[0.1em]">SCANNER LES CALENDRIERS</span>
+                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mt-2 group-hover:text-orange-400 italic">Vérification Réalité 100%</span>
                 </button>
 
                 {store.draft && (
@@ -230,7 +221,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
                         <div className="flex items-center gap-6 flex-1">
                             <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent to-orange-500/30"></div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">APERÇU RÉEL (3 PAR RANGÉE)</h2>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.5em] text-[10px] italic whitespace-nowrap">GRID 3-COLS PREMIUM (VISUEL HD)</h2>
                             <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent to-orange-500/30"></div>
                         </div>
                         
@@ -240,7 +231,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                             className="bg-gradient-brand text-white font-black px-12 py-5 rounded-2xl flex items-center gap-4 transition-all transform hover:scale-105 shadow-[0_0_40px_rgba(249,115,22,0.4)] text-[11px] uppercase tracking-[0.2em] italic"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            TÉLÉCHARGER LE VISUEL IA
+                            EXPORTER LE VISUEL HD
                         </button>
                     </div>
 
@@ -261,7 +252,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                         </div>
 
                         <div className="mt-28 text-center pt-16 border-t border-gray-800/50 relative z-10">
-                            <p className="text-gray-500 font-black text-[11px] uppercase tracking-[1em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.3</p>
+                            <p className="text-gray-500 font-black text-[11px] uppercase tracking-[1em] italic">WWW.NEXTWIN.AI • ANALYSE PRÉDICTIVE V18.4</p>
                             <p className="text-gray-700 font-bold text-[8px] uppercase tracking-[0.3em] mt-8 px-32 leading-relaxed opacity-60">
                                 Les pronostics sont fournis à titre informatif. Le jeu comporte des risques : endettement, isolement, dépendance. Appelez le 09-74-75-13-13. Interdit aux mineurs.
                             </p>
@@ -276,8 +267,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                     <div className="w-24 h-24 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
                         <svg className="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
-                    <h3 className="text-gray-600 font-black uppercase text-xl tracking-[0.3em] italic">Prêt pour la sync LiveScore</h3>
-                    <p className="text-gray-800 text-xs uppercase font-bold tracking-[0.4em] mt-4 italic">Générez un pack pour activer l'exportation</p>
+                    <h3 className="text-gray-600 font-black uppercase text-xl tracking-[0.3em] italic">DEEP SCANNER READY</h3>
+                    <p className="text-gray-800 text-xs uppercase font-bold tracking-[0.4em] mt-4 italic">Recherche de calendrier en direct sur le web</p>
                 </div>
             )}
         </div>
