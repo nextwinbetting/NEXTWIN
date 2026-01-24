@@ -49,9 +49,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             MISSION : Générer 8 pronostics RÉELS futurs (Coup d'envoi > 1h après ${timePart}).
             
             RÉPARTITION OBLIGATOIRE (8 MATCHS TOTAL) :
-            1. 4 Matchs "Standard" : Football/Basket/Tennis (Vainqueur ou Double Chance).
-            2. 2 Matchs "Bonus Football" : Marché "Les deux équipes marquent" (BTTS) uniquement.
-            3. 2 Matchs "Bonus Basket" : Marché "Nombre de points" (Over/Under Player ou Team) uniquement.
+            1. 6 Matchs "Standard" : Football/Basket/Tennis (Vainqueur ou Double Chance). C'est la Sélection Élite.
+            2. 1 Match "Bonus Football" : Marché "Les deux équipes marquent" (BTTS) uniquement.
+            3. 1 Match "Bonus Basket" : Marché "Nombre de points" (Over/Under Player ou Team) uniquement.
 
             STRUCTURE JSON :
             {
@@ -133,7 +133,11 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 useCORS: true,
                 onclone: (clonedDoc: any) => {
                     clonedDoc.querySelectorAll('.logo-win-part').forEach((el: any) => {
-                        el.style.backgroundImage = 'none'; el.style.color = '#F97316'; el.style.opacity = '1'; el.style.webkitBackgroundClip = 'initial';
+                        el.style.backgroundImage = 'none'; 
+                        el.style.color = '#F97316'; 
+                        el.style.opacity = '1'; 
+                        el.style.webkitBackgroundClip = 'initial';
+                        el.style.backgroundClip = 'initial';
                     });
                 }
             });
@@ -172,7 +176,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 <button onClick={generateIAPronostics} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-brand"></div>
                     <span className="text-white font-black text-lg uppercase italic tracking-tighter block">LANCER LE SCANNER V10</span>
-                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-[0.3em] block mt-2 opacity-60">Répartition : 4 Élite + 2 BTTS + 2 Points</span>
+                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-[0.3em] block mt-2 opacity-60">Répartition : 6 Élite + 1 BTTS + 1 Points</span>
                 </button>
                 {store.draft && (
                     <button onClick={downloadAsImage} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-green-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl text-white font-black uppercase italic tracking-widest">
@@ -191,19 +195,19 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                          </div>
                     </div>
 
-                    {/* SECTION 1 : SELECTION PRINCIPALE */}
+                    {/* SECTION 1 : SELECTION ELITE (6 MATCHS) */}
                     <div className="mb-20">
                         <div className="flex items-center gap-4 mb-10">
                             <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent to-white/10"></div>
                             <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter">Sélection <span className="text-orange-500">Élite</span></h2>
                             <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-white/10"></div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {mainPicks.map(p => <PredictionCard key={p.id} prediction={p} />)}
                         </div>
                     </div>
 
-                    {/* SECTION 2 : LES BONUS SEPARÉS */}
+                    {/* SECTION 2 : LES BONUS SEPARÉS (1 + 1) */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* BONUS FOOTBALL */}
                         <div className="space-y-10">
