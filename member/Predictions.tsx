@@ -5,6 +5,9 @@ import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
 import { GoogleGenAI } from "@google/genai";
 
+const CACHE_KEY = 'nextwin_daily_predictions';
+const CACHE_EXPIRATION = 12 * 60 * 60 * 1000; // 12 heures
+
 const mapStringToSport = (sport: string): Sport => {
     const s = sport.toUpperCase();
     if (s.includes('BASKET')) return Sport.Basketball;
@@ -32,25 +35,39 @@ const Predictions: React.FC<{ language: Language }> = ({ language }) => {
     const [error, setError] = useState<{message: string, isQuota: boolean} | null>(null);
     const [predictions, setPredictions] = useState<Prediction[]>([]);
 
-    const fetchPredictions = useCallback(async (useSearch = true) => {
+    const fetchPredictions = useCallback(async (forceRefresh = false) => {
         setIsLoading(true);
         setError(null);
+
+        // 1. Vérifier le cache
+        if (!forceRefresh) {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_EXPIRATION) {
+                    setPredictions(data);
+                    setIsLoading(false);
+                    return;
+                }
+            }
+        }
+
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
             
-            const prompt = `Générer 6 pronostics sportifs RÉELS (2 Football, 2 Basketball, 2 Tennis) pour des matchs officiels se déroulant après le ${new Date().toISOString()}.
-            Utilise ton outil de recherche pour trouver des matchs qui existent vraiment.
-            Répondre UNIQUEMENT avec un objet JSON :
+            const prompt = `Générer 6 pronostics sportifs RÉELS (2 Football, 2 Basketball, 2 Tennis) pour aujourd'hui et demain.
+            Sources à consulter : SofaScore, Flashscore, WhoScored.
+            Format JSON STRICT :
             {
               "predictions": [
                 {
                   "sport": "Football",
-                  "league": "Ligue 1",
-                  "match": "PSG vs Marseille",
-                  "betType": "Victoire PSG",
-                  "matchDateTimeUTC": "2025-05-20T20:45:00Z",
-                  "probability": 75,
-                  "analysis": "Analyse technique courte"
+                  "league": "Premier League",
+                  "match": "Team A vs Team B",
+                  "betType": "Victoire Team A",
+                  "matchDateTimeUTC": "2025-05-20T20:00:00Z",
+                  "probability": 78,
+                  "analysis": "Analyse basée sur xG et forme récente."
                 }
               ]
             }`;
@@ -59,26 +76,17 @@ const Predictions: React.FC<{ language: Language }> = ({ language }) => {
                 model: 'gemini-3-flash-preview',
                 contents: prompt,
                 config: {
-                    tools: useSearch ? [{ googleSearch: {} }] : undefined,
+                    tools: [{ googleSearch: {} }],
+                    temperature: 0.2
                 }
             });
 
-            // Handle Grounding Metadata
-            const groundingSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((chunk: any) => ({
-                uri: chunk.web?.uri,
-                title: chunk.web?.title
-            })).filter((s: any) => s.uri) || [];
-
             const text = response.text || "";
-            const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-            
-            if (!jsonMatch) throw new Error("Format de réponse Engine invalide.");
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("Réponse Engine malformée.");
             
             const data = JSON.parse(jsonMatch[0]);
-            if (!data.predictions) throw new Error("Données de pronostics manquantes.");
-
-            setPredictions(data.predictions.map((p: any, i: number) => {
+            const formatted = data.predictions.map((p: any, i: number) => {
                 const { dateStr, timeStr } = formatMatchDateTime(p.matchDateTimeUTC);
                 return {
                     id: `${i}-${Date.now()}`,
@@ -89,16 +97,23 @@ const Predictions: React.FC<{ language: Language }> = ({ language }) => {
                     time: timeStr,
                     probability: p.probability,
                     analysis: `[${p.league}] ${p.analysis}`,
-                    sources: i === 0 ? groundingSources : [] // Attach sources to first card for simplicity or as global
+                    sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((c: any) => ({
+                        uri: c.web?.uri,
+                        title: c.web?.title
+                    })).filter((s: any) => s.uri).slice(0, 3) || []
                 };
-            }));
+            });
+
+            setPredictions(formatted);
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ data: formatted, timestamp: Date.now() }));
+            
         } catch (err: any) {
-            console.error("Engine Sync Error:", err);
+            console.error("Fetch Error:", err);
             const isQuota = err.message?.includes('429') || JSON.stringify(err).includes('429');
             setError({
                 message: isQuota 
-                    ? "Limite de quota API atteinte. Veuillez vérifier votre plan de facturation Google Cloud." 
-                    : (err.message || "Erreur de synchronisation Engine."),
+                    ? "Limite de quota API atteinte. Le serveur se réinitialise..." 
+                    : "Erreur de synchronisation Engine.",
                 isQuota
             });
         } finally {
@@ -115,42 +130,41 @@ const Predictions: React.FC<{ language: Language }> = ({ language }) => {
     return (
         <div>
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-white tracking-tight italic uppercase">{t.predictions_title}</h1>
-                <p className="mt-4 text-brand-light-gray text-xs uppercase tracking-[0.2em]">{t.predictions_subtitle}</p>
+                <h1 className="text-4xl font-bold text-white tracking-tight italic uppercase italic tracking-tighter">PRONOSTICS IA TEMPS RÉEL</h1>
+                <p className="mt-4 text-brand-light-gray text-[10px] uppercase tracking-[0.3em] font-black">{t.predictions_subtitle}</p>
             </div>
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center min-h-[400px]">
-                    <div className="relative">
-                        <div className="animate-spin rounded-full h-24 w-24 border-t-2 border-orange-500 border-opacity-50"></div>
-                        <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white uppercase animate-pulse">SYNC</div>
+                    <div className="relative mb-8">
+                        <div className="animate-spin rounded-full h-20 w-20 border-t-2 border-orange-500"></div>
                     </div>
-                    <p className="mt-8 text-white font-bold animate-pulse text-sm tracking-[0.4em] uppercase">Initialisation NEXTWIN Engine...</p>
+                    <p className="text-white font-black text-xs tracking-[0.5em] uppercase animate-pulse">Sync avec SofaScore & Flashscore...</p>
                 </div>
             ) : error ? (
-                <div className="text-center bg-brand-card border border-red-500/30 rounded-2xl p-12 max-w-2xl mx-auto shadow-2xl backdrop-blur-md">
-                     <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                        <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <div className="text-center bg-brand-card border border-red-500/20 rounded-2xl p-12 max-w-2xl mx-auto shadow-2xl backdrop-blur-xl">
+                     <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                      </div>
-                     <h3 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter">
-                        {error.isQuota ? "LIMITE DE QUOTA ATTEINTE" : "ÉCHEC DE SYNCHRONISATION"}
+                     <h3 className="text-xl font-black text-white mb-2 uppercase tracking-tighter">
+                        {error.isQuota ? "QUOTA API ÉPUISÉ" : "SYNCHRONISATION INTERROMPUE"}
                      </h3>
-                     <p className="text-brand-light-gray text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                     <p className="text-gray-400 text-xs mb-8 leading-relaxed max-w-sm mx-auto uppercase tracking-widest">
                         {error.isQuota 
-                          ? "Votre clé API Gemini a épuisé son quota actuel. Veuillez passer à un plan payant ou attendre la réinitialisation de votre quota dans Google AI Studio."
-                          : "Le moteur NEXTWIN n'a pas pu authentifier les flux de données sportives en temps réel."}
+                          ? "Votre clé API gratuite a atteint sa limite journalière. Veuillez activer la facturation (Billing) dans Google AI Studio ou patienter."
+                          : "Le flux de données sportives est temporairement indisponible."}
                      </p>
-                     <button onClick={() => fetchPredictions()} className="bg-gradient-brand px-12 py-5 rounded-lg font-black text-white uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-orange-500/20">
-                        RÉESSAYER LA CONNEXION
+                     <button onClick={() => fetchPredictions(true)} className="bg-gradient-brand px-10 py-4 rounded-lg font-black text-white text-xs uppercase tracking-widest hover:scale-105 transition-all">
+                        TENTER UNE RECONNEXION
                      </button>
-                     <p className="text-[10px] mt-10 text-gray-700 font-mono select-all uppercase">LOG_STATUS_429: QUOTA_EXCEEDED_CHECK_BILLING</p>
+                     <p className="mt-8 text-[9px] text-gray-700 font-mono">STATUS: QUOTA_429_LIMIT_REACHED</p>
                 </div>
             ) : (
                 <>
                     <div className="flex justify-center gap-3 mb-12 flex-wrap">
                         {['ALL', ...Object.values(Sport)].map(s => (
-                            <button key={s} onClick={() => setActiveSport(s as any)} className={`px-6 py-3 rounded-xl text-xs font-black transition-all uppercase tracking-widest border ${activeSport === s ? 'bg-gradient-brand text-white border-transparent shadow-xl ring-2 ring-orange-500/20' : 'bg-brand-dark border-gray-800 text-gray-500 hover:border-gray-600 hover:text-white'}`}>
-                                {s === 'ALL' ? 'Tous les sports' : s}
+                            <button key={s} onClick={() => setActiveSport(s as any)} className={`px-6 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest border ${activeSport === s ? 'bg-gradient-brand text-white border-transparent shadow-xl' : 'bg-brand-dark border-gray-800 text-gray-500 hover:text-white'}`}>
+                                {s === 'ALL' ? 'TOUS LES MATCHS' : s}
                             </button>
                         ))}
                     </div>
