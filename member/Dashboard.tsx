@@ -33,7 +33,8 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             [DashboardNav.Bankroll]: <BankrollManagement />,
             [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
             [DashboardNav.Profile]: <Profile />,
-            [DashboardNav.Support]: <Support language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
+            // Pass setActivePage to Support component to fix prop error after Support.tsx update
+            [DashboardNav.Support]: <Support language={language} setActivePage={setActivePage} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
             // Pages retirées mais conservées dans l'enum pour compatibilité
             [DashboardNav.Analyzer]: null,
             [DashboardNav.Archives]: null,
