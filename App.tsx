@@ -22,14 +22,21 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 const LoadingFallback: React.FC = () => (
-  <div className="flex flex-col justify-center items-center h-screen bg-brand-bg">
-    <div className="relative h-20 w-20 mb-8">
+  <div className="flex flex-col justify-center items-center h-screen bg-brand-bg relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-b from-brand-orange/5 to-brand-violet/5 opacity-50"></div>
+    <div className="relative h-24 w-24 mb-10">
       <div className="absolute inset-0 rounded-full border-4 border-white/5"></div>
-      <div className="absolute inset-0 rounded-full border-4 border-t-brand-accent animate-spin"></div>
+      <div className="absolute inset-0 rounded-full border-4 border-t-brand-orange animate-spin shadow-[0_0_20px_rgba(249,115,22,0.4)]"></div>
+      <div className="absolute inset-3 rounded-full border-2 border-brand-violet/20 border-b-brand-violet animate-[spin_1.5s_linear_infinite_reverse]"></div>
     </div>
-    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] italic animate-pulse">
-      Initialisation du Moteur Neural...
-    </p>
+    <div className="relative z-10 text-center">
+      <p className="text-[12px] font-black text-white uppercase tracking-[0.6em] italic animate-pulse mb-2">
+        NEXTWIN ENGINE
+      </p>
+      <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.3em] italic">
+        SYNCHRONISATION NEURALE EN COURS...
+      </p>
+    </div>
   </div>
 );
 

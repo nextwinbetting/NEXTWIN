@@ -9,12 +9,12 @@ interface HowItWorksProps {
 }
 
 const ProtocolCard: React.FC<{ num: string; title: string; desc: string; slogan: string }> = ({ num, title, desc, slogan }) => (
-    <div className="glass-card p-12 rounded-[3rem] border-white/5 relative overflow-hidden group hover:border-brand-accent/30 transition-all duration-700">
+    <div className="glass-premium p-12 rounded-[3rem] border-white/5 relative overflow-hidden group hover:border-brand-orange/30 transition-all duration-700">
         <span className="absolute -top-10 -right-10 text-[12rem] font-display font-black text-white/[0.02] italic">{num}</span>
         <div className="relative z-10">
             <h3 className="text-4xl font-display font-black text-white italic uppercase tracking-tighter mb-6">{title}</h3>
             <p className="text-gray-400 font-medium text-lg leading-relaxed italic mb-8">{desc}</p>
-            <div className="inline-block px-8 py-3 bg-brand-accent text-black font-display font-black italic text-sm uppercase tracking-widest rounded-xl">
+            <div className="inline-block px-8 py-3 bg-gradient-to-r from-brand-orange to-brand-violet text-white font-display font-black italic text-sm uppercase tracking-widest rounded-xl shadow-lg shadow-brand-orange/10">
                 {slogan}
             </div>
         </div>
@@ -31,7 +31,7 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ language, onNavigate }) => {
                     <h1 className="text-6xl md:text-8xl font-display font-black text-white italic tracking-tighter uppercase leading-[0.85] mb-8">
                         {t.how_title}
                     </h1>
-                    <p className="text-brand-accent font-black uppercase tracking-[0.5em] italic text-[14px] mb-12 font-display">
+                    <p className="text-brand-orange font-black uppercase tracking-[0.5em] italic text-[14px] mb-12 font-display">
                         {t.how_subtitle}
                     </p>
                     <p className="text-2xl text-gray-500 font-bold italic leading-relaxed">
@@ -66,8 +66,8 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ language, onNavigate }) => {
                     />
                 </div>
 
-                <div className="mt-40 p-20 glass-card rounded-[4rem] text-center border-brand-pro/20 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-brand-accent/5"></div>
+                <div className="mt-40 p-20 glass-premium rounded-[4rem] text-center border-white/5 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand-orange/5 to-brand-violet/5 opacity-50"></div>
                     <div className="relative z-10">
                         <h2 className="text-5xl font-display font-black text-white italic uppercase tracking-tighter mb-8">L'INFORMATION AVANT L'ÉMOTION.</h2>
                         <p className="text-2xl text-gray-500 font-bold italic mb-12 max-w-2xl mx-auto">
@@ -75,7 +75,7 @@ const HowItWorks: React.FC<HowItWorksProps> = ({ language, onNavigate }) => {
                         </p>
                         <button 
                             onClick={() => onNavigate(Page.JoinUs)}
-                            className="btn-hover px-12 py-5 bg-gradient-pro text-white rounded-xl text-sm font-black uppercase tracking-[0.2em] italic shadow-2xl"
+                            className="px-12 py-5 bg-gradient-brand text-white rounded-xl text-sm font-black uppercase tracking-[0.2em] italic shadow-2xl hover:scale-105 transition-all active:scale-95"
                         >
                             REJOINDRE LE FLUX
                         </button>
