@@ -25,10 +25,10 @@ const NavItem: React.FC<{
             className={`flex items-center w-full px-5 py-4 rounded-xl transition-all duration-300 group mb-2 ${
                 isActive
                     ? 'bg-brand-orange text-white font-black'
-                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                    : 'text-white hover:bg-white/5'
             }`}
         >
-            <div className={`w-5 h-5 mr-4 ${isActive ? 'text-white' : 'text-white/20 group-hover:text-brand-orange'}`}>
+            <div className={`w-5 h-5 mr-4 ${isActive ? 'text-white' : 'text-white group-hover:text-brand-orange'}`}>
                 {icon}
             </div>
             <span className={`text-[10px] uppercase tracking-widest italic font-bold`}>{label}</span>
@@ -42,7 +42,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, l
     return (
         <aside className="hidden md:flex md:fixed md:top-24 md:bottom-0 md:left-0 md:w-72 md:flex-col bg-brand-bg border-r border-white/5 z-40">
             <div className="flex-1 px-6 py-10 space-y-1 overflow-y-auto">
-                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-6 px-5">TERMINAL V2.5</p>
+                <p className="text-[9px] font-black text-white uppercase tracking-widest mb-6 px-5">TERMINAL V2.5</p>
                 
                 <NavItem 
                     page={DashboardNav.DashboardHome} activePage={activePage} setActivePage={setActivePage} 
@@ -66,7 +66,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, l
                 />
 
                 <div className="pt-10">
-                    <p className="text-[9px] font-black text-white/10 uppercase tracking-widest mb-6 px-5">ACCOUNT</p>
+                    <p className="text-[9px] font-black text-white uppercase tracking-widest mb-6 px-5">ACCOUNT</p>
                     <NavItem 
                         page={DashboardNav.Subscription} activePage={activePage} setActivePage={setActivePage} 
                         label={t.dash_nav_subscription} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>} 

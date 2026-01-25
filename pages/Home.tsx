@@ -70,7 +70,7 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string
             <div className={`w-16 h-16 rounded-3xl flex items-center justify-center ${color} shadow-2xl transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}>
                 {icon}
             </div>
-            <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic opacity-40">{label}</span>
+            <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic opacity-60">{label}</span>
         </div>
         <h3 className="text-3xl font-sans font-black text-white italic uppercase tracking-tighter mb-6">{title}</h3>
         <p className="text-white text-sm font-bold uppercase tracking-widest leading-relaxed italic flex-grow">{desc}</p>
@@ -154,7 +154,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                     <h2 className="text-5xl md:text-7xl font-sans font-black text-white italic uppercase tracking-tighter leading-none">
                         VOTRE ÉCOSYSTÈME <br/> <span className="text-brand-orange">HAUTE PERFORMANCE.</span>
                     </h2>
-                    <p className="text-white font-black uppercase tracking-[0.8em] italic text-xs opacity-40">Ingénierie de Données Appliquée</p>
+                    <p className="text-white font-black uppercase tracking-[0.8em] italic text-xs opacity-60">Ingénierie de Données Appliquée</p>
                 </div>
                 
                 <div className="grid md:grid-cols-3 gap-16">
@@ -186,7 +186,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
             <section className="py-40 border-y border-white/5 bg-brand-surface/20 overflow-hidden relative">
                 <div className="absolute inset-0 bg-brand-violet/5 blur-[150px] rounded-full -translate-x-1/2"></div>
                 <div className="container mx-auto px-6 mb-24 flex items-center justify-between relative z-10">
-                    <h2 className="text-[12px] font-black text-white uppercase tracking-[0.8em] italic opacity-40">FLUX CERTIFIÉ • COMMUNAUTÉ NEXTWIN</h2>
+                    <h2 className="text-[12px] font-black text-white uppercase tracking-[0.8em] italic opacity-60">FLUX CERTIFIÉ • COMMUNAUTÉ NEXTWIN</h2>
                     <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] italic animate-pulse">Synchronisation Directe</span>
                 </div>
                 <div className="animate-marquee-slow hover:[animation-play-state:paused] relative z-10">
