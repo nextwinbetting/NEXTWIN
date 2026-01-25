@@ -8,7 +8,6 @@ import LockedFeature from './LockedFeature';
 import Strategy from './Strategy';
 import DashboardHome from './DashboardHome';
 import Support from './Support';
-import Analyzer from './Analyzer';
 import Archives from './Archives';
 import DashboardSidebar from './DashboardSidebar';
 import { Language, DashboardNav, Page, User, ArchivedAnalysis } from '../types';
@@ -37,21 +36,6 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
         if (saved) setArchivedAnalyses(JSON.parse(saved));
     }, []);
 
-    const handleNewAnalysis = (data: any) => {
-        const newArchive: ArchivedAnalysis = {
-            ...data.result,
-            id: `arch-${Date.now()}`,
-            sport: data.sport,
-            team1: data.team1,
-            team2: data.team2,
-            betType: data.betType,
-            analysisDate: new Date().toLocaleDateString('fr-FR')
-        };
-        const updated = [newArchive, ...archivedAnalyses].slice(0, 50);
-        setArchivedAnalyses(updated);
-        localStorage.setItem(STORAGE_ARCHIVES, JSON.stringify(updated));
-    };
-
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
             [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
@@ -59,12 +43,11 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
                 currentUser.isAdmin ? (
                     <Predictions language={language} isAdmin={true} />
                 ) : (
-                    <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500"></div></div>}>
+                    <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500"></div></div>}>
                         <PredictionsMember language={language} />
                     </Suspense>
                 )
             ) : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
-            [DashboardNav.Analyzer]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Archives]: isSubscribed ? <Archives archives={archivedAnalyses} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Bankroll]: <BankrollManagement />,
@@ -82,7 +65,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     };
 
     return (
-        <div className="flex min-h-screen bg-brand-dark">
+        <div className="flex min-h-screen bg-[#0f1117]">
             <DashboardSidebar 
                 activePage={activePage} 
                 setActivePage={setActivePage} 
@@ -93,14 +76,16 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             />
 
             <div className="flex-1 md:ml-64 transition-all duration-300">
-                <div className="md:hidden sticky top-0 z-30 flex items-center justify-between p-4 bg-brand-dark-blue/80 backdrop-blur-sm border-b border-gray-800">
-                    <button onClick={handleHomeReturn} className="text-white font-bold tracking-tighter italic text-lg">NEXTWIN</button>
+                <div className="md:hidden sticky top-0 z-30 flex items-center justify-between p-4 bg-[#111319] border-b border-white/5">
+                    <button onClick={handleHomeReturn} className="text-white font-bold tracking-tight text-lg">NEXTWIN</button>
                     <button onClick={() => setSidebarOpen(true)} className="text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                 </div>
-                <main className="p-4 sm:p-6 lg:p-8">
-                    {renderContent()}
+                <main className="p-4 sm:p-8 lg:p-12">
+                    <div className="max-w-[1200px] mx-auto">
+                        {renderContent()}
+                    </div>
                 </main>
             </div>
         </div>

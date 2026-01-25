@@ -23,7 +23,6 @@ export type Language = 'FR' | 'EN';
 export enum DashboardNav {
   DashboardHome = "TABLEAU DE BORD",
   Predictions = "PRONOSTICS DU JOUR",
-  Analyzer = "ANALYSEUR",
   Strategy = "STRATÉGIE",
   Bankroll = "BANKROLL",
   LiveScores = "MATCHS_EN_DIRECT",

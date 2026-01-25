@@ -36,7 +36,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("RECHERCHE DES OPPORTUNITÉS RÉELLES...");
+        setStatus("ANALYSE DES FLUX DE MARCHÉ...");
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -45,29 +45,32 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const fullTime = now.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
             const [datePart, timePart] = fullTime.split(' ');
 
-            const prompt = `[ROLE: WORLD-CLASS SPORTS TRADER & DATA ARCHITECT]
-            [SYSTEM_TIME: ${fullTime} (UTC+1)]
+            const prompt = `[ROLE: SENIOR QUANTITATIVE SPORTS TRADER]
+            [MISSION: GENERATE HIGH-VALUE PREDICTIONS PACK]
+            [SYSTEM_TIME: ${fullTime} (Paris UTC+1)]
             
-            MISSION : Extraire 8 matchs RÉELS de Football, Basketball ou Tennis prévus UNIQUEMENT dans le futur.
+            TASK: Identify 8 REAL upcoming matches for Football, Basketball, or Tennis with positive expected value.
             
-            PROTOCOLE DE SÉCURITÉ :
-            1. Scanne SofaScore, Flashscore et ESPN en temps réel.
-            2. INTERDICTION : N'inclus aucun match commencé ou fini.
-            3. MARGE DE SÉCURITÉ : Le coup d'envoi doit avoir lieu au minimum 60 minutes APRÈS ${timePart}.
-            4. DIVERSITÉ : Propose des ligues variées (NBA, EuroLeague, Top Ligues Europe, ATP/WTA).
+            CONSTRAINTS:
+            1. FUTURE MATCHES ONLY: Kick-off must be at least 1 hour from ${timePart}.
+            2. REAL DATA: Sourced from actual top-tier leagues (Premier League, LaLiga, NBA, ATP, WTA, etc.).
+            3. DIVERSITY: 6 'Standard' (High Win Prob) and 2 'Bonus' (Niche markets like BTTS or Player Props).
+            4. ACCURACY: Probability score based on recent form, xG/xPoints, and key injury reports.
+            5. ANALYSIS: Expert, technical tone. Use betting terminology. Max 100 characters per analysis.
 
-            STRUCTURE JSON RÉPONSE :
+            JSON STRUCTURE REQUIRED:
             {
               "predictions": [
                 {
                   "sport": "Football | Basketball | Tennis",
-                  "competition": "Nom officiel",
-                  "match": "Équipe A vs Équipe B",
-                  "betType": "Pari suggéré",
-                  "probability": 70-95,
-                  "analysis": "Analyse ultra-courte (1 phrase)",
+                  "competition": "League/Tournament Name",
+                  "match": "Team A VS Team B",
+                  "betType": "Specific bet recommendation",
+                  "category": "Standard | Bonus",
+                  "probability": integer (70-95),
+                  "analysis": "Technical expert analysis snippet.",
                   "date": "${datePart}",
-                  "time": "HH:MM (Heure Paris)"
+                  "time": "HH:MM (Paris Time)"
                 }
               ]
             }`;
@@ -77,7 +80,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0.1,
+                    temperature: 0.2,
                     responseMimeType: "application/json"
                 }
             });
@@ -87,12 +90,12 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const rawPreds = data.predictions || [];
             
             const filtered: Prediction[] = rawPreds.map((p: any, i: number) => ({
-                id: `nw-v10-${Date.now()}-${i}`,
+                id: `nw-pro-${Date.now()}-${i}`,
                 sport: p.sport as Sport,
                 competition: p.competition,
                 match: p.match,
                 betType: p.betType,
-                category: 'Standard',
+                category: p.category || 'Standard',
                 probability: p.probability,
                 analysis: p.analysis,
                 date: p.date,
@@ -104,19 +107,19 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 })).filter((s: any) => s.uri).slice(0, 2) || []
             }));
 
-            if (filtered.length === 0) throw new Error("Aucun match futur trouvé. Relancez le scanner.");
+            if (filtered.length === 0) throw new Error("Aucun signal détecté sur les flux.");
 
             const newDraft: DailyPack = {
                 timestamp: Date.now(),
                 isValidated: false,
                 predictions: filtered,
-                publishedBy: 'ADMIN_V10_PRO'
+                publishedBy: 'NEXTWIN_QUANT_ENGINE_V10'
             };
 
             const newStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newStore));
             setStore(newStore);
-            setStatus(`✓ ${filtered.length} MATCHS EXTRAITS`);
+            setStatus(`✓ ${filtered.length} SÉLECTIONS GÉNÉRÉES`);
         } catch (err: any) {
             setStatus(`⚠ ERREUR : ${err.message}`);
         } finally {
@@ -128,21 +131,21 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     const downloadAsImage = async () => {
         if (!previewContainerRef.current) return;
         setIsLoading(true);
-        setStatus("OPTIMISATION DU RENDU...");
+        setStatus("RENDU GRAPHIQUE HAUTE DÉFINITION...");
         try {
             await new Promise(r => setTimeout(r, 1000));
             const canvas = await html2canvas(previewContainerRef.current, {
-                backgroundColor: '#110f1f', scale: 3, useCORS: true,
+                backgroundColor: '#0f0e1f', scale: 2.5, useCORS: true,
                 onclone: (cloned: any) => {
                     cloned.querySelectorAll('.logo-win-part').forEach((el: any) => el.style.color = '#F97316');
                 }
             });
             const link = document.createElement('a');
-            link.download = `NEXTWIN_PACK_V10.png`;
+            link.download = `NEXTWIN_ELITE_PACK_${new Date().toLocaleDateString().replace(/\//g, '-')}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
-            setStatus("✓ PACK EXPORTÉ");
-        } catch { setStatus("⚠ ÉCHEC RENDU"); }
+            setStatus("✓ EXPORT RÉUSSI");
+        } catch { setStatus("⚠ ERREUR RENDU"); }
         finally { setIsLoading(false); setTimeout(() => setStatus(null), 2500); }
     };
 
@@ -151,55 +154,54 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     return (
         <div className="max-w-6xl mx-auto pb-20 px-4">
             {status && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#110f1f] border border-orange-500/40 text-white px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-4">
-                    <div className="h-2 w-2 rounded-full bg-orange-500 animate-ping"></div>
-                    <span className="font-black text-[10px] uppercase tracking-[0.2em] italic">{status}</span>
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#110f1f]/90 border border-orange-500/20 text-white px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-2xl flex items-center gap-4">
+                    <div className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                    <span className="font-black text-[10px] uppercase tracking-[0.3em] italic">{status}</span>
                 </div>
             )}
 
-            <div className="text-center mb-16">
-                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-6">
-                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest italic tracking-[0.3em]">GEMINI 3 PRO • ULTRA-FLOW</span>
+            <div className="text-center mb-12">
+                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-5 py-1.5 rounded-full mb-4">
+                    <span className="text-[9px] font-black text-orange-500 uppercase tracking-[0.5em] italic">ADMIN CONSOLE • V10 QUANTUM</span>
                 </div>
-                <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none">ENGINE <span className="text-transparent bg-clip-text bg-gradient-brand">ELITE PACK V10</span></h1>
+                <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">FLUX <span className="text-transparent bg-clip-text bg-gradient-brand">ELITE V10</span></h1>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6 mb-20">
-                <button onClick={generateIAPronostics} disabled={isLoading} className="bg-brand-card border-2 border-white/5 hover:border-orange-500/40 p-8 rounded-[2rem] transition-all group flex-1 max-w-lg relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-brand"></div>
-                    <span className="text-white font-black text-lg uppercase italic tracking-tighter block">LANCER LE SCANNER V10</span>
-                    <span className="text-gray-500 text-[9px] font-black uppercase tracking-[0.3em] block mt-2 opacity-60">Sourcing direct SofaScore/FlashScore</span>
+            <div className="flex flex-col md:flex-row justify-center gap-4 mb-16">
+                <button onClick={generateIAPronostics} disabled={isLoading} className="bg-[#1a1835] border border-white/5 hover:border-orange-500/30 p-6 rounded-2xl transition-all group flex-1 max-w-md relative overflow-hidden shadow-xl">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-brand"></div>
+                    <span className="text-white font-black text-sm uppercase italic tracking-tighter block">DÉMARRER LE SCANNER</span>
+                    <span className="text-gray-500 text-[8px] font-black uppercase tracking-[0.3em] block mt-1 opacity-60">Sourcing Quantitatif Gemini 3 Pro</span>
                 </button>
                 {store.draft && (
-                    <button onClick={() => { if(confirm("Vider?")) setStore({...store, draft: null}); }} className="bg-red-900/10 border border-red-500/20 hover:bg-red-500 hover:text-white px-10 rounded-[2rem] transition-all shadow-2xl text-red-500 text-[10px] font-black uppercase tracking-widest">RESET</button>
+                    <button onClick={() => { if(confirm("Vider?")) setStore({...store, draft: null}); }} className="bg-red-950/20 border border-red-500/20 hover:bg-red-500 hover:text-white px-8 rounded-2xl transition-all shadow-lg text-red-500 text-[9px] font-black uppercase tracking-widest italic">RÉINITIALISER</button>
                 )}
             </div>
 
             {store.draft && (
-                <div className="animate-fade-in space-y-10">
-                    <div className="bg-gray-900/40 p-8 rounded-[2rem] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="animate-fade-in space-y-8">
+                    <div className="bg-[#151425]/40 p-6 rounded-2xl border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
                         <div>
-                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] italic">FLUX DE DONNÉES SÉCURISÉ</h2>
-                            <p className="text-gray-500 text-[9px] font-bold uppercase mt-1 tracking-widest">VÉRIFIEZ LES COTES AVANT L'EXPORTATION HD</p>
+                            <h2 className="text-orange-500 font-black uppercase tracking-[0.4em] text-[9px] italic">VÉRIFICATION DU FLUX SORTANT</h2>
+                            <p className="text-gray-500 text-[8px] font-bold uppercase mt-1 tracking-widest italic">PRÊT POUR LE DÉPLOIEMENT MEMBRE</p>
                         </div>
-                        <button onClick={downloadAsImage} disabled={isLoading} className="bg-gradient-brand text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 transition-all text-[10px] uppercase tracking-widest italic shadow-xl hover:scale-105">TÉLÉCHARGER LE PACK PREMIUM</button>
+                        <button onClick={downloadAsImage} disabled={isLoading} className="bg-gradient-brand text-white font-black px-8 py-3.5 rounded-xl flex items-center gap-3 transition-all text-[9px] uppercase tracking-widest italic shadow-xl hover:scale-105 active:scale-95">EXPORT GRAPHIQUE HD</button>
                     </div>
 
-                    <div className="rounded-[3.5rem] overflow-hidden border-4 border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                        <div ref={previewContainerRef} className="bg-[#110f1f] p-16 relative overflow-hidden">
-                            <div className="flex flex-col items-center mb-24 relative z-10">
-                                <div className="mb-10 h-16 flex items-center justify-center"><NextWinLogo /></div>
-                                <div className="bg-orange-500/10 border border-orange-500/30 px-10 py-2.5 rounded-full backdrop-blur-md">
-                                    <span className="text-orange-500 font-black text-[10px] uppercase tracking-[0.6em] italic">V10 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</span>
+                    <div className="rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl bg-[#0f0e1f]">
+                        <div ref={previewContainerRef} className="bg-[#0f0e1f] p-12 lg:p-20 relative overflow-hidden">
+                            <div className="flex flex-col items-center mb-16 relative z-10">
+                                <div className="mb-8 transform scale-90"><NextWinLogo /></div>
+                                <div className="bg-orange-500/5 border border-orange-500/20 px-8 py-2 rounded-full backdrop-blur-md">
+                                    <span className="text-orange-500 font-black text-[9px] uppercase tracking-[0.6em] italic">V10 ELITE EDITION • {new Date().toLocaleDateString('fr-FR')}</span>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative z-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
                                 {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                             </div>
-                            <div className="mt-28 text-center opacity-30">
-                                <p className="text-gray-600 font-black text-[9px] uppercase tracking-[1.5em] italic">VERIFIED BY GEMINI 3 PRO • HIGH ACCURACY • WWW.NEXTWIN.AI</p>
+                            <div className="mt-20 text-center opacity-20">
+                                <p className="text-gray-500 font-black text-[8px] uppercase tracking-[1.2em] italic">QUANTUM VERIFIED • NEXTWIN.AI • {new Date().getFullYear()}</p>
                             </div>
-                            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
                         </div>
                     </div>
                 </div>
