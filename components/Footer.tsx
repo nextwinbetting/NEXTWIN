@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Page, Language } from '../types';
 import NextWinLogo from './NextWinLogo';
@@ -46,7 +47,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, language }) => {
 
           <FooterColumn title="PLATEFORME">
             <FooterLink onClick={() => onNavigate(Page.Home)}>Accueil</FooterLink>
-            <FooterLink onClick={() => onNavigate(Page.HowItWorks)}>Le Protocole Engine</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.HowItWorks)}>Comment ça marche ?</FooterLink>
             <FooterLink onClick={() => onNavigate(Page.StrategyInfo)}>Stratégie Elite</FooterLink>
             <FooterLink onClick={() => onNavigate(Page.Markets)}>Analyse Marchés</FooterLink>
           </FooterColumn>
@@ -88,4 +89,5 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, language }) => {
   );
 };
 
+// Fixed: Added missing default export
 export default Footer;

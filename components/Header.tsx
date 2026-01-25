@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                 <nav className="hidden xl:flex items-center gap-16">
                     {[
                         { p: Page.Home, l: 'ACCUEIL' },
-                        { p: Page.HowItWorks, l: 'PROTOCOLE' },
+                        { p: Page.HowItWorks, l: 'COMMENT ÇA MARCHE ?' },
                         { p: Page.StrategyInfo, l: 'STRATÉGIE' },
                         { p: Page.JoinUs, l: 'MEMBERSHIP' }
                     ].map(item => (

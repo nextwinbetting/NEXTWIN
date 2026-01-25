@@ -138,7 +138,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                                 onClick={() => onNavigate(Page.HowItWorks)}
                                 className="px-20 py-8 glass-premium text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:bg-brand-violet transition-all"
                             >
-                                LE PROTOCOLE
+                                COMMENT ÇA MARCHE ?
                             </button>
                         </div>
                     </div>

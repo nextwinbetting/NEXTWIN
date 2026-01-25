@@ -1,7 +1,7 @@
 
 export enum Page {
   Home = 'ACCUEIL',
-  HowItWorks = 'PROTOCOLE',
+  HowItWorks = 'COMMENT ÇA MARCHE ?',
   Bankroll = 'BANKROLL',
   Markets = 'MARCHÉS',
   StrategyInfo = 'STRATÉGIE',

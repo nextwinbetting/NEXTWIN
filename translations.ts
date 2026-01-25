@@ -2,7 +2,7 @@ export const translations = {
   FR: {
     nav_home: 'ACCUEIL',
     nav_results: 'RÉSULTATS',
-    nav_how_it_works: 'PROTOCOLE',
+    nav_how_it_works: 'COMMENT ÇA MARCHE ?',
     nav_strategy: 'STRATÉGIE',
     nav_join: 'REJOINDRE',
     nav_login: 'CONNEXION',
@@ -31,7 +31,7 @@ export const translations = {
     section_daily_title: "LE FLUX NEURAL DU JOUR",
     section_daily_subtitle: "8 signaux détectés par notre Engine IA. Précision professionnelle.",
     
-    how_title: "LE PROTOCOLE ENGINE",
+    how_title: "COMMENT ÇA MARCHE ?",
     how_subtitle: "L'INTELLIGENCE AU SERVICE DU SPORT",
     how_intro: "Notre technologie fusionne le Big Data et les réseaux neuronaux pour extraire de la valeur là où l'humain voit du hasard.",
     how_step1_title: "Analyse des données",
@@ -121,7 +121,7 @@ export const translations = {
   EN: {
     nav_home: 'HOME',
     nav_results: 'RESULTS',
-    nav_how_it_works: 'PROTOCOL',
+    nav_how_it_works: 'HOW IT WORKS?',
     nav_strategy: 'STRATEGY',
     nav_join: 'JOIN',
     nav_login: 'LOGIN',
