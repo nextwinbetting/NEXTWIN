@@ -8,89 +8,81 @@ interface HowItWorksProps {
     onNavigate: (page: Page) => void;
 }
 
-const Step: React.FC<{ 
-    number: number; 
-    title: string; 
-    description: string; 
-    benefitTitle: string;
-    benefitDesc: string;
-    isReversed: boolean; 
-}> = ({ number, title, description, benefitTitle, benefitDesc, isReversed }) => (
-    <div className="relative py-12">
-        <div className={`grid md:grid-cols-2 gap-12 md:gap-20 items-center`}>
-            <div className={`flex justify-center items-center p-4 ${isReversed ? 'md:order-2' : ''}`}>
-               <HowItWorksIllustration step={number} className="w-full max-w-sm h-auto" />
-            </div>
-            <div className={`text-center md:text-left ${isReversed ? 'md:order-1' : ''}`}>
-                <span className="text-sm font-bold text-transparent bg-clip-text bg-gradient-brand">ÉTAPE {number}</span>
-                <h3 className="mt-2 text-3xl font-bold text-white">{title}</h3>
-                <p className="mt-4 text-brand-light-gray leading-relaxed">{description}</p>
-                <div className="mt-6 bg-gray-800/50 border border-gray-700 rounded-lg p-5">
-                    <h4 className="font-semibold text-white flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-green-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        {benefitTitle}
-                    </h4>
-                    <p className="text-sm text-gray-400 mt-2">{benefitDesc}</p>
-                </div>
+const ProtocolCard: React.FC<{ num: string; title: string; desc: string; slogan: string }> = ({ num, title, desc, slogan }) => (
+    <div className="glass-card p-12 rounded-[3rem] border-white/5 relative overflow-hidden group hover:border-brand-accent/30 transition-all duration-700">
+        <span className="absolute -top-10 -right-10 text-[12rem] font-display font-black text-white/[0.02] italic">{num}</span>
+        <div className="relative z-10">
+            <h3 className="text-4xl font-display font-black text-white italic uppercase tracking-tighter mb-6">{title}</h3>
+            <p className="text-gray-400 font-medium text-lg leading-relaxed italic mb-8">{desc}</p>
+            <div className="inline-block px-8 py-3 bg-brand-accent text-black font-display font-black italic text-sm uppercase tracking-widest rounded-xl">
+                {slogan}
             </div>
         </div>
     </div>
 );
 
-
 const HowItWorks: React.FC<HowItWorksProps> = ({ language, onNavigate }) => {
     const t = translations[language];
-    const steps = [
-        { title: t.how_step1_title, description: t.how_step1_desc, benefitTitle: t.how_step1_benefit_title, benefitDesc: t.how_step1_benefit_desc },
-        { title: t.how_step2_title, description: t.how_step2_desc, benefitTitle: t.how_step2_benefit_title, benefitDesc: t.how_step2_benefit_desc },
-        { title: t.how_step3_title, description: t.how_step3_desc, benefitTitle: t.how_step3_benefit_title, benefitDesc: t.how_step3_benefit_desc },
-        { title: t.how_step4_title, description: t.how_step4_desc, benefitTitle: t.how_step4_benefit_title, benefitDesc: t.how_step4_benefit_desc },
-        { title: t.how_step5_title, description: t.how_step5_desc, benefitTitle: t.how_step5_benefit_title, benefitDesc: t.how_step5_benefit_desc },
-        { title: t.how_step6_title, description: t.how_step6_desc, benefitTitle: t.how_step6_benefit_title, benefitDesc: t.how_step6_benefit_desc },
-    ];
 
     return (
-        <>
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="text-center max-w-3xl mx-auto">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white">{t.how_title}</h1>
-                    <p className="mt-4 text-lg text-brand-light-gray">
+        <div className="pt-40 pb-40">
+            <div className="container mx-auto px-6">
+                <div className="text-center max-w-4xl mx-auto mb-32">
+                    <h1 className="text-6xl md:text-8xl font-display font-black text-white italic tracking-tighter uppercase leading-[0.85] mb-8">
+                        {t.how_title}
+                    </h1>
+                    <p className="text-brand-accent font-black uppercase tracking-[0.5em] italic text-[14px] mb-12 font-display">
                         {t.how_subtitle}
                     </p>
+                    <p className="text-2xl text-gray-500 font-bold italic leading-relaxed">
+                        {t.how_intro}
+                    </p>
                 </div>
-                <div className="mt-16 max-w-6xl mx-auto">
-                     <div className="relative border-l-2 border-gray-800">
-                        {steps.map((step, index) => (
-                             <div key={index} className="pl-8 md:pl-12">
-                                <span className="absolute -left-[11px] top-[4.5rem] h-5 w-5 rounded-full bg-gray-700 border-4 border-gray-900 ring-4 ring-gray-800"></span>
-                                <Step 
-                                    number={index + 1} 
-                                    title={step.title} 
-                                    description={step.description}
-                                    benefitTitle={step.benefitTitle}
-                                    benefitDesc={step.benefitDesc}
-                                    isReversed={index % 2 !== 0}
-                                />
-                             </div>
-                        ))}
-                    </div>
+
+                <div className="grid lg:grid-cols-2 gap-10">
+                    <ProtocolCard 
+                        num="01"
+                        title={t.how_step1_title}
+                        desc={t.how_step1_desc}
+                        slogan={t.how_step1_slogan}
+                    />
+                    <ProtocolCard 
+                        num="02"
+                        title={t.how_step2_title}
+                        desc={t.how_step2_desc}
+                        slogan={t.how_step2_slogan}
+                    />
+                    <ProtocolCard 
+                        num="03"
+                        title={t.how_step3_title}
+                        desc={t.how_step3_desc}
+                        slogan={t.how_step3_slogan}
+                    />
+                    <ProtocolCard 
+                        num="04"
+                        title={t.how_step4_title}
+                        desc={t.how_step4_desc}
+                        slogan={t.how_step4_slogan}
+                    />
                 </div>
-            </div>
-             <div className="bg-brand-dark py-20">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-white">{t.how_cta_title}</h2>
-                    <p className="mt-4 text-lg text-brand-light-gray max-w-2xl mx-auto">{t.how_cta_subtitle}</p>
-                    <div className="mt-8">
-                        <button
+
+                <div className="mt-40 p-20 glass-card rounded-[4rem] text-center border-brand-pro/20 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-brand-accent/5"></div>
+                    <div className="relative z-10">
+                        <h2 className="text-5xl font-display font-black text-white italic uppercase tracking-tighter mb-8">L'INFORMATION AVANT L'ÉMOTION.</h2>
+                        <p className="text-2xl text-gray-500 font-bold italic mb-12 max-w-2xl mx-auto">
+                            Notre Engine IA ne supporte aucune équipe. Elle ne supporte que la logique mathématique.
+                        </p>
+                        <button 
                             onClick={() => onNavigate(Page.JoinUs)}
-                            className="rounded-md bg-gradient-brand px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105"
+                            className="btn-hover px-12 py-5 bg-gradient-pro text-white rounded-xl text-sm font-black uppercase tracking-[0.2em] italic shadow-2xl"
                         >
-                            {t.how_cta_button}
+                            REJOINDRE LE FLUX
                         </button>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

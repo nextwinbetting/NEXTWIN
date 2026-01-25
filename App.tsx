@@ -1,8 +1,6 @@
-
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { translations } from './translations';
 import { Page, Language, User } from './types';
 
 // --- Lazy Loading des Pages ---
@@ -23,10 +21,15 @@ const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
-
 const LoadingFallback: React.FC = () => (
-  <div className="flex justify-center items-center h-screen">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
+  <div className="flex flex-col justify-center items-center h-screen bg-brand-bg">
+    <div className="relative h-20 w-20 mb-8">
+      <div className="absolute inset-0 rounded-full border-4 border-white/5"></div>
+      <div className="absolute inset-0 rounded-full border-4 border-t-brand-accent animate-spin"></div>
+    </div>
+    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] italic animate-pulse">
+      Initialisation du Moteur Neural...
+    </p>
   </div>
 );
 
@@ -131,7 +134,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-brand-dark-blue font-sans flex flex-col">
+    <div className="min-h-screen bg-brand-bg font-sans flex flex-col text-white">
       <Header 
         currentPage={currentPage} 
         onNavigate={handleNavigation} 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Prediction } from '../types';
 
@@ -9,48 +8,40 @@ const PredictionCard: React.FC<{ prediction: Prediction; isBonus?: boolean }> = 
     const isVeryHigh = prob >= 80;
 
     return (
-        <div className="bg-[#1a1d26] border border-white/5 rounded-2xl p-6 flex flex-col h-full transition-all duration-300 hover:border-orange-500/30 group relative shadow-md">
-            {/* Tag & Date */}
-            <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{prediction.date} • {prediction.time}</span>
-                {isBonus && (
-                    <span className="bg-orange-500/10 text-orange-500 text-[9px] font-bold uppercase px-2 py-1 rounded border border-orange-500/20">Bonus</span>
-                )}
+        <div className="glass-premium p-10 flex flex-col h-full group relative overflow-hidden transition-all duration-500 border-white/5 hover:border-brand-orange/40 rounded-[3rem]">
+            {/* Soft background glow */}
+            <div className={`absolute -top-10 -right-10 w-40 h-40 blur-[80px] opacity-10 transition-all duration-700 ${isBonus ? 'bg-brand-orange' : 'bg-brand-violet'}`}></div>
+
+            <div className="flex items-center justify-between mb-12 relative z-10">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em] italic">{prediction.date} • {prediction.time}</span>
+                <span className={`text-[9px] font-black uppercase px-4 py-2 rounded-xl border tracking-[0.2em] italic ${isBonus ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/20' : 'bg-brand-violet/10 text-brand-violet border-brand-violet/20'}`}>
+                    {isBonus ? 'NEURAL BONUS' : 'AI SIGNAL'}
+                </span>
             </div>
 
-            {/* Title */}
-            <div className="mb-4">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 truncate">{prediction.competition}</p>
-                <h3 className="text-base font-bold text-white group-hover:text-orange-500 transition-colors leading-tight">
+            <div className="mb-12 relative z-10">
+                <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.5em] mb-4 truncate italic">{prediction.competition}</p>
+                <h3 className="text-3xl font-sans font-black text-white leading-tight italic uppercase tracking-tighter">
                     {prediction.match}
                 </h3>
             </div>
 
-            {/* Recommendation Box */}
-            <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/5">
-                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1 italic">Conseil IA</p>
-                <p className="text-sm font-bold text-white uppercase">{prediction.betType}</p>
+            <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6 mb-12 relative z-10">
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] mb-2 italic">Scénario Engine</p>
+                <p className="text-xl font-sans font-black text-brand-orange uppercase italic tracking-tighter">{prediction.betType}</p>
             </div>
 
-            {/* Probability Gauge */}
-            <div className="mt-auto space-y-2">
-                <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Confiance</span>
-                    <span className={`text-sm font-bold ${isVeryHigh ? 'text-emerald-400' : 'text-orange-400'}`}>{prob}%</span>
+            <div className="mt-auto flex items-end justify-between relative z-10">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] italic mb-2">FIABILITÉ IA</span>
+                    <span className={`text-5xl font-sans font-black italic tracking-tighter ${isVeryHigh ? 'text-white' : 'text-gray-400'}`}>{prob}%</span>
                 </div>
-                <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div className="w-24 h-1.5 bg-gray-900 rounded-full overflow-hidden">
                     <div 
-                        className={`h-full transition-all duration-1000 ${isVeryHigh ? 'bg-emerald-500' : 'bg-orange-500'}`} 
+                        className={`h-full transition-all duration-1000 ${isBonus ? 'bg-brand-orange' : 'bg-brand-violet'}`} 
                         style={{ width: `${prob}%` }}
                     ></div>
                 </div>
-            </div>
-
-            {/* Short Analysis */}
-            <div className="mt-6 pt-4 border-t border-white/5">
-                <p className="text-xs text-gray-400 leading-relaxed italic line-clamp-3">
-                    "{prediction.analysis}"
-                </p>
             </div>
         </div>
     );

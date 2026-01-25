@@ -1,37 +1,36 @@
 
 export enum Page {
   Home = 'ACCUEIL',
-  HowItWorks = 'COMMENT ÇA MARCHE ?',
+  HowItWorks = 'PROTOCOLE',
   Bankroll = 'BANKROLL',
-  Markets = 'SPORTS & MARCHÉS ANALYSÉS',
-  StrategyInfo = 'NOTRE STRATÉGIE – ACCÈS MEMBRES',
+  Markets = 'MARCHÉS',
+  StrategyInfo = 'STRATÉGIE',
   JoinUs = 'NOUS REJOINDRE',
   FAQ = 'FAQ',
-  Contact = 'CONTACTEZ-NOUS',
+  Contact = 'CONTACT',
   Login = 'CONNEXION',
-  Dashboard = 'TABLEAU DE BORD',
-  Legal = 'MENTIONS LÉGALES',
+  Dashboard = 'TERMINAL ELITE',
+  Legal = 'LÉGAL',
   CGV = 'CGV',
-  PrivacyPolicy = 'POLITIQUE DE CONFIDENTIALITÉ',
+  PrivacyPolicy = 'PRIVACY',
   Register = 'INSCRIPTION',
-  ForgotPassword = 'MOT_DE_PASSE_OUBLIE',
-  ResetPassword = 'RÉINITIALISER_MOT_DE_PASSE',
+  ForgotPassword = 'RESET_PWD',
+  ResetPassword = 'NEW_PWD',
 }
 
 export type Language = 'FR' | 'EN';
 
 export enum DashboardNav {
   DashboardHome = "TABLEAU DE BORD",
-  Predictions = "PRONOSTICS DU JOUR",
-  Strategy = "STRATÉGIE",
-  Bankroll = "BANKROLL",
-  LiveScores = "MATCHS_EN_DIRECT",
-  Archives = "ARCHIVES & SUIVI",
-  Subscription = "ABONNEMENT",
-  Profile = "PARAMÈTRES",
+  Predictions = "SIGNALS",
+  Strategy = "STRATEGY",
+  Bankroll = "CAPITAL",
+  LiveScores = "LIVE",
+  Archives = "ARCHIVES",
+  Subscription = "MEMBERSHIP",
+  Profile = "PROFILE",
   Support = "SUPPORT",
 }
-
 
 export enum Sport {
   Football = 'FOOTBALL',
@@ -60,7 +59,7 @@ export interface Prediction {
   match: string;
   betType: string;
   marketType?: string;
-  category: 'Standard' | 'Bonus' | 'Gift';
+  category: 'Standard' | 'Bonus' | 'Gift' | 'Elite';
   date: string;
   time: string;
   probability: number;

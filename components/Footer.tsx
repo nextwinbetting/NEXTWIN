@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Page, Language } from '../types';
 import NextWinLogo from './NextWinLogo';
@@ -8,64 +9,81 @@ interface FooterProps {
   language: Language;
 }
 
-const SocialIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div className="text-gray-400 hover:text-white transition-colors cursor-pointer">
-        {children}
+const FooterColumn: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+    <div className="flex flex-col gap-10">
+        <h4 className="text-[11px] font-black text-gray-700 uppercase tracking-[0.6em] italic border-b border-white/5 pb-4">{title}</h4>
+        <div className="flex flex-col gap-6">
+            {children}
+        </div>
     </div>
 );
 
-const Footer: React.FC<FooterProps> = ({ onNavigate, language }) => {
-  const t = translations[language];
+const FooterLink: React.FC<{ onClick: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
+    <button onClick={onClick} className="text-sm font-bold text-gray-400 hover:text-brand-orange transition-all text-left italic uppercase tracking-widest hover:translate-x-2">
+        {children}
+    </button>
+);
 
+const Footer: React.FC<FooterProps> = ({ onNavigate, language }) => {
   return (
-    <footer className="bg-brand-dark border-t border-gray-800 mt-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-1 space-y-4 flex flex-col items-center md:items-start">
-            <NextWinLogo className="h-10" />
-            <p className="text-brand-light-gray text-sm text-center md:text-left">{t.footer_tagline}</p>
-            <div className="flex space-x-4">
-              <SocialIcon>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-              </SocialIcon>
-              <SocialIcon>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-              </SocialIcon>
-               <SocialIcon>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 11.75a29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-              </SocialIcon>
+    <footer className="bg-brand-surface pt-40 pb-20 border-t border-white/5 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-pro opacity-30"></div>
+      
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 mb-32">
+          {/* Brand Col */}
+          <div className="flex flex-col gap-10">
+            <NextWinLogo />
+            <p className="text-sm text-gray-500 font-bold leading-relaxed max-w-xs italic uppercase tracking-widest">
+                L'architecture prédictive de référence mondiale. Gérée par la data, validée par l'intelligence artificielle.
+            </p>
+            <div className="flex gap-4">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-600 hover:text-brand-orange hover:border-brand-orange transition-all cursor-pointer">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /></svg>
+                    </div>
+                ))}
             </div>
           </div>
-          <div>
-            <h3 className="text-white font-semibold tracking-wider">{t.footer_nav}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li><button onClick={() => onNavigate(Page.HowItWorks)} className="text-brand-light-gray hover:text-white transition-colors">{t.footer_nav_how_it_works}</button></li>
-              <li><button onClick={() => onNavigate(Page.StrategyInfo)} className="text-brand-light-gray hover:text-white transition-colors">{t.footer_nav_strategy_info}</button></li>
-              <li><button onClick={() => onNavigate(Page.Markets)} className="text-brand-light-gray hover:text-white transition-colors">Sports & Marchés Analysés</button></li>
-              <li><button onClick={() => onNavigate(Page.JoinUs)} className="text-brand-light-gray hover:text-white transition-colors">Tarifs</button></li>
-              <li><button onClick={() => onNavigate(Page.FAQ)} className="text-brand-light-gray hover:text-white transition-colors">{t.nav_faq}</button></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-white font-semibold tracking-wider">{t.footer_legal}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li><button onClick={() => onNavigate(Page.Legal)} className="text-brand-light-gray hover:text-white transition-colors">Mentions légales</button></li>
-              <li><button onClick={() => onNavigate(Page.CGV)} className="text-brand-light-gray hover:text-white transition-colors">CGV</button></li>
-              <li><button onClick={() => onNavigate(Page.PrivacyPolicy)} className="text-brand-light-gray hover:text-white transition-colors">Politique de confidentialité</button></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-white font-semibold tracking-wider">{t.footer_support}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li><button onClick={() => onNavigate(Page.Contact)} className="text-brand-light-gray hover:text-white transition-colors">{t.footer_nav_contact}</button></li>
-            </ul>
-          </div>
+
+          <FooterColumn title="PLATEFORME">
+            <FooterLink onClick={() => onNavigate(Page.Home)}>Accueil</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.HowItWorks)}>Le Protocole Engine</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.StrategyInfo)}>Stratégie Elite</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.Markets)}>Analyse Marchés</FooterLink>
+          </FooterColumn>
+
+          <FooterColumn title="MEMBRES">
+            <FooterLink onClick={() => onNavigate(Page.Dashboard)}>Terminal IA</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.Bankroll)}>Gestion Bankroll</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.FAQ)}>Centre d'Aide</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.Contact)}>Assistance Tech</FooterLink>
+          </FooterColumn>
+
+          <FooterColumn title="LEGAL">
+            <FooterLink onClick={() => onNavigate(Page.Legal)}>Mentions Légales</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.CGV)}>Conditions de Vente</FooterLink>
+            <FooterLink onClick={() => onNavigate(Page.PrivacyPolicy)}>Confidentialité</FooterLink>
+          </FooterColumn>
         </div>
-        <div className="mt-12 border-t border-gray-800 pt-8 text-center">
-             <p className="text-sm text-gray-500 mb-4">
-                {t.footer_legal_warning}
+
+        <div className="pt-20 border-t border-white/5 flex flex-col lg:grid lg:grid-cols-3 items-center gap-12 text-center">
+            <div className="flex flex-col gap-3 text-left">
+                <p className="text-[10px] text-gray-700 font-black uppercase tracking-[0.5em] italic">© 2025 NEXTWIN ENGINE TECHNOLOGY</p>
+                <div className="flex gap-6 text-[9px] text-gray-800 font-black uppercase italic tracking-[0.3em]">
+                    <span className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div> System Online</span>
+                    <span className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-brand-violet"></div> AI Active</span>
+                </div>
+            </div>
+            
+            <div className="flex justify-center">
+                <img src="https://stripe.com/img/v3/home/social.png" alt="Stripe Secure" className="h-8 opacity-20 grayscale" />
+            </div>
+
+            <p className="text-[9px] text-gray-600 font-bold leading-relaxed uppercase italic tracking-widest text-right">
+                Avertissement : Les paris sportifs comportent des risques. NextWin est un outil d'aide à la décision mathématique. 
+                Aucun gain n'est garanti à 100%. Jouez de manière responsable.
             </p>
-            <p className="text-base text-brand-light-gray">&copy; {new Date().getFullYear()} NextWin</p>
         </div>
       </div>
     </footer>

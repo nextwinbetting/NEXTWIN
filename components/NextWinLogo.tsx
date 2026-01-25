@@ -1,25 +1,31 @@
-
 import React from 'react';
 
-const NextWinLogo: React.FC<{ className?: string }> = ({ className }) => {
+const NextWinLogo: React.FC<{ className?: string; onClick?: () => void }> = ({ className, onClick }) => {
     return (
-        <div className={`flex items-center gap-4 flex-nowrap shrink-0 ${className}`}>
-            <div className="h-10 w-10 flex-shrink-0">
-                <svg viewBox="0 0 38 38" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div onClick={onClick} className={`flex items-center gap-6 group cursor-pointer ${className}`}>
+            <div className="relative h-16 w-14 flex-shrink-0">
+                {/* 3D Ribbon 'N' */}
+                <svg viewBox="0 0 100 140" className="h-full w-full drop-shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-transform group-hover:scale-110 duration-500">
                     <defs>
-                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0%" stopColor="#FDE047" />
-                            <stop offset="30%" stopColor="#F97316" />
-                            <stop offset="70%" stopColor="#D946EF" />
-                            <stop offset="100%" stopColor="#6D28D9" />
+                        <linearGradient id="n-ribbon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#F97316" />
+                            <stop offset="100%" stopColor="#8B5CF6" />
                         </linearGradient>
                     </defs>
-                    <path d="M0 38 V0 H14 L25 19 V0 H38 V38 H24 L13 19 V38 H0Z" fill="url(#logo-gradient)"/>
+                    <path d="M0 5 L35 0 L35 140 L0 135 Z" fill="#F97316" />
+                    <path d="M65 0 L100 5 L100 135 L65 140 Z" fill="#8B5CF6" />
+                    <path d="M0 5 L35 0 L100 140 L65 140 Z" fill="url(#n-ribbon-grad)" className="drop-shadow-lg" />
                 </svg>
             </div>
-            <div className="flex items-center text-4xl font-black tracking-tighter whitespace-nowrap leading-none">
-                <span className="text-white">Next</span>
-                <span className="text-transparent bg-clip-text bg-gradient-brand logo-win-part" style={{ paddingRight: '4px' }}>Win</span>
+            <div className="flex flex-col leading-none">
+                <div className="flex items-baseline">
+                    <span className="text-4xl font-sans font-black text-white tracking-tighter uppercase">NEXT</span>
+                    <span className="text-4xl font-sans font-black tracking-tighter uppercase italic ml-1 bg-clip-text text-transparent bg-gradient-to-r from-brand-violet to-brand-orange">WIN</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                    <div className="h-[1px] w-6 bg-brand-orange"></div>
+                    <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.5em] italic">Intelligence Artificielle</span>
+                </div>
             </div>
         </div>
     );

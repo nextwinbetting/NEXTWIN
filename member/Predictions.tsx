@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Prediction, Sport, Language, DailyPack } from '../types';
 import PredictionCard from '../components/PredictionCard';
 import { translations } from '../translations';
@@ -39,7 +38,7 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
 
     const generateIAPronostics = async () => {
         setIsLoading(true);
-        setStatus("GÉNÉRATION DU BROUILLON...");
+        setStatus("INITIALISATION DU MOTEUR NEURAL...");
         
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -48,8 +47,8 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
             const fullTime = now.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
             const [datePart, timePart] = fullTime.split(' ');
 
-            const prompt = `[ROLE: SPORTS DATA ANALYST]
-            TASK: Identify 8 REAL upcoming matches for Football, Basketball, or Tennis.
+            const prompt = `[ROLE: NEXTWIN NEURAL ENGINE]
+            TASK: Identify 8 REAL upcoming matches for Football, Basketball, or Tennis occurring in the next 24-48 hours.
             STRUCTURE: JSON
             {
               "predictions": [
@@ -57,10 +56,10 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                   "sport": "Football | Basketball | Tennis",
                   "competition": "League Name",
                   "match": "Team A VS Team B",
-                  "betType": "Prediction",
-                  "category": "Standard | Bonus",
+                  "betType": "1N2 or Over/Under 2.5 or Score Exact",
+                  "category": "Standard",
                   "probability": integer (70-95),
-                  "analysis": "Short technical analysis.",
+                  "analysis": "Short technical data-based analysis emphasizing why this bet has value.",
                   "date": "${datePart}",
                   "time": "HH:MM"
                 }
@@ -72,15 +71,24 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }],
-                    temperature: 0.2,
+                    temperature: 0.1, // Low temperature for high precision
                     responseMimeType: "application/json"
                 }
             });
 
-            const text = response.text || "";
-            const data = JSON.parse(text);
+            // CRITICAL: use response.text, not response.text()
+            const responseText = response.text || "";
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("Format JSON non trouvé");
+            
+            const data = JSON.parse(jsonMatch[0]);
             const rawPreds = data.predictions || [];
             
+            const sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((chunk: any) => ({
+                uri: chunk.web?.uri,
+                title: chunk.web?.title
+            })).filter((s: any) => s.uri) || [];
+
             const filtered: Prediction[] = rawPreds.map((p: any, i: number) => ({
                 id: `nw-${Date.now()}-${i}`,
                 sport: p.sport as Sport,
@@ -92,43 +100,40 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
                 analysis: p.analysis,
                 date: p.date,
                 time: p.time,
-                isLive: false
+                isLive: false,
+                sources: sources
             }));
 
             const newDraft: DailyPack = {
                 timestamp: Date.now(),
                 isValidated: false,
-                predictions: filtered,
-                publishedBy: 'NEXTWIN_ENGINE'
+                predictions: filtered.slice(0, 8),
+                publishedBy: 'NEXTWIN_NEURAL_ENGINE'
             };
 
             const updatedStore = { ...store, draft: newDraft };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedStore));
             setStore(updatedStore);
-            setStatus("BROUILLON PRÊT");
+            setStatus("SCAN TERMINÉ : 8 SIGNAUX IDENTIFIÉS");
         } catch (err: any) {
-            setStatus("ERREUR MOTEUR");
+            console.error("AI Generation Error:", err);
+            setStatus("ERREUR ENGINE : SYNCHRONISATION ÉCHOUÉE");
         } finally {
             setIsLoading(false);
-            setTimeout(() => setStatus(null), 3000);
+            setTimeout(() => setStatus(null), 4000);
         }
     };
 
     const publishToClient = () => {
         if (!store.draft) return;
-        
         setIsLoading(true);
-        setStatus("PUBLICATION EN COURS...");
+        setStatus("DÉPLOIEMENT SUR LE TERMINAL MEMBRE...");
 
-        const validatedPack = {
-            ...store.draft,
-            isValidated: true
-        };
-
+        const validatedPack = { ...store.draft, isValidated: true };
         const updatedStore = {
             ...store,
             activePack: validatedPack,
-            draft: null, // On vide le brouillon après publication
+            draft: null,
             history: [validatedPack, ...store.history].slice(0, 10)
         };
 
@@ -137,9 +142,9 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
         
         setTimeout(() => {
             setIsLoading(false);
-            setStatus("ENVOYÉ AUX CLIENTS ✅");
+            setStatus("VOTRE FLUX EST EN LIGNE ✅");
             setTimeout(() => setStatus(null), 3000);
-        }, 1000);
+        }, 1200);
     };
 
     if (!isAdmin) return null;
@@ -147,65 +152,63 @@ const Predictions: React.FC<{ language: Language; isAdmin: boolean }> = ({ langu
     return (
         <div className="max-w-6xl mx-auto pb-20 animate-fade-in">
             {status && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-orange-500 text-white px-8 py-3 rounded-full shadow-2xl font-black text-[10px] tracking-widest uppercase animate-bounce">
+                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[60] bg-brand-accent text-black px-8 py-4 rounded-xl shadow-[0_0_40px_rgba(255,107,0,0.3)] font-black text-[11px] tracking-widest uppercase italic animate-slide-up border border-white/20">
                     {status}
                 </div>
             )}
 
-            <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Console Administration</h1>
-                    <p className="text-gray-400 text-sm mt-1">Gérez le flux de pronostics envoyé aux membres.</p>
+                    <h1 className="text-4xl font-display font-black text-white italic uppercase tracking-tighter leading-none">Console Admin</h1>
+                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em] mt-3 italic">Contrôle du Flux Neural</p>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                     <button 
                         onClick={generateIAPronostics} 
                         disabled={isLoading} 
-                        className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-6 py-3 rounded-xl font-bold text-xs transition-all disabled:opacity-50 uppercase tracking-wider"
+                        className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-xl font-black text-[10px] transition-all uppercase tracking-[0.2em] italic group"
                     >
-                        {isLoading ? "Chargement..." : "1. Générer Brouillon"}
+                        {isLoading ? "CALCUL EN COURS..." : "1. GÉNÉRER FLUX IA"}
                     </button>
-                    
                     {store.draft && (
                         <button 
                             onClick={publishToClient} 
-                            disabled={isLoading}
-                            className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-xs transition-all shadow-lg shadow-emerald-500/20 uppercase tracking-wider flex items-center gap-2 animate-pulse"
+                            disabled={isLoading} 
+                            className="bg-gradient-pro text-white px-8 py-4 rounded-xl font-black text-[10px] transition-all shadow-[0_0_30px_rgba(255,107,0,0.3)] uppercase tracking-[0.2em] italic hover:scale-105 active:scale-95"
                         >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                            2. Envoyer espace client
+                            2. DÉPLOYER LE PACK
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* Draft Preview Section */}
             {store.draft && (
-                <div className="mb-20">
-                    <div className="flex items-center gap-3 mb-6">
-                        <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-                        <h2 className="text-sm font-bold text-white uppercase tracking-widest">Aperçu du Brouillon (Non publié)</h2>
+                <div className="mb-24">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="h-[1px] flex-1 bg-white/5"></div>
+                        <h2 className="text-[10px] font-black text-orange-500 uppercase tracking-[0.5em] italic">Brouillon en attente de validation</h2>
+                        <div className="h-[1px] flex-1 bg-white/5"></div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-80">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 opacity-70 hover:opacity-100 transition-opacity">
                         {store.draft.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                     </div>
                 </div>
             )}
 
-            {/* Active Pack Section */}
             <div>
-                <div className="flex items-center gap-3 mb-6">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <h2 className="text-sm font-bold text-white uppercase tracking-widest">Flux Actuellement en Ligne</h2>
+                 <div className="flex items-center gap-4 mb-8">
+                    <div className="h-[1px] flex-1 bg-white/5"></div>
+                    <h2 className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.5em] italic">Flux Actif sur le Terminal</h2>
+                    <div className="h-[1px] flex-1 bg-white/5"></div>
                 </div>
                 {store.activePack ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {store.activePack.predictions.map(p => <PredictionCard key={p.id} prediction={p} />)}
                     </div>
                 ) : (
-                    <div className="bg-white/5 border border-dashed border-white/10 rounded-3xl p-20 text-center">
-                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Aucun pronostic publié aujourd'hui.</p>
+                    <div className="bg-white/[0.02] border border-dashed border-white/10 rounded-[3rem] py-32 text-center">
+                        <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.8em] italic">Aucun flux neural en ligne actuellement.</p>
                     </div>
                 )}
             </div>

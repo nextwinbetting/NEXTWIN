@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DashboardNav, Language, User } from '../types';
 import NextWinLogo from '../components/NextWinLogo';
@@ -24,106 +23,74 @@ const NavItem: React.FC<{
     return (
         <button
             onClick={() => setActivePage(page)}
-            className={`flex items-center w-full px-5 py-3 rounded-xl transition-all duration-200 group mb-1 ${
+            className={`flex items-center w-full px-5 py-4 rounded-xl transition-all duration-300 group mb-2 ${
                 isActive
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-brand-accent text-black font-black'
+                    : 'text-gray-500 hover:text-white hover:bg-white/5'
             }`}
         >
-            <div className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-orange-400'}`}>
+            <div className={`w-5 h-5 mr-4 ${isActive ? 'text-black' : 'text-gray-700 group-hover:text-brand-accent'}`}>
                 {icon}
             </div>
-            <span className="text-xs font-semibold tracking-wide">{label}</span>
+            <span className={`text-[10px] uppercase tracking-widest italic font-bold`}>{label}</span>
         </button>
     );
 };
 
-const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, isSidebarOpen, setSidebarOpen, language }) => {
+const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, language, currentUser }) => {
     const t = translations[language];
 
-    const navLinks = (
-        <nav className="flex-1 px-4 py-8 space-y-1 overflow-y-auto">
-            <div className="px-5 mb-6">
-                <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">Navigation</p>
-                <div className="h-[1px] w-full bg-white/5"></div>
-            </div>
-
-            <NavItem 
-                page={DashboardNav.DashboardHome} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_home} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>} 
-            />
-            
-            <NavItem 
-                page={DashboardNav.Predictions} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_predictions} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} 
-            />
-
-            <NavItem 
-                page={DashboardNav.Strategy} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_strategy} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>} 
-            />
-            
-            <NavItem 
-                page={DashboardNav.Bankroll} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_bankroll} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>} 
-            />
-
-            <div className="pt-8">
-                 <div className="h-[1px] w-full bg-white/5 mb-6"></div>
-            </div>
-
-            <NavItem 
-                page={DashboardNav.Subscription} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_subscription} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>} 
-            />
-
-            <NavItem 
-                page={DashboardNav.Profile} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_profile} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} 
-            />
-
-            <NavItem 
-                page={DashboardNav.Support} 
-                activePage={activePage} 
-                setActivePage={setActivePage} 
-                label={t.dash_nav_support} 
-                icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>} 
-            />
-        </nav>
-    );
-
     return (
-        <>
-            <div className={`fixed inset-0 bg-black/60 z-40 md:hidden transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
-            <div className={`fixed top-0 left-0 h-full w-64 bg-[#111319] border-r border-white/5 z-50 transform transition-transform duration-300 md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="flex flex-col h-full">
-                    <div className="p-6 border-b border-white/5 flex items-center justify-center"><NextWinLogo className="h-6"/></div>
-                    {navLinks}
+        <aside className="hidden md:flex md:fixed md:top-24 md:bottom-0 md:left-0 md:w-72 md:flex-col bg-brand-bg border-r border-white/5 z-40">
+            <div className="flex-1 px-6 py-10 space-y-1 overflow-y-auto">
+                <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest mb-6 px-5">TERMINAL V2.5</p>
+                
+                <NavItem 
+                    page={DashboardNav.DashboardHome} activePage={activePage} setActivePage={setActivePage} 
+                    label={t.dash_nav_home} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>} 
+                />
+                <NavItem 
+                    page={DashboardNav.Predictions} activePage={activePage} setActivePage={setActivePage} 
+                    label={t.dash_nav_predictions} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} 
+                />
+                <NavItem 
+                    page={DashboardNav.LiveScores} activePage={activePage} setActivePage={setActivePage} 
+                    label="SCANNER" icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>} 
+                />
+                <NavItem 
+                    page={DashboardNav.Strategy} activePage={activePage} setActivePage={setActivePage} 
+                    label={t.dash_nav_strategy} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>} 
+                />
+                <NavItem 
+                    page={DashboardNav.Bankroll} activePage={activePage} setActivePage={setActivePage} 
+                    label={t.dash_nav_bankroll} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>} 
+                />
+
+                <div className="pt-10">
+                    <p className="text-[9px] font-black text-gray-800 uppercase tracking-widest mb-6 px-5">ACCOUNT</p>
+                    <NavItem 
+                        page={DashboardNav.Subscription} activePage={activePage} setActivePage={setActivePage} 
+                        label={t.dash_nav_subscription} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>} 
+                    />
+                    <NavItem 
+                        page={DashboardNav.Profile} activePage={activePage} setActivePage={setActivePage} 
+                        label={t.dash_nav_profile} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>} 
+                    />
                 </div>
             </div>
-
-            <div className="hidden md:flex md:fixed md:top-24 md:bottom-0 md:left-0 md:w-64 md:flex-col bg-[#111319] border-r border-white/5">
-                <div className="flex flex-col h-full">{navLinks}</div>
+            
+            <div className="p-8 bg-brand-surface border-t border-white/5">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-brand-accent flex items-center justify-center font-display font-black text-black text-sm italic">
+                        {currentUser.username.substring(0, 1).toUpperCase()}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                        <p className="text-xs font-black text-white truncate uppercase tracking-widest italic">{currentUser.username}</p>
+                        <p className="text-[9px] text-brand-accent font-black uppercase tracking-widest italic">PREMIUM ACCESS</p>
+                    </div>
+                </div>
             </div>
-        </>
+        </aside>
     );
 };
 

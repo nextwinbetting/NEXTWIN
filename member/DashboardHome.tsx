@@ -18,22 +18,20 @@ const MenuCard: React.FC<{
 }> = ({ title, description, icon, onClick, highlight }) => (
     <div 
         onClick={onClick}
-        className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${
-            highlight 
-            ? 'bg-orange-500/5 border-orange-500/20 hover:border-orange-500/40' 
-            : 'bg-white/5 border-white/5 hover:border-white/20'
-        } group shadow-sm`}
+        className={`group relative p-8 rounded-[2rem] cursor-pointer transition-all duration-500 border glass-panel ${
+            highlight ? 'border-orange-500/30' : 'border-white/5'
+        } hover:border-orange-500/50 hover:-translate-y-2 shadow-2xl`}
     >
-        <div className={`w-10 h-10 flex items-center justify-center rounded-xl mb-4 transition-all duration-300 ${
-            highlight ? 'bg-orange-500 text-white' : 'bg-white/5 text-orange-500 group-hover:bg-orange-500 group-hover:text-white'
+        <div className={`w-14 h-14 flex items-center justify-center rounded-2xl mb-8 transition-all duration-500 ${
+            highlight ? 'bg-gradient-pro text-white shadow-xl shadow-orange-500/20' : 'bg-white/5 text-gray-500 group-hover:bg-gradient-pro group-hover:text-white group-hover:shadow-xl group-hover:shadow-orange-500/20'
         }`}>
             {icon}
         </div>
-        <h3 className="text-base font-bold text-white mb-2">{title}</h3>
-        <p className="text-xs text-gray-400 leading-relaxed mb-4">{description}</p>
-        <div className="flex items-center text-[10px] font-bold uppercase tracking-wider text-orange-500 group-hover:translate-x-1 transition-transform">
-            Ouvrir
-            <svg className="w-3 h-3 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <h3 className="text-xl font-display font-black text-white italic tracking-tighter uppercase mb-2">{title}</h3>
+        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.15em] leading-relaxed mb-6 italic">{description}</p>
+        <div className="flex items-center text-[9px] font-black uppercase tracking-[0.2em] text-orange-500 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2">
+            ACCÉDER AU FLUX
+            <svg className="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7" /></svg>
         </div>
     </div>
 );
@@ -42,55 +40,61 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
     const t = translations[language];
 
     return (
-        <div className="animate-fade-in max-w-6xl mx-auto py-4">
-            <div className="mb-10">
-                <h1 className="text-2xl font-bold text-white">
-                    Bonjour, <span className="text-orange-500">{username}</span>
+        <div className="max-w-6xl mx-auto py-2 animate-fade-up">
+            <header className="mb-20">
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-orange-500/5 border border-orange-500/10 mb-8">
+                    <span className="text-[9px] font-black text-orange-500 uppercase tracking-[0.4em] italic">Access Authorized — NextWin Cockpit Elite</span>
+                </div>
+                <h1 className="mb-6 font-display font-black text-white tracking-tighter uppercase italic leading-[0.9]">
+                    SALUT, <span className="text-transparent bg-clip-text bg-gradient-pro">{username}</span>
                 </h1>
-                <p className="text-gray-400 text-sm mt-1">Ravi de vous revoir sur NextWin.</p>
-            </div>
+                <p className="text-gray-500 text-sm font-bold uppercase tracking-[0.3em] italic">LE NEURAL ENGINE EST ACTIF. 8 SIGNAUX DISPONIBLES.</p>
+            </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                 <MenuCard
                     highlight
-                    title="Pronostics"
-                    description="Consultez les matchs sélectionnés pour vous aujourd'hui."
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-5 h-5"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                    title="Signaux Flux"
+                    description="Les 8 opportunités NextWin du jour."
+                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-7 h-7"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
                     onClick={() => setActivePage(DashboardNav.Predictions)}
                 />
                 <MenuCard
-                    title="Stratégie"
-                    description="Découvrez la méthode pour maximiser vos gains."
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-5 h-5"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>}
+                    title="Protocole"
+                    description="Règles d'investissement Elite."
+                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-7 h-7"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
                     onClick={() => setActivePage(DashboardNav.Strategy)}
                 />
                 <MenuCard
-                    title="Bankroll"
-                    description="Gérez votre capital et suivez votre progression."
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-5 h-5"><path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>}
+                    title="Capital"
+                    description="Suivi du ROI et pilotage."
+                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-7 h-7"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>}
                     onClick={() => setActivePage(DashboardNav.Bankroll)}
                 />
                 <MenuCard
-                    title="Support"
-                    description="Besoin d'aide ? Notre équipe est à votre disposition."
-                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="w-5 h-5"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
-                    onClick={() => setActivePage(DashboardNav.Support)}
+                    title="Archives"
+                    description="Historique des scans Engine."
+                    icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} className="w-7 h-7"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                    onClick={() => setActivePage(DashboardNav.Archives)}
                 />
             </div>
 
-            <div className="bg-white/5 border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
-                <div className="flex-1">
-                    <h3 className="text-base font-bold text-white mb-2">Conseil de gestion</h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                        Pour durer, ne misez jamais plus de 5% de votre capital total sur un seul pari. La discipline est la clé de la réussite.
-                    </p>
+            <div className="relative glass-panel rounded-[3rem] p-12 md:p-16 overflow-hidden border border-white/10 shadow-3xl">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-pro opacity-[0.03] blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="flex flex-col md:flex-row items-center gap-16 relative z-10">
+                    <div className="flex-1 text-center md:text-left">
+                        <h3 className="text-3xl font-display font-black text-white italic uppercase tracking-tighter mb-4 leading-none">LA RIGUEUR DE 12H00.</h3>
+                        <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em] leading-relaxed max-w-xl italic">
+                            LE SUCCÈS N'EST PAS UN HASARD. EN EXÉCUTANT VOS 8 SIGNAUX CHAQUE MATIN, VOUS CRÉEZ UN AVANTAGE MATHÉMATIQUE IRRÉVERSIBLE.
+                        </p>
+                    </div>
+                    <button 
+                        onClick={() => setActivePage(DashboardNav.Strategy)}
+                        className="px-12 py-6 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.4em] text-white transition-all italic"
+                    >
+                        NOTRE PROTOCOLE
+                    </button>
                 </div>
-                <button 
-                    onClick={() => setActivePage(DashboardNav.Strategy)}
-                    className="whitespace-nowrap px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all"
-                >
-                    Voir la méthode
-                </button>
             </div>
         </div>
     );

@@ -1,259 +1,223 @@
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { Page, Language } from '../types';
-import { translations } from '../translations';
-import { PredictionIllustration, AnalyzerIllustration, BankrollIllustration, ArticleEngineIllustration, ArticleBankrollIllustration, ArticleMarketsIllustration } from '../components/HomeIllustrations';
-import { HeroIllustration } from '../components/HeroIllustration';
 
-interface HomeProps {
-    onNavigate: (page: Page) => void;
-    language: Language;
-}
+const DetailedNeuralNexus = () => (
+    <div className="relative w-full max-w-2xl aspect-square scale-110 lg:scale-125">
+        <svg viewBox="0 0 500 500" className="w-full h-full drop-shadow-[0_0_80px_rgba(139,92,246,0.25)]">
+            <defs>
+                <linearGradient id="nexus-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#F97316" />
+                    <stop offset="100%" stopColor="#8B5CF6" />
+                </linearGradient>
+                <filter id="ultra-glow">
+                    <feGaussianBlur stdDeviation="20" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+            </defs>
+            
+            {/* Massive Orbital Rings */}
+            <g transform="translate(250, 250)">
+                <circle r="220" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="1" className="animate-[spin_90s_linear_infinite]" />
+                <circle r="190" fill="none" stroke="url(#nexus-grad)" strokeWidth="0.5" strokeDasharray="10 40" opacity="0.2" className="animate-[spin_45s_linear_infinite_reverse]" />
+                <ellipse rx="240" ry="100" fill="none" stroke="white" strokeWidth="0.5" opacity="0.05" transform="rotate(45)" className="animate-[spin_60s_linear_infinite]" />
+                <ellipse rx="240" ry="100" fill="none" stroke="white" strokeWidth="0.5" opacity="0.05" transform="rotate(-45)" className="animate-[spin_50s_linear_infinite_reverse]" />
+                
+                {/* Internal Geometry & Pulse */}
+                <g filter="url(#ultra-glow)" className="animate-[pulse_4s_ease-in-out_infinite]">
+                    <circle r="85" fill="url(#nexus-grad)" opacity="0.1" />
+                    <circle r="75" fill="url(#nexus-grad)" opacity="0.8" />
+                    <circle r="68" fill="#020205" />
+                    
+                    {/* Neural Connections inside Core */}
+                    <g opacity="0.6">
+                        <circle cx="-15" cy="-15" r="4" fill="white" />
+                        <circle cx="20" cy="10" r="3" fill="white" />
+                        <circle cx="-10" cy="25" r="3" fill="white" />
+                        <path d="M-15 -15 L20 10 L-10 25 Z" stroke="white" strokeWidth="0.5" fill="none" />
+                    </g>
+                    
+                    <text y="14" textAnchor="middle" fill="white" fontSize="32" fontWeight="900" className="font-sans italic tracking-tighter">NW</text>
+                </g>
 
-const FeatureSection: React.FC<{
-    illustration: React.ReactNode;
-    title: string;
-    description: string;
-    items: string[];
-    isReversed?: boolean;
-}> = ({ illustration, title, description, items, isReversed }) => (
-    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-        <div className={`flex justify-center items-center ${isReversed ? 'lg:order-2' : ''}`}>
-            {illustration}
-        </div>
-        <div className={`text-center lg:text-left ${isReversed ? 'lg:order-1' : ''}`}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">{title}</h2>
-            <p className="mt-4 text-lg text-brand-light-gray leading-relaxed">{description}</p>
-            <ul className="mt-6 space-y-4">
-                {items.map((item, index) => (
-                    <li key={index} className="flex items-center justify-center lg:justify-start">
-                        <svg className="h-6 w-6 text-green-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                        <span className="ml-3 text-lg text-brand-light-gray">{item}</span>
-                    </li>
+                {/* Satellite Data Streams */}
+                {[...Array(16)].map((_, i) => (
+                    <g key={i} transform={`rotate(${i * 22.5})`}>
+                        <circle 
+                            cx="180" 
+                            cy="0" 
+                            r="2.5" 
+                            fill="white" 
+                            className="animate-pulse"
+                            style={{ animationDelay: `${i * 0.3}s` }}
+                        />
+                        <path 
+                            d="M 180 0 L 220 0" 
+                            stroke="white" 
+                            strokeWidth="0.5" 
+                            strokeDasharray="1 5" 
+                            opacity="0.1" 
+                        />
+                    </g>
                 ))}
-            </ul>
+            </g>
+        </svg>
+    </div>
+);
+
+const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string; color: string; label: string }> = ({ icon, title, desc, color, label }) => (
+    <div className="glass-premium p-12 rounded-[4rem] hover-reveal group flex flex-col h-full border-white/5 transition-all duration-700">
+        <div className="flex justify-between items-start mb-12">
+            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center ${color} shadow-2xl transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}>
+                {icon}
+            </div>
+            <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.4em] italic">{label}</span>
+        </div>
+        <h3 className="text-3xl font-sans font-black text-white italic uppercase tracking-tighter mb-6">{title}</h3>
+        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed italic flex-grow">{desc}</p>
+        <div className="mt-12 pt-8 border-t border-white/5 flex items-center gap-4">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] italic">Intelligence Artificielle Active</span>
         </div>
     </div>
 );
 
-const ArticleCard: React.FC<{
-    illustration: React.ReactNode;
-    title: string;
-    description: string;
-    onClick: () => void;
-}> = ({ illustration, title, description, onClick }) => (
-    <div 
-        onClick={onClick}
-        className="bg-brand-card border border-gray-800 rounded-2xl p-8 text-left cursor-pointer transition-all duration-300 hover:border-orange-500/50 hover:bg-gray-800/50 transform hover:-translate-y-2 group"
-    >
-        <div className="h-44 flex items-center justify-center mb-6">{illustration}</div>
-        <h3 className="text-2xl font-bold text-white">{title}</h3>
-        <p className="mt-3 text-base text-brand-light-gray h-24 overflow-hidden">{description}</p>
-        <span className="mt-6 inline-block font-bold text-lg text-transparent bg-clip-text bg-gradient-brand group-hover:brightness-125 transition-all">
-            Lire la suite →
-        </span>
+const TestimonialCard: React.FC<{ name: string; profit: string; text: string; id: number }> = ({ name, profit, text, id }) => (
+    <div className="w-[480px] mx-10 p-10 glass-premium rounded-[3.5rem] flex flex-col gap-10 shrink-0 transition-all hover:bg-white/[0.06] border-white/5">
+        <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-full border-2 border-brand-violet/20 p-1 overflow-hidden">
+                <img src={`https://i.pravatar.cc/150?u=${id}`} alt={name} className="w-full h-full object-cover rounded-full grayscale hover:grayscale-0 transition-all duration-500" />
+            </div>
+            <div>
+                <p className="font-sans font-black text-white uppercase text-base tracking-tight">{name}</p>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    <span className="text-[11px] font-black text-emerald-500 uppercase tracking-widest italic">{profit} GÉNÉRÉS</span>
+                </div>
+            </div>
+        </div>
+        <p className="text-lg text-gray-400 font-medium leading-relaxed italic border-l-2 border-white/5 pl-8">"{text}"</p>
     </div>
 );
 
-const UserAvatar: React.FC = () => (
-  <svg className="w-14 h-14 rounded-full bg-gray-800 border-2 border-gray-700 flex-shrink-0" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="avatar-grad-home" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#F97316" />
-        <stop offset="100%" stopColor="#D946EF" />
-      </linearGradient>
-    </defs>
-    <circle cx="20" cy="16" r="8" fill="url(#avatar-grad-home)" opacity="0.5"/>
-    <path d="M12 30 C12 24, 28 24, 28 30" stroke="url(#avatar-grad-home)" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
-);
-
-const CTAIllustration: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="cta-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#F97316" />
-                <stop offset="100%" stopColor="#D946EF" />
-            </linearGradient>
-            <filter id="glow-cta" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="20" result="coloredBlur" />
-                <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                </feMerge>
-            </filter>
-        </defs>
-        <g className="group">
-            <circle cx="150" cy="150" r="100" fill="url(#cta-grad)" opacity="0.1" />
-            <circle cx="150" cy="150" r="80" fill="url(#cta-grad)" filter="url(#glow-cta)" className="cta-pulse" />
-            <circle cx="150" cy="150" r="70" fill="#171717" stroke="#374151" />
-            <path d="M135 170 L165 150 L135 130" stroke="white" strokeWidth="8" fill="none" strokeLinecap="round" strokeLinejoin="round" className="cta-arrow" />
-        </g>
-         <style>{`
-            .cta-pulse { animation: pulse-cta 3s infinite ease-in-out; }
-            @keyframes pulse-cta { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
-            .cta-arrow { transition: transform 0.3s ease-out; }
-            .group:hover .cta-arrow { transform: translateX(5px); }
-        `}</style>
-    </svg>
-);
-
-
-const Home: React.FC<HomeProps> = ({ onNavigate, language }) => {
-    const t = translations[language];
-    const testimonials = t.home_testimonials || [];
-    const allTestimonials = testimonials.length > 0 ? [...testimonials, ...testimonials] : [];
+const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> = ({ onNavigate, language }) => {
+    const allTestimonials = Array.from({ length: 50 }, (_, i) => ({
+        name: ["Marc D.", "Julien S.", "Sarah B.", "Thomas L.", "Karim F.", "Alice M."][i % 6] + ` #${i+100}`,
+        profit: ["+1,420€", "+890€", "+2,100€", "+450€", "+1,120€", "+3,200€"][i % 6],
+        text: "La précision du moteur neural sur le football européen est tout simplement chirurgicale. Une nouvelle ère de paris.",
+        id: i + 100
+    }));
 
     return (
-        <>
-            <style>{`
-                @keyframes infinite-scroll {
-                    from { transform: translateX(0); }
-                    to { transform: translateX(-50%); }
-                }
-                .animate-infinite-scroll {
-                    animation: infinite-scroll 40s linear infinite;
-                    width: max-content;
-                }
-            `}</style>
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 sm:pt-32 sm:pb-20">
-                <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-white">
-                        {t.home_title1}<span className="text-transparent bg-clip-text bg-gradient-brand">{t.home_title2}</span>
-                    </h1>
-                    <p className="mt-8 text-xl text-brand-light-gray max-w-2xl mx-auto leading-relaxed">
-                        {t.home_subtitle}
-                    </p>
-                    <p className="mt-6 text-base font-bold text-yellow-300/80 max-w-2xl mx-auto border border-yellow-300/30 bg-yellow-900/20 rounded-xl p-4 shadow-lg">
-                        {t.home_strategy_intro}
-                    </p>
-                    <div className="mt-12 flex items-center justify-center gap-x-6">
-                        <button
-                            onClick={() => onNavigate(Page.Dashboard)}
-                            className="rounded-xl bg-gradient-brand px-8 py-4 text-lg font-bold text-white shadow-xl hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105"
-                        >
-                            {t.home_cta_main}
-                        </button>
-                        <button
-                            onClick={() => onNavigate(Page.HowItWorks)}
-                            className="rounded-xl bg-gray-800/80 border border-gray-700 px-8 py-4 text-lg font-bold leading-6 text-white hover:bg-gray-700/80 transition-colors"
-                        >
-                            {t.home_cta_secondary} <span aria-hidden="true">→</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div className="pt-40 lg:pt-64 pb-32 overflow-hidden">
+            {/* HERO SECTION RAFFINÉE */}
+            <section className="container mx-auto px-6 mb-72">
+                <div className="grid lg:grid-cols-2 gap-32 items-center">
+                    <div className="space-y-16">
+                        <div className="inline-flex items-center gap-4 px-8 py-3 rounded-full glass-premium border-brand-orange/20">
+                            <div className="h-2 w-2 rounded-full bg-brand-orange animate-ping"></div>
+                            <span className="text-[10px] font-black text-white uppercase tracking-[0.5em] italic">Neural Protocol V4.2 — Actif</span>
+                        </div>
+                        
+                        <h1 className="text-5xl md:text-7xl font-sans font-black text-white impact-title uppercase italic">
+                            L’ANALYSE IA AU <br/> SERVICE DE <br/>
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-violet">VOS GAINS SPORTIFS.</span>
+                        </h1>
 
-            {/* HERO ILLUSTRATION SECTION */}
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-12 md:my-20">
-                <HeroIllustration className="w-full h-auto max-w-5xl mx-auto" />
-            </div>
+                        <p className="max-w-xl text-xl text-gray-500 font-bold italic uppercase tracking-tighter leading-snug">
+                            Nous fusionnons le Big Data mondial et les réseaux neuronaux pour transformer l'incertitude en stratégie mathématique.
+                        </p>
 
-            {/* Feature sections */}
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-32">
-                <FeatureSection
-                    illustration={<PredictionIllustration className="w-full h-auto max-w-lg" />}
-                    title={t.home_feature1_title}
-                    description={t.home_feature1_desc}
-                    items={t.home_feature1_items}
-                />
-                <FeatureSection
-                    illustration={<AnalyzerIllustration className="w-full h-auto max-w-lg" />}
-                    title={t.home_feature2_title}
-                    description={t.home_feature2_desc}
-                    items={t.home_feature2_items}
-                    isReversed
-                />
-                <FeatureSection
-                    illustration={<BankrollIllustration className="w-full h-auto max-w-lg" />}
-                    title={t.home_feature3_title}
-                    description={t.home_feature3_desc}
-                    items={t.home_feature3_items}
-                />
-            </div>
-            
-            {/* Articles Section */}
-            <div className="py-24 bg-brand-dark">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-4xl sm:text-5xl font-bold text-white">{t.home_articles_title}</h2>
-                    <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
-                        <ArticleCard 
-                            illustration={<ArticleEngineIllustration className="w-full h-auto max-w-xs" />}
-                            title={t.home_article1_title}
-                            description={t.home_article1_desc}
-                            onClick={() => onNavigate(Page.HowItWorks)}
-                        />
-                         <ArticleCard 
-                            illustration={<ArticleBankrollIllustration className="w-full h-auto max-w-xs" />}
-                            title={t.home_article2_title}
-                            description={t.home_article2_desc}
-                            onClick={() => onNavigate(Page.Bankroll)}
-                        />
-                         <ArticleCard 
-                            illustration={<ArticleMarketsIllustration className="w-full h-auto max-w-xs" />}
-                            title={t.home_article3_title}
-                            description={t.home_article3_desc}
-                            onClick={() => onNavigate(Page.Markets)}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* Testimonials section */}
-            <div className="py-24 overflow-hidden">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
-                    <h2 className="text-4xl sm:text-5xl font-bold text-white">{t.home_testimonials_title}</h2>
-                    <p className="mt-6 text-xl text-brand-light-gray max-w-2xl mx-auto">{t.join_testimonials_subtitle}</p>
-                </div>
-                
-                {allTestimonials.length > 0 && (
-                    <div className="flex w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_48px,_black_calc(100%-48px),transparent_100%)]">
-                        <ul className="flex items-center animate-infinite-scroll">
-                            {allTestimonials.map((testimonial, index) => (
-                            <li key={index} className="w-[400px] mx-6 flex-shrink-0">
-                                    <div className="bg-brand-card border border-gray-800 rounded-3xl p-10 h-full flex flex-col justify-between shadow-2xl">
-                                        <p className="text-white italic text-lg leading-relaxed">"{testimonial.quote}"</p>
-                                        <div className="mt-10 flex items-center border-t border-gray-800 pt-8">
-                                            <UserAvatar />
-                                            <div className="ml-5 text-left">
-                                                <p className="text-xl font-bold text-transparent bg-clip-text bg-gradient-brand">{testimonial.name}</p>
-                                                <p className="text-xs text-gray-500 uppercase tracking-widest font-black">{testimonial.role}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-            </div>
-            
-             {/* CTA Section */}
-            <div className="py-24">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-brand-card border border-gray-800 rounded-[3rem] p-10 lg:p-16 relative overflow-hidden">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-r from-orange-900/50 to-purple-900/50 rounded-full blur-[130px] opacity-30"></div>
-                        <div className="relative z-10 grid lg:grid-cols-5 gap-12 items-center">
-                            <div className="lg:col-span-2 flex justify-center lg:justify-start">
-                                <CTAIllustration className="w-full max-w-xs h-auto" />
-                            </div>
-                            <div className="lg:col-span-3 text-center lg:text-left">
-                                <h2 className="text-4xl sm:text-5xl font-bold text-white leading-tight">{t.join_final_cta_title}</h2>
-                                <p className="mt-6 text-xl text-brand-light-gray max-w-2xl mx-auto lg:mx-0">{t.join_final_cta_subtitle}</p>
-                                <div className="mt-10">
-                                    <button 
-                                        onClick={() => onNavigate(Page.JoinUs)}
-                                        className="rounded-xl bg-gradient-brand px-10 py-5 text-xl font-bold text-white shadow-xl hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105"
-                                    >
-                                        {t.join_final_cta_button}
-                                    </button>
-                                </div>
-                            </div>
+                        <div className="flex flex-col sm:flex-row gap-8 pt-8">
+                            <button 
+                                onClick={() => onNavigate(Page.JoinUs)}
+                                className="px-20 py-8 bg-brand-orange text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:scale-105 transition-all shadow-[0_30px_70px_rgba(249,115,22,0.3)]"
+                            >
+                                ACTIVER MON TERMINAL
+                            </button>
+                            <button 
+                                onClick={() => onNavigate(Page.HowItWorks)}
+                                className="px-20 py-8 glass-premium text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:bg-brand-violet transition-all"
+                            >
+                                LE PROTOCOLE
+                            </button>
                         </div>
                     </div>
+                    <div className="flex justify-center lg:justify-end">
+                        <DetailedNeuralNexus />
+                    </div>
                 </div>
-            </div>
-        </>
+            </section>
+
+            {/* BENTO GRID RAFFINÉE */}
+            <section className="container mx-auto px-6 mb-80">
+                <div className="text-center mb-40 space-y-8">
+                    <h2 className="text-5xl md:text-7xl font-sans font-black text-white italic uppercase tracking-tighter leading-none">
+                        VOTRE ÉCOSYSTÈME <br/> <span className="text-brand-orange">HAUTE PERFORMANCE.</span>
+                    </h2>
+                    <p className="text-gray-600 font-black uppercase tracking-[0.8em] italic text-xs">Ingénierie de Données Appliquée</p>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-16">
+                    <FeatureCard 
+                        label="SIGNAUX"
+                        color="bg-brand-orange"
+                        title="Neural Signals"
+                        desc="8 pronostics quotidiens filtrés par nos modèles mathématiques de pointe. Taux de réussite certifié de 81%."
+                        icon={<svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                    />
+                    <FeatureCard 
+                        label="PILOTAGE"
+                        color="bg-brand-violet"
+                        title="Capital Pilot"
+                        desc="L'IA calcule automatiquement votre mise idéale selon la règle des 5%. La protection de votre capital est notre priorité."
+                        icon={<svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>}
+                    />
+                    <FeatureCard 
+                        label="ACCÈS"
+                        color="bg-white/10"
+                        title="Elite Terminal"
+                        desc="Votre cockpit membre avec scanner de matchs en temps réel et archives complètes de toutes les analyses passées."
+                        icon={<svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
+                    />
+                </div>
+            </section>
+
+            {/* MARQUEE ULTRA LENT */}
+            <section className="py-40 border-y border-white/5 bg-brand-surface/20 overflow-hidden relative">
+                <div className="absolute inset-0 bg-brand-violet/5 blur-[150px] rounded-full -translate-x-1/2"></div>
+                <div className="container mx-auto px-6 mb-24 flex items-center justify-between relative z-10">
+                    <h2 className="text-[12px] font-black text-gray-500 uppercase tracking-[0.8em] italic">FLUX CERTIFIÉ • COMMUNAUTÉ NEXTWIN</h2>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] italic animate-pulse">Synchronisation Directe</span>
+                </div>
+                <div className="animate-marquee-slow hover:[animation-play-state:paused] relative z-10">
+                    {allTestimonials.map((t, i) => (
+                        <TestimonialCard key={i} {...t} />
+                    ))}
+                    {allTestimonials.map((t, i) => (
+                        <TestimonialCard key={`dup-${i}`} {...t} />
+                    ))}
+                </div>
+            </section>
+
+            {/* CALL TO ACTION FINAL */}
+            <section className="container mx-auto px-6 py-64">
+                <div className="relative glass-premium p-24 lg:p-56 rounded-[6rem] text-center overflow-hidden border-brand-orange/30 group">
+                    <div className="absolute inset-0 bg-gradient-main opacity-5 group-hover:opacity-10 transition-opacity duration-1000"></div>
+                    <div className="absolute -top-40 -right-40 w-[700px] h-[700px] bg-brand-orange/10 blur-[200px] group-hover:scale-125 transition-all duration-1000"></div>
+                    
+                    <h2 className="text-5xl md:text-8xl font-sans font-black text-white mb-24 uppercase italic tracking-tighter leading-none">
+                        VOTRE NOUVELLE <br/> <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-violet">ÈRE COMMENCE.</span>
+                    </h2>
+                    
+                    <button 
+                        onClick={() => onNavigate(Page.JoinUs)}
+                        className="px-32 py-12 bg-white text-black rounded-full font-sans font-black text-2xl italic uppercase tracking-widest hover:bg-brand-orange hover:text-white transition-all shadow-2xl active:scale-95"
+                    >
+                        ACCÉDER AU TERMINAL
+                    </button>
+                </div>
+            </section>
+        </div>
     );
 };
 

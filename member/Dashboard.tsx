@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
 import Predictions from './Predictions';
 import BankrollManagement from './BankrollManagement';
 import Subscription from './Subscription';
@@ -9,10 +8,10 @@ import Strategy from './Strategy';
 import DashboardHome from './DashboardHome';
 import Support from './Support';
 import Archives from './Archives';
+import Analyzer from './Analyzer';
 import DashboardSidebar from './DashboardSidebar';
 import { Language, DashboardNav, Page, User, ArchivedAnalysis } from '../types';
 
-// Lazy loading the new member predictions view
 const PredictionsMember = lazy(() => import('./PredictionsMember'));
 
 interface DashboardProps {
@@ -34,7 +33,23 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
     useEffect(() => {
         const saved = localStorage.getItem(STORAGE_ARCHIVES);
         if (saved) setArchivedAnalyses(JSON.parse(saved));
-    }, []);
+        window.scrollTo(0, 0);
+    }, [activePage]);
+
+    const handleNewAnalysis = useCallback((data: any) => {
+        const newArchive: ArchivedAnalysis = {
+            ...data.result,
+            id: `arch-${Date.now()}`,
+            sport: data.sport,
+            team1: data.team1,
+            team2: data.team2,
+            betType: data.betType,
+            analysisDate: new Date().toLocaleDateString('fr-FR')
+        };
+        const updated = [newArchive, ...archivedAnalyses].slice(0, 50);
+        setArchivedAnalyses(updated);
+        localStorage.setItem(STORAGE_ARCHIVES, JSON.stringify(updated));
+    }, [archivedAnalyses]);
 
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
@@ -43,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
                 currentUser.isAdmin ? (
                     <Predictions language={language} isAdmin={true} />
                 ) : (
-                    <Suspense fallback={<div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500"></div></div>}>
+                    <Suspense fallback={<div className="flex flex-col items-center justify-center py-20"><div className="w-10 h-10 border-2 border-orange-500/20 border-t-orange-500 rounded-full animate-spin mb-4"></div></div>}>
                         <PredictionsMember language={language} />
                     </Suspense>
                 )
@@ -54,18 +69,13 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
             [DashboardNav.Profile]: <Profile />,
             [DashboardNav.Support]: <Support language={language} setActivePage={setActivePage} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
-            [DashboardNav.LiveScores]: null,
+            [DashboardNav.LiveScores]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
         };
         return pageMapping[activePage];
     }
 
-    const handleHomeReturn = () => {
-        setActivePage(DashboardNav.DashboardHome);
-        setSidebarOpen(false);
-    };
-
     return (
-        <div className="flex min-h-screen bg-[#0f1117]">
+        <div className="flex min-h-screen bg-brand-bg pt-24 lg:pt-32">
             <DashboardSidebar 
                 activePage={activePage} 
                 setActivePage={setActivePage} 
@@ -75,15 +85,9 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
                 currentUser={currentUser}
             />
 
-            <div className="flex-1 md:ml-64 transition-all duration-300">
-                <div className="md:hidden sticky top-0 z-30 flex items-center justify-between p-4 bg-[#111319] border-b border-white/5">
-                    <button onClick={handleHomeReturn} className="text-white font-bold tracking-tight text-lg">NEXTWIN</button>
-                    <button onClick={() => setSidebarOpen(true)} className="text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                    </button>
-                </div>
+            <div className="flex-1 md:ml-72 transition-all duration-300">
                 <main className="p-4 sm:p-8 lg:p-12">
-                    <div className="max-w-[1200px] mx-auto">
+                    <div className="max-w-[1200px] mx-auto animate-slide-up">
                         {renderContent()}
                     </div>
                 </main>

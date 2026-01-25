@@ -3,59 +3,31 @@ import React from 'react';
 import { Language } from '../types';
 import { translations } from '../translations';
 
-const MethodPilier: React.FC<{
+const ProtocolStep: React.FC<{
     num: string;
     title: string;
     desc: string;
-    items: string[];
-    icon: React.ReactNode;
-}> = ({ num, title, desc, items, icon }) => (
-    <div className="bg-brand-card border border-white/5 rounded-[2.5rem] p-10 lg:p-12 relative overflow-hidden group hover:border-orange-500/30 transition-all duration-500">
-        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span className="text-8xl font-black italic tracking-tighter text-white">{num}</span>
-        </div>
-        
+    tags: string[];
+    isHighlight?: boolean;
+}> = ({ num, title, desc, tags, isHighlight }) => (
+    <div className={`relative p-8 rounded-[2.5rem] border transition-all duration-500 overflow-hidden ${
+        isHighlight 
+        ? 'bg-gradient-to-br from-orange-500/10 to-purple-500/10 border-orange-500/30 shadow-[0_0_50px_rgba(249,115,22,0.05)]' 
+        : 'bg-white/[0.03] border-white/5 hover:border-white/20'
+    }`}>
+        <div className="absolute -top-4 -right-4 text-8xl font-black italic opacity-[0.03] select-none text-white">{num}</div>
         <div className="relative z-10">
-            <div className="h-16 w-16 bg-gray-900 border border-white/10 rounded-2xl flex items-center justify-center text-orange-500 mb-8 shadow-2xl group-hover:bg-gradient-brand group-hover:text-white transition-all duration-500">
-                {icon}
+            <div className="flex items-center gap-3 mb-4">
+                <span className={`h-1.5 w-6 rounded-full ${isHighlight ? 'bg-orange-500' : 'bg-gray-600'}`}></span>
+                <h3 className="text-lg font-black text-white italic uppercase tracking-tighter">{title}</h3>
             </div>
-            
-            <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-4">{title}</h2>
-            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest leading-relaxed mb-8 max-w-md">{desc}</p>
-            
-            <div className="space-y-3">
-                {items.map((item, i) => (
-                    <div key={i} className="flex items-center gap-4 bg-white/[0.03] p-4 rounded-xl border border-white/5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-orange-500"></div>
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{item}</span>
-                    </div>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-relaxed mb-6 italic">{desc}</p>
+            <div className="flex flex-wrap gap-2">
+                {tags.map((tag, i) => (
+                    <span key={i} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[9px] font-black text-gray-500 uppercase tracking-widest">{tag}</span>
                 ))}
             </div>
         </div>
-    </div>
-);
-
-const ProtocolCard: React.FC<{
-    title: string;
-    odd: string;
-    action: string;
-    desc: string;
-    type: 'success' | 'warning';
-}> = ({ title, odd, action, desc, type }) => (
-    <div className={`relative overflow-hidden rounded-3xl p-8 border transition-all duration-500 hover:scale-[1.01] backdrop-blur-md ${
-        type === 'success' 
-            ? 'bg-green-500/[0.03] border-green-500/20 hover:border-green-500/40' 
-            : 'bg-orange-500/[0.03] border-orange-500/20 hover:border-orange-500/40'
-    }`}>
-        <div className="flex justify-between items-start mb-6">
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 italic">{title}</span>
-            <div className={`h-2 w-2 rounded-full ${type === 'success' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]'}`}></div>
-        </div>
-        <div className="mb-4">
-            <p className="text-4xl font-black text-white italic tracking-tighter mb-1">{odd}</p>
-            <p className={`text-xs font-black uppercase tracking-[0.1em] ${type === 'success' ? 'text-green-400' : 'text-orange-400'}`}>{action}</p>
-        </div>
-        <p className="text-gray-400 text-[10px] font-medium leading-relaxed uppercase tracking-widest">{desc}</p>
     </div>
 );
 
@@ -63,97 +35,81 @@ const Strategy: React.FC<{ language: Language }> = ({ language }) => {
     const t = translations[language];
 
     return (
-        <div className="animate-fade-in max-w-7xl mx-auto pb-24 px-4 sm:px-6">
-            <div className="text-center mb-24">
-                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-6 py-2 rounded-full mb-8">
-                    <span className="text-xs font-black text-orange-500 uppercase tracking-[0.4em] italic">ORIENTATION STRATÉGIQUE</span>
+        <div className="animate-fade-in max-w-6xl mx-auto pb-24">
+            {/* Header Masterclass */}
+            <div className="mb-20">
+                <div className="inline-block bg-orange-500/5 border border-orange-500/10 px-4 py-1.5 rounded-full mb-6">
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-[0.5em] italic">PROTOCOLE D'ÉLITE V1.4</span>
                 </div>
-                <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-[1.1] mb-8">
-                    {t.strategy_title}
+                <h1 className="text-5xl lg:text-7xl font-black text-white italic tracking-tighter uppercase leading-[0.9]">
+                    LA MÉTHODE <br/> <span className="text-transparent bg-clip-text bg-gradient-brand">MATRICIELLE</span>
                 </h1>
-                <p className="text-sm sm:text-xl font-bold text-gray-500 uppercase tracking-[0.4em] italic leading-relaxed max-w-4xl mx-auto">
-                    {t.strategy_subtitle}
+                <p className="mt-8 text-gray-500 text-sm font-bold uppercase tracking-[0.3em] italic leading-relaxed max-w-2xl">
+                    Le succès n'est pas une question de chance, mais de probabilités exploitées avec une discipline de fer.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-24">
-                <MethodPilier 
+            {/* Piliers Fondamentaux */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+                <ProtocolStep 
                     num="01"
-                    title="FILTRAGE ALGORITHMIQUE"
-                    desc="L'IA NextWin ne retient que le top 5% des probabilités mondiales pour garantir un avantage mathématique."
-                    items={[
-                        "Indice de confiance certifié ≥ 70%",
-                        "Analyse de la 'Value' temps réel",
-                        "Scan massif multi-bookmakers",
-                        "Zéro influence psychologique"
-                    ]}
-                    icon={<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>}
+                    title="Analyse par IA"
+                    desc="Notre moteur scanne 150 championnats pour identifier les cotes mal ajustées par les bookmakers."
+                    tags={["Modélisation xG", "H2H Technologique", "Zéro Émotion"]}
+                    isHighlight
                 />
-                <MethodPilier 
+                <ProtocolStep 
                     num="02"
-                    title="DISCIPLINE DE MISE"
-                    desc="La gestion du capital est le seul rempart contre la variance inévitable des marchés sportifs."
-                    items={[
-                        "Règle d'or du 5% par session",
-                        "Gestion multi-bankroll",
-                        "Réinvestissement composé",
-                        "Tracking ROI mensuel obligatoire"
-                    ]}
-                    icon={<svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/></svg>}
+                    title="La Loi des 5%"
+                    desc="Ne jouez jamais plus de 5% de votre capital sur un match. C'est l'assurance vie de votre bankroll."
+                    tags={["Risque Maîtrisé", "Anti-Bust", "Scalabilité"]}
                 />
             </div>
 
-            <div className="bg-brand-card border border-white/5 rounded-[3rem] p-10 lg:p-16 relative overflow-hidden shadow-2xl mb-24">
-                <div className="flex flex-col lg:flex-row items-center gap-12 relative z-10">
-                    <div className="lg:w-1/3 text-center lg:text-left">
-                        <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-6">{t.strategy_s1_title}</h2>
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest leading-loose">
-                            {t.strategy_s1_desc}
-                        </p>
-                    </div>
-                    <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-                        <ProtocolCard 
-                            title="STABILITÉ"
-                            odd="CÔTE ≥ 1.50"
-                            action="PARI SIMPLE"
-                            desc={t.strategy_s1_c1_desc}
-                            type="success"
-                        />
-                        <ProtocolCard 
-                            title="VALEUR"
-                            odd="CÔTE < 1.50"
-                            action="COMBINÉ X2"
-                            desc={t.strategy_s1_c2_desc}
-                            type="warning"
-                        />
+            {/* Matrice d'Exécution */}
+            <div className="bg-[#1a1d26] border border-white/5 rounded-[3rem] p-12 mb-20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/5 blur-[100px] rounded-full"></div>
+                <div className="relative z-10">
+                    <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-10 border-l-4 border-orange-500 pl-6">MATRICE D'EXÉCUTION</h2>
+                    
+                    <div className="grid lg:grid-cols-3 gap-8">
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 italic">Configuration 1 : Sécurité</p>
+                            <div className="p-8 bg-black/30 border border-white/5 rounded-3xl group hover:border-orange-500/30 transition-all">
+                                <p className="text-3xl font-black text-white mb-1">Cote ≥ 1.50</p>
+                                <p className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">Jouer en Simple</p>
+                                <p className="mt-4 text-[10px] text-gray-500 leading-relaxed uppercase italic">Optimise la régularité et réduit l'impact de la variance sur le long terme.</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 italic">Configuration 2 : Rendement</p>
+                            <div className="p-8 bg-black/30 border border-white/5 rounded-3xl group hover:border-purple-500/30 transition-all">
+                                <p className="text-3xl font-black text-white mb-1">Cote < 1.50</p>
+                                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Combiner x2</p>
+                                <p className="mt-4 text-[10px] text-gray-500 leading-relaxed uppercase italic">Permet d'atteindre une cote cible de 2.00 tout en conservant une probabilité élevée.</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 italic">Configuration 3 : Bankroll</p>
+                            <div className="p-8 bg-orange-500/5 border border-orange-500/10 rounded-3xl group hover:border-orange-500/30 transition-all">
+                                <p className="text-3xl font-black text-white mb-1">Fixe : 5%</p>
+                                <p className="text-[10px] font-bold text-white uppercase tracking-widest">Mise Statique</p>
+                                <p className="mt-4 text-[10px] text-gray-500 leading-relaxed uppercase italic">Votre mise doit être identique pour chaque prono d'une même session.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="p-12 bg-white/[0.02] border border-white/5 rounded-[3.5rem] relative overflow-hidden text-center sm:text-left">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-brand opacity-[0.03] blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-8 border-l-4 border-orange-500 pl-8">VIGILANCE & MENTAL</h3>
-                <div className="grid md:grid-cols-2 gap-16">
-                    <div className="space-y-10">
-                        <div className="flex flex-col sm:flex-row gap-6">
-                            <span className="text-orange-500 font-black text-xl">A.</span>
-                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">Ne tentez jamais de 'vous refaire' après une défaite. L'IA juge sur des cycles de 100 paris, pas sur un jour.</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-6">
-                            <span className="text-orange-500 font-black text-xl">B.</span>
-                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">Une cote est 'Value' quand la probabilité réelle est supérieure à la probabilité estimée par le bookmaker.</p>
-                        </div>
-                    </div>
-                    <div className="space-y-10">
-                        <div className="flex flex-col sm:flex-row gap-6">
-                            <span className="text-orange-500 font-black text-xl">C.</span>
-                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">Le sport est incertain par nature. Nous vendons une méthode mathématique, pas une boule de cristal.</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-6">
-                            <span className="text-orange-500 font-black text-xl">D.</span>
-                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">La patience est votre plus grand atout financier. Laissez le temps à la loi des grands nombres d'agir.</p>
-                        </div>
-                    </div>
+            {/* Mindset Footer */}
+            <div className="p-12 bg-white/[0.02] border border-white/5 rounded-[3.5rem] text-center">
+                <h3 className="text-xl font-black text-white uppercase italic tracking-tighter mb-6">Mantra de l'Investisseur</h3>
+                <div className="flex flex-col md:flex-row items-center justify-center gap-12 text-[11px] font-bold text-gray-600 uppercase tracking-[0.2em] italic">
+                    <span className="flex items-center gap-3"><span className="h-1.5 w-1.5 bg-orange-500 rounded-full"></span> Discipline</span>
+                    <span className="flex items-center gap-3"><span className="h-1.5 w-1.5 bg-orange-500 rounded-full"></span> Patience</span>
+                    <span className="flex items-center gap-3"><span className="h-1.5 w-1.5 bg-orange-500 rounded-full"></span> Data-Only</span>
                 </div>
             </div>
         </div>
