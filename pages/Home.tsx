@@ -130,13 +130,13 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                         <div className="flex flex-col sm:flex-row gap-8 pt-8">
                             <button 
                                 onClick={() => onNavigate(Page.JoinUs)}
-                                className="px-20 py-8 bg-brand-orange text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:scale-105 transition-all shadow-[0_30px_70px_rgba(249,115,22,0.3)]"
+                                className="px-20 py-8 bg-gradient-to-r from-brand-orange to-brand-violet text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:scale-105 transition-all shadow-[0_30px_70px_rgba(249,115,22,0.3)]"
                             >
                                 ACTIVER MON TERMINAL
                             </button>
                             <button 
                                 onClick={() => onNavigate(Page.HowItWorks)}
-                                className="px-20 py-8 glass-premium text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:bg-brand-violet transition-all"
+                                className="px-20 py-8 glass-premium text-white rounded-full font-sans font-black text-xs uppercase tracking-[0.4em] italic hover:bg-gradient-to-r hover:from-brand-orange hover:to-brand-violet transition-all"
                             >
                                 COMMENT ÇA MARCHE ?
                             </button>
@@ -211,7 +211,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                     
                     <button 
                         onClick={() => onNavigate(Page.JoinUs)}
-                        className="px-32 py-12 bg-white text-black rounded-full font-sans font-black text-2xl italic uppercase tracking-widest hover:bg-brand-orange hover:text-white transition-all shadow-2xl active:scale-95"
+                        className="px-32 py-12 bg-white text-black rounded-full font-sans font-black text-2xl italic uppercase tracking-widest hover:bg-gradient-to-r hover:from-brand-orange hover:to-brand-violet hover:text-white transition-all shadow-2xl active:scale-95"
                     >
                         ACCÉDER AU TERMINAL
                     </button>

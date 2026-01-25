@@ -4,7 +4,7 @@ import { translations } from '../translations';
 
 const FeatureGridItem: React.FC<{ icon: React.ReactNode; title: string; description: string; }> = ({ icon, title, description }) => (
     <div className="bg-brand-card border border-gray-800/50 rounded-xl p-6 text-center transition-all duration-300 hover:border-orange-500/30 hover:bg-gray-800/50 transform hover:-translate-y-1">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-brand text-white mb-5 shadow-lg shadow-orange-500/20">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-orange to-brand-violet text-white mb-5 shadow-lg shadow-orange-500/20">
             {icon}
         </div>
         <h3 className="text-xl font-bold text-white">{title}</h3>
@@ -19,7 +19,7 @@ const TestimonialCard: React.FC<{ quote: string; name: string; role: string; }> 
             <p className="mt-4 text-white italic">"{quote}"</p>
         </div>
         <div className="mt-6">
-            <p className="font-bold text-transparent bg-clip-text bg-gradient-brand">{name}</p>
+            <p className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-violet">{name}</p>
             <p className="text-sm text-gray-500">{role}</p>
         </div>
     </div>
@@ -81,81 +81,61 @@ const JoinUs: React.FC<JoinUsProps> = ({ language, onNavigate }) => {
         t.join_feature_list_1,
         t.join_feature_list_2,
         t.join_feature_list_3,
-        t.join_feature_list_4,
     ];
 
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center max-w-3xl mx-auto">
-                <h1 className="text-4xl sm:text-5xl font-bold text-white">
-                    {t.join_hero_title1} <span className="text-transparent bg-clip-text bg-gradient-brand">{t.join_hero_title2}</span>
+                <h1 className="text-4xl sm:text-5xl font-bold text-white uppercase italic">
+                    {t.join_hero_title1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-violet">{t.join_hero_title2}</span>
                 </h1>
-                <p className="mt-4 text-lg text-brand-light-gray">
+                <p className="mt-4 text-lg text-brand-light-gray italic">
                     {t.join_hero_subtitle}
                 </p>
             </div>
             
             <div className="mt-20 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="w-[600px] h-[600px] bg-gradient-to-r from-orange-900/50 to-purple-900/50 rounded-full blur-[150px] opacity-30"></div>
+                     <div className="w-[600px] h-[600px] bg-gradient-to-r from-brand-orange/20 to-brand-violet/20 rounded-full blur-[150px] opacity-30"></div>
                 </div>
                 <div className="relative z-10 flex justify-center">
-                    <div className="max-w-md w-full bg-brand-card border border-gray-800 rounded-2xl p-8 shadow-2xl">
+                    <div className="max-w-md w-full bg-brand-card border border-white/10 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden">
                         <div className="text-center">
-                            <span className="inline-block bg-gray-800 text-sm font-semibold text-transparent bg-clip-text bg-gradient-brand px-3 py-1 rounded-full">{t.join_pass}</span>
-                            <h2 className="mt-4 text-5xl font-bold text-white">12,99€<span className="text-2xl text-brand-light-gray"> {t.join_price}</span></h2>
-                            <p className="mt-2 text-sm text-yellow-400 bg-yellow-900/50 inline-block px-3 py-1 rounded-full">{t.join_commitment}</p>
+                            <span className="inline-block bg-gray-800 text-[10px] font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-violet px-4 py-1.5 rounded-full uppercase tracking-widest">{t.join_pass}</span>
+                            <h2 className="mt-4 text-5xl font-black text-white italic">12,99€<span className="text-2xl text-brand-light-gray font-normal"> {t.join_price}</span></h2>
+                            <p className="mt-2 text-[10px] font-black text-yellow-500 bg-yellow-900/50 inline-block px-4 py-1.5 rounded-full uppercase tracking-widest">{t.join_commitment}</p>
 
-                            <ul className="text-left mt-8 space-y-3">
+                            <ul className="text-left mt-10 space-y-4">
                                 {featureList.map((feature, index) => (
-                                     <li key={index} className="flex items-start"><CheckIcon /><span className="ml-3 text-brand-light-gray">{feature}</span></li>
+                                     <li key={index} className="flex items-start bg-white/5 p-4 rounded-xl border border-white/5"><CheckIcon /><span className="ml-4 text-brand-light-gray text-xs font-bold uppercase tracking-widest">{feature}</span></li>
                                 ))}
                             </ul>
 
-                            <button onClick={() => onNavigate(Page.Register)} className="mt-8 w-full rounded-md bg-gradient-brand px-6 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
+                            <button onClick={() => onNavigate(Page.Register)} className="mt-10 w-full rounded-2xl bg-gradient-to-r from-brand-orange to-brand-violet px-6 py-5 text-xs font-black uppercase tracking-[0.3em] italic text-white shadow-xl shadow-brand-orange/20 hover:scale-105 transition-transform active:scale-95">
                                 {t.join_cta}
                             </button>
-                            <p className="mt-4 text-xs text-gray-500">{t.join_info}</p>
+                            <p className="mt-6 text-[9px] font-black text-gray-500 uppercase tracking-widest italic">{t.join_info}</p>
                         </div>
                     </div>
                 </div>
-                 <div className="mt-8 text-center max-w-sm mx-auto relative z-10">
-                    <h3 className="text-sm font-semibold text-gray-400">Paiement 100% sécurisé</h3>
-                </div>
             </div>
 
-            <div className="mt-24 text-center">
-                <h2 className="text-3xl font-bold text-white">{t.join_features_title}</h2>
+            <div className="mt-32 text-center">
+                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">ÉCOSYSTÈME HAUTE PERFORMANCE</h2>
             </div>
-            <div className="mt-12 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feature, index) => (
                     <FeatureGridItem key={index} {...feature} />
                 ))}
             </div>
 
-            <div className="mt-24 text-center">
-                <h2 className="text-3xl font-bold text-white">{t.join_testimonials_title}</h2>
-                <p className="mt-4 text-lg text-brand-light-gray max-w-2xl mx-auto">{t.join_testimonials_subtitle}</p>
-            </div>
-             <div className="mt-12 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <TestimonialCard 
-                    quote={t.join_testimonial1_quote}
-                    name={t.join_testimonial1_name}
-                    role={t.join_testimonial1_role}
-                />
-                 <TestimonialCard 
-                    quote={t.join_testimonial2_quote}
-                    name={t.join_testimonial2_name}
-                    role={t.join_testimonial2_role}
-                />
-            </div>
-
-            <div className="mt-24 bg-brand-card border border-gray-800 rounded-2xl py-16 px-8 text-center max-w-4xl mx-auto">
-                <h2 className="text-3xl sm:text-4xl font-bold text-white">{t.join_final_cta_title}</h2>
-                <p className="mt-4 text-lg text-brand-light-gray max-w-2xl mx-auto">{t.join_final_cta_subtitle}</p>
-                <div className="mt-8">
-                    <button onClick={() => onNavigate(Page.Register)} className="rounded-md bg-gradient-brand px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-gradient-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 transition-transform transform hover:scale-105">
-                        {t.join_final_cta_button}
+            <div className="mt-32 bg-brand-card border border-white/5 rounded-[3.5rem] py-20 px-10 text-center max-w-4xl mx-auto relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/5 to-brand-violet/5"></div>
+                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase italic tracking-tighter mb-6 relative z-10">VOTRE NOUVELLE <br/> <span className="text-brand-orange">ÈRE COMMENCE.</span></h2>
+                <p className="mt-4 text-xs font-bold text-brand-light-gray max-w-xl mx-auto uppercase tracking-widest italic mb-12 relative z-10">L’INTELLIGENCE ARTIFICIELLE AU SERVICE DES PARIEURS PROFESSIONNELS.</p>
+                <div className="relative z-10">
+                    <button onClick={() => onNavigate(Page.Register)} className="rounded-2xl bg-gradient-to-r from-brand-orange to-brand-violet px-12 py-6 text-xs font-black uppercase tracking-[0.4em] italic text-white shadow-2xl shadow-brand-orange/20 hover:scale-105 transition-transform">
+                        ACTIVER MON ACCÈS ÉLITE
                     </button>
                 </div>
             </div>

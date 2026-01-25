@@ -1,16 +1,15 @@
-
 import React, { useState } from 'react';
 import { Bankroll, Bet, Sport } from '../types';
 
 const StatCard: React.FC<{ title: string; value: string; subtext: string; color: string; roi?: string; }> = ({ title, value, subtext, color, roi }) => (
-    <div className="bg-brand-card border border-gray-800 rounded-xl p-5 relative flex flex-col justify-between">
+    <div className="bg-brand-card border border-white/5 rounded-2xl p-6 relative flex flex-col justify-between shadow-xl">
         <div>
             <div className="flex justify-between items-start">
-                <p className="text-sm text-brand-light-gray uppercase">{title}</p>
-                {roi && <span className={`text-xs font-bold px-2 py-1 rounded-full ${parseFloat(roi) >= 0 ? 'text-green-400 bg-green-900/50' : 'text-red-400 bg-red-900/50'}`}>{roi}</span>}
+                <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest italic">{title}</p>
+                {roi && <span className={`text-[9px] font-black px-3 py-1 rounded-lg border italic ${parseFloat(roi) >= 0 ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' : 'text-red-400 border-red-500/20 bg-red-500/5'}`}>{roi}</span>}
             </div>
-            <p className={`text-4xl font-bold mt-2 ${color}`}>{value}</p>
-            <p className="text-xs text-gray-500 mt-1">{subtext}</p>
+            <p className={`text-3xl font-black mt-4 italic tracking-tighter uppercase ${color}`}>{value}</p>
+            <p className="text-[9px] text-gray-600 font-bold mt-2 uppercase italic">{subtext}</p>
         </div>
     </div>
 );
@@ -95,7 +94,7 @@ const BankrollManagement: React.FC = () => {
             capitalUpdate = bet.stake * bet.odds;
         } else { // lost
             profit = -bet.stake;
-            capitalUpdate = 0; // stake was already removed
+            capitalUpdate = 0; 
         }
 
         setBankroll(prev => ({
@@ -107,146 +106,114 @@ const BankrollManagement: React.FC = () => {
         }));
     };
 
-    const profit = bankroll.currentCapital - bankroll.initialCapital;
+    const profitValue = bankroll.currentCapital - bankroll.initialCapital;
     const totalStaked = bankroll.bets.reduce((sum, bet) => sum + (bet.result !== 'pending' ? bet.stake : 0), 0);
-    const yieldValue = totalStaked > 0 ? (profit / totalStaked) * 100 : 0;
+    const yieldValue = totalStaked > 0 ? (profitValue / totalStaked) * 100 : 0;
     
     const concludedBets = bankroll.bets.filter(b => b.result !== 'pending');
     const successRate = concludedBets.length > 0 ? (concludedBets.filter(b => b.result === 'won').length / concludedBets.length) * 100 : 0;
     const suggestedBet = bankroll.currentCapital * 0.05;
 
     return (
-        <div>
-            <div className="text-center max-w-2xl mx-auto">
-                <h1 className="text-4xl sm:text-5xl font-bold text-white">Gestion Bankroll</h1>
-                <div className="inline-block bg-gray-800/80 border border-yellow-500/50 rounded-full px-4 py-1.5 text-sm text-yellow-400 mt-4">
-                   RISK MANAGEMENT: 5% ACTIVE
+        <div className="pb-20 animate-fade-in">
+            <header className="mb-16">
+                <div className="inline-block bg-brand-orange/5 border border-brand-orange/20 px-4 py-1.5 rounded-full mb-6">
+                    <span className="text-[10px] font-black text-brand-orange uppercase tracking-[0.5em] italic">RISK MANAGEMENT: 5% ACTIVE</span>
                 </div>
+                <h1 className="text-4xl lg:text-5xl font-black text-white italic tracking-tighter uppercase leading-none">GESTION DE <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-violet">CAPITAL.</span></h1>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <StatCard title="Capital Actuel" value={`${bankroll.currentCapital.toFixed(2)}€`} subtext={`${bankroll.initialCapital.toFixed(2)}€ investis`} color="text-white" roi={`${yieldValue.toFixed(1)}% ROI`} />
+                <StatCard title="Profit Net" value={`${profitValue >= 0 ? '+' : ''}${profitValue.toFixed(2)}€`} subtext="Performance cumulée" color={profitValue >= 0 ? 'text-emerald-400' : 'text-red-400'} />
+                <StatCard title="Yield Engine" value={`${yieldValue >= 0 ? '+' : ''}${yieldValue.toFixed(1)}%`} subtext="Rentabilité brute" color={yieldValue >= 0 ? 'text-emerald-400' : 'text-red-400'} />
+                <StatCard title="Success Rate" value={`${successRate.toFixed(0)}%`} subtext={`${concludedBets.length} signaux terminés`} color="text-white" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-                <StatCard title="Bankroll Actuelle" value={`${bankroll.currentCapital.toFixed(2)}€`} subtext={`${bankroll.initialCapital.toFixed(2)}€ investis total`} color="text-white" roi={`${yieldValue.toFixed(1)}% ROI`} />
-                <StatCard title="Profit / Perte" value={`${profit >= 0 ? '+' : ''}${profit.toFixed(2)}€`} subtext="Performance des paris" color={profit >= 0 ? 'text-green-400' : 'text-red-400'} />
-                <StatCard title="Yield" value={`${yieldValue >= 0 ? '+' : ''}${yieldValue.toFixed(1)}%`} subtext="Rentabilité brute" color={yieldValue >= 0 ? 'text-green-400' : 'text-red-400'} />
-                <StatCard title="Taux de réussite" value={`${successRate.toFixed(0)}%`} subtext={`${concludedBets.length} paris terminés`} color="text-white" />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                <div className="lg:col-span-1 space-y-6">
-                     <div className="bg-brand-card border border-gray-800 rounded-xl p-6">
-                        <h3 className="text-lg font-bold text-white flex items-center">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-orange-400"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                           Ajouter un Pari Manuel
-                        </h3>
-                        <div className="bg-gray-900/50 border border-yellow-500/30 p-3 rounded-lg text-center mt-4">
-                            <p className="text-xs font-semibold text-yellow-400">MISE SUGGÉRÉE (RISK MANAGEMENT 5%)</p>
-                            <p className="text-2xl font-bold text-white mt-1">{suggestedBet.toFixed(2)}€</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-1 space-y-8">
+                     <div className="bg-brand-card border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
+                        <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-8 border-l-4 border-brand-orange pl-6">ENREGISTRER SIGNAL</h3>
+                        <div className="bg-brand-orange/5 border border-brand-orange/20 p-5 rounded-2xl text-center mb-8">
+                            <p className="text-[9px] font-black text-brand-orange uppercase tracking-widest italic mb-1">MISE SUGGÉRÉE (NEURAL 5%)</p>
+                            <p className="text-3xl font-black text-white italic tracking-tighter uppercase">{suggestedBet.toFixed(2)}€</p>
                         </div>
-                        <form onSubmit={handleAddBet} className="mt-4 space-y-4">
+                        <form onSubmit={handleAddBet} className="space-y-6">
                              <div>
-                                <label className="text-sm font-semibold text-brand-light-gray">Discipline Sportive</label>
-                                <select value={newBetSport} onChange={e => setNewBetSport(e.target.value as Sport)} className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:ring-orange-500 focus:border-orange-500">
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">SPORT</label>
+                                <select value={newBetSport} onChange={e => setNewBetSport(e.target.value as Sport)} className="w-full mt-2 bg-gray-900 border border-white/5 rounded-xl p-4 text-white text-xs font-bold outline-none uppercase focus:border-brand-orange transition-all">
                                     <option value={Sport.Football}>Football</option>
                                     <option value={Sport.Basketball}>Basketball</option>
                                     <option value={Sport.Tennis}>Tennis</option>
                                 </select>
                             </div>
                              <div>
-                                <label className="text-sm font-semibold text-brand-light-gray">Équipes / Joueurs</label>
-                                <input type="text" placeholder="Ex: Real Madrid vs Bayern" value={newBetMatch} onChange={e => setNewBetMatch(e.target.value)} className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:ring-orange-500 focus:border-orange-500" />
+                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">MATCH</label>
+                                <input type="text" placeholder="ÉQUIPES" value={newBetMatch} onChange={e => setNewBetMatch(e.target.value)} className="w-full mt-2 bg-gray-900 border border-white/5 rounded-xl p-4 text-white text-xs font-bold outline-none uppercase focus:border-brand-orange transition-all placeholder:text-gray-800" />
                             </div>
                              <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm font-semibold text-brand-light-gray">Cote</label>
-                                    <input type="number" step="0.01" min="1.01" placeholder="Ex: 1.85" value={newBetOdds} onChange={e => setNewBetOdds(e.target.value)} className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:ring-orange-500 focus:border-orange-500" />
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">COTE</label>
+                                    <input type="number" step="0.01" min="1.01" placeholder="1.85" value={newBetOdds} onChange={e => setNewBetOdds(e.target.value)} className="w-full mt-2 bg-gray-900 border border-white/5 rounded-xl p-4 text-white text-xs font-bold outline-none uppercase focus:border-brand-orange transition-all" />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-semibold text-brand-light-gray">Mise (€)</label>
-                                    <input type="number" step="0.01" min="0.01" placeholder={`Ex: ${suggestedBet.toFixed(2)}`} value={newBetStake} onChange={e => setNewBetStake(e.target.value)} className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:ring-orange-500 focus:border-orange-500" />
+                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">MISE (€)</label>
+                                    <input type="number" step="0.01" min="0.01" value={newBetStake} onChange={e => setNewBetStake(e.target.value)} className="w-full mt-2 bg-gray-900 border border-white/5 rounded-xl p-4 text-white text-xs font-bold outline-none uppercase focus:border-brand-orange transition-all" />
                                 </div>
                             </div>
-                             <button type="submit" className="w-full rounded-md bg-gradient-brand px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gradient-brand-hover">
-                               AJOUTER LE PARI
-                            </button>
-                        </form>
-                     </div>
-                     <div className="bg-brand-card border border-gray-800 rounded-xl p-6">
-                        <h3 className="text-lg font-bold text-white flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-green-400"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                           Approvisionner la Bankroll
-                        </h3>
-                        <p className="text-sm text-brand-light-gray mt-2">
-                           Mettez à jour votre capital pour refléter un dépôt sur votre bookmaker.
-                        </p>
-                        <form onSubmit={handleFundBankroll} className="mt-4 space-y-3">
-                            <div>
-                                <label className="text-sm font-semibold text-brand-light-gray">Montant à ajouter (€)</label>
-                                <input 
-                                    type="number" 
-                                    step="0.01" 
-                                    min="0.01" 
-                                    placeholder="Ex: 100" 
-                                    value={fundAmount} 
-                                    onChange={e => setFundAmount(e.target.value)}
-                                    className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:ring-orange-500 focus:border-orange-500" 
-                                />
-                            </div>
-                            <button type="submit" className="w-full rounded-md bg-gray-700 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gray-600">
-                               APPROVISIONNER
+                             <button type="submit" className="w-full rounded-xl bg-gradient-to-r from-brand-orange to-brand-violet px-6 py-5 text-[11px] font-black uppercase tracking-[0.3em] italic text-white shadow-xl shadow-brand-orange/20 transition-transform transform hover:scale-105 active:scale-95">
+                               AJOUTER AU CAPITAL
                             </button>
                         </form>
                      </div>
                 </div>
-                 <div className="lg:col-span-2 bg-brand-card border border-gray-800 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-white">Historique des Paris</h3>
+
+                 <div className="lg:col-span-2 bg-brand-card border border-white/5 rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
+                    <h3 className="text-lg font-black text-white italic uppercase tracking-tighter mb-8 border-l-4 border-brand-violet pl-6">HISTORIQUE DES OPÉRATIONS</h3>
                      {bankroll.bets.length === 0 ? (
-                         <div className="mt-6 flex items-center justify-center h-48 text-brand-light-gray">
-                            <p>Aucun pari enregistré pour le moment.</p>
+                         <div className="py-32 text-center opacity-20">
+                            <p className="text-[11px] font-black uppercase tracking-[0.8em] italic">Aucun mouvement détecté</p>
                         </div>
                      ) : (
-                         <div className="mt-4 flow-root">
-                            <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                                    <table className="min-w-full divide-y divide-gray-700">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0">Match</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Mise</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Cote</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Statut</th>
-                                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Profit</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-800">
-                                            {bankroll.bets.map(bet => (
-                                                <tr key={bet.id}>
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-0">
-                                                        <div className="font-medium text-white">{bet.match}</div>
-                                                        <div className="text-gray-400">{bet.sport} - {bet.date}</div>
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">{bet.stake.toFixed(2)}€</td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">{bet.odds.toFixed(2)}</td>
-                                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                                        {bet.result === 'pending' ? (
-                                                            <div className="flex space-x-2">
-                                                                <button onClick={() => handleBetResult(bet.id, 'won')} className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-300 rounded-md hover:bg-green-400">Gagné</button>
-                                                                <button onClick={() => handleBetResult(bet.id, 'lost')} className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-300 rounded-md hover:bg-red-400">Perdu</button>
-                                                            </div>
-                                                        ) : (
-                                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bet.result === 'won' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
-                                                                {bet.result === 'won' ? 'Gagné' : 'Perdu'}
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td className={`whitespace-nowrap px-3 py-4 text-sm font-bold ${bet.profit > 0 ? 'text-green-400' : bet.profit < 0 ? 'text-red-400' : 'text-gray-300'}`}>
-                                                        {bet.profit >= 0 ? '+' : ''}{bet.profit.toFixed(2)}€
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="border-b border-white/5">
+                                    <tr>
+                                        <th className="py-5 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] italic">MATCH / DATE</th>
+                                        <th className="py-5 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] italic">MISE</th>
+                                        <th className="py-5 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] italic">COTE</th>
+                                        <th className="py-5 text-left text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] italic">STATUT</th>
+                                        <th className="py-5 text-right text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] italic">P&L</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {bankroll.bets.map(bet => (
+                                        <tr key={bet.id} className="group hover:bg-white/[0.02] transition-colors">
+                                            <td className="py-6">
+                                                <p className="text-sm font-black text-white italic uppercase tracking-tighter">{bet.match}</p>
+                                                <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1 italic">{bet.sport} • {bet.date}</p>
+                                            </td>
+                                            <td className="py-6 text-xs font-black text-white italic">{bet.stake.toFixed(2)}€</td>
+                                            <td className="py-6 text-xs font-black text-white italic">{bet.odds.toFixed(2)}</td>
+                                            <td className="py-6">
+                                                {bet.result === 'pending' ? (
+                                                    <div className="flex gap-2">
+                                                        <button onClick={() => handleBetResult(bet.id, 'won')} className="px-3 py-1 text-[9px] font-black text-emerald-400 border border-emerald-500/20 bg-emerald-500/5 rounded-lg hover:bg-emerald-500 hover:text-white transition-all uppercase tracking-widest italic">GAGNÉ</button>
+                                                        <button onClick={() => handleBetResult(bet.id, 'lost')} className="px-3 py-1 text-[9px] font-black text-red-400 border border-red-500/20 bg-red-500/5 rounded-lg hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest italic">PERDU</button>
+                                                    </div>
+                                                ) : (
+                                                    <span className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest italic rounded-lg border ${bet.result === 'won' ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' : 'text-red-400 border-red-500/20 bg-red-500/5'}`}>
+                                                        {bet.result === 'won' ? 'WIN' : 'LOSS'}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className={`py-6 text-right text-sm font-black italic tracking-tighter ${bet.profit > 0 ? 'text-emerald-400' : bet.profit < 0 ? 'text-red-400' : 'text-white/40'}`}>
+                                                {bet.profit >= 0 ? '+' : ''}{bet.profit.toFixed(2)}€
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                      )}
                 </div>
