@@ -36,10 +36,10 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                         <button 
                             key={item.p}
                             onClick={() => onNavigate(item.p)}
-                            className={`text-[11px] font-black uppercase tracking-[0.4em] italic transition-all relative group ${currentPage === item.p ? 'text-white' : 'text-white hover:text-brand-orange'}`}
+                            className={`text-[11px] font-black uppercase tracking-[0.4em] italic transition-all relative group ${currentPage === item.p ? 'text-white' : 'text-white/60 hover:text-brand-orange'}`}
                         >
                             {item.l}
-                            <span className={`absolute -bottom-2 left-0 h-[2px] bg-brand-orange transition-all duration-500 ${currentPage === item.p ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                            <span className={`absolute -bottom-2 left-0 h-[2px] bg-gradient-to-r from-brand-orange to-brand-violet transition-all duration-500 ${currentPage === item.p ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
                         </button>
                     ))}
                 </nav>
@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                     {isLoggedIn ? (
                         <button 
                             onClick={() => onNavigate(Page.Dashboard)}
-                            className="bg-gradient-to-r from-brand-orange to-brand-violet text-white px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic hover:scale-105 active:scale-95 transition-all shadow-xl"
+                            className="bg-gradient-to-r from-brand-orange to-brand-violet text-white px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-orange/10"
                         >
                             DASHBOARD
                         </button>

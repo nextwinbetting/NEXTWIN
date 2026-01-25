@@ -22,7 +22,7 @@ const MenuCard: React.FC<{
         } hover:border-brand-orange/50 hover:-translate-y-2 shadow-2xl`}
     >
         <div className={`w-14 h-14 flex items-center justify-center rounded-2xl mb-8 transition-all duration-500 ${
-            highlight ? 'bg-gradient-pro text-white shadow-xl shadow-orange-500/20' : 'bg-white/5 text-white/20 group-hover:bg-gradient-pro group-hover:text-white group-hover:shadow-xl group-hover:shadow-orange-500/20'
+            highlight ? 'bg-gradient-to-r from-brand-orange to-brand-violet text-white shadow-xl shadow-brand-orange/20' : 'bg-white/5 text-white/20 group-hover:bg-gradient-to-r group-hover:from-brand-orange group-hover:to-brand-violet group-hover:text-white group-hover:shadow-xl group-hover:shadow-brand-orange/20'
         }`}>
             {icon}
         </div>
@@ -45,7 +45,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                     <span className="text-[9px] font-black text-orange-500 uppercase tracking-[0.4em] italic">Access Authorized — NextWin Cockpit Elite</span>
                 </div>
                 <h1 className="mb-6 font-display font-black text-white tracking-tighter uppercase italic leading-[0.9]">
-                    SALUT, <span className="text-transparent bg-clip-text bg-gradient-pro">{username}</span>
+                    SALUT, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-violet">{username}</span>
                 </h1>
                 <p className="text-white text-sm font-bold uppercase tracking-[0.3em] italic opacity-40">LE NEURAL ENGINE EST ACTIF. 8 SIGNAUX DISPONIBLES.</p>
             </header>
@@ -79,7 +79,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
             </div>
 
             <div className="relative glass-panel rounded-[3rem] p-12 md:p-16 overflow-hidden border border-white/10 shadow-3xl">
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-pro opacity-[0.03] blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-brand-orange to-brand-violet opacity-[0.05] blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
                 <div className="flex flex-col md:flex-row items-center gap-16 relative z-10">
                     <div className="flex-1 text-center md:text-left">
                         <h3 className="text-3xl font-display font-black text-white italic uppercase tracking-tighter mb-4 leading-none">LA RIGUEUR DE 12H00.</h3>
@@ -89,7 +89,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                     </div>
                     <button 
                         onClick={() => setActivePage(DashboardNav.Strategy)}
-                        className="px-12 py-6 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.4em] text-white transition-all italic"
+                        className="px-12 py-6 bg-white/5 border border-white/10 hover:bg-gradient-to-r hover:from-brand-orange hover:to-brand-violet rounded-xl text-[10px] font-black uppercase tracking-[0.4em] text-white transition-all italic"
                     >
                         NOTRE PROTOCOLE
                     </button>
