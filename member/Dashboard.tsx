@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Predictions from './Predictions';
 import BankrollManagement from './BankrollManagement';
 import Subscription from './Subscription';
@@ -9,10 +9,9 @@ import DashboardHome from './DashboardHome';
 import Support from './Support';
 import Archives from './Archives';
 import Analyzer from './Analyzer';
+import PredictionsMember from './PredictionsMember';
 import DashboardSidebar from './DashboardSidebar';
 import { Language, DashboardNav, Page, User, ArchivedAnalysis } from '../types';
-
-const PredictionsMember = lazy(() => import('./PredictionsMember'));
 
 interface DashboardProps {
     currentUser: User;
@@ -58,9 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
                 currentUser.isAdmin ? (
                     <Predictions language={language} isAdmin={true} />
                 ) : (
-                    <Suspense fallback={<div className="flex flex-col items-center justify-center py-20"><div className="w-10 h-10 border-2 border-orange-500/20 border-t-orange-500 rounded-full animate-spin mb-4"></div></div>}>
-                        <PredictionsMember language={language} />
-                    </Suspense>
+                    <PredictionsMember language={language} />
                 )
             ) : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
             [DashboardNav.Archives]: isSubscribed ? <Archives archives={archivedAnalyses} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
@@ -71,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
             [DashboardNav.Support]: <Support language={language} setActivePage={setActivePage} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
             [DashboardNav.LiveScores]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
         };
-        return pageMapping[activePage];
+        return pageMapping[activePage] || pageMapping[DashboardNav.DashboardHome];
     }
 
     return (
@@ -87,7 +84,7 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
 
             <div className="flex-1 md:ml-72 transition-all duration-300">
                 <main className="p-4 sm:p-8 lg:p-12">
-                    <div className="max-w-[1200px] mx-auto animate-slide-up">
+                    <div className="max-w-[1200px] mx-auto">
                         {renderContent()}
                     </div>
                 </main>
