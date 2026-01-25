@@ -1,6 +1,5 @@
 import React from 'react';
 import { DashboardNav, Language, User } from '../types';
-import NextWinLogo from '../components/NextWinLogo';
 import { translations } from '../translations';
 
 interface SidebarProps {
@@ -25,11 +24,11 @@ const NavItem: React.FC<{
             onClick={() => setActivePage(page)}
             className={`flex items-center w-full px-5 py-4 rounded-xl transition-all duration-300 group mb-2 ${
                 isActive
-                    ? 'bg-brand-accent text-black font-black'
-                    : 'text-gray-500 hover:text-white hover:bg-white/5'
+                    ? 'bg-brand-orange text-white font-black'
+                    : 'text-white/40 hover:text-white hover:bg-white/5'
             }`}
         >
-            <div className={`w-5 h-5 mr-4 ${isActive ? 'text-black' : 'text-gray-700 group-hover:text-brand-accent'}`}>
+            <div className={`w-5 h-5 mr-4 ${isActive ? 'text-white' : 'text-white/20 group-hover:text-brand-orange'}`}>
                 {icon}
             </div>
             <span className={`text-[10px] uppercase tracking-widest italic font-bold`}>{label}</span>
@@ -43,7 +42,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, l
     return (
         <aside className="hidden md:flex md:fixed md:top-24 md:bottom-0 md:left-0 md:w-72 md:flex-col bg-brand-bg border-r border-white/5 z-40">
             <div className="flex-1 px-6 py-10 space-y-1 overflow-y-auto">
-                <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest mb-6 px-5">TERMINAL V2.5</p>
+                <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-6 px-5">TERMINAL V2.5</p>
                 
                 <NavItem 
                     page={DashboardNav.DashboardHome} activePage={activePage} setActivePage={setActivePage} 
@@ -67,7 +66,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, l
                 />
 
                 <div className="pt-10">
-                    <p className="text-[9px] font-black text-gray-800 uppercase tracking-widest mb-6 px-5">ACCOUNT</p>
+                    <p className="text-[9px] font-black text-white/10 uppercase tracking-widest mb-6 px-5">ACCOUNT</p>
                     <NavItem 
                         page={DashboardNav.Subscription} activePage={activePage} setActivePage={setActivePage} 
                         label={t.dash_nav_subscription} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>} 
@@ -81,12 +80,12 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, l
             
             <div className="p-8 bg-brand-surface border-t border-white/5">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-brand-accent flex items-center justify-center font-display font-black text-black text-sm italic">
+                    <div className="w-10 h-10 rounded-lg bg-brand-orange flex items-center justify-center font-display font-black text-white text-sm italic">
                         {currentUser.username.substring(0, 1).toUpperCase()}
                     </div>
                     <div className="flex-1 overflow-hidden">
                         <p className="text-xs font-black text-white truncate uppercase tracking-widest italic">{currentUser.username}</p>
-                        <p className="text-[9px] text-brand-accent font-black uppercase tracking-widest italic">PREMIUM ACCESS</p>
+                        <p className="text-[9px] text-brand-orange font-black uppercase tracking-widest italic">PREMIUM ACCESS</p>
                     </div>
                 </div>
             </div>

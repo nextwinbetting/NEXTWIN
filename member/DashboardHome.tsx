@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DashboardNav, Language } from '../types';
 import { translations } from '../translations';
@@ -19,17 +18,17 @@ const MenuCard: React.FC<{
     <div 
         onClick={onClick}
         className={`group relative p-8 rounded-[2rem] cursor-pointer transition-all duration-500 border glass-panel ${
-            highlight ? 'border-orange-500/30' : 'border-white/5'
-        } hover:border-orange-500/50 hover:-translate-y-2 shadow-2xl`}
+            highlight ? 'border-brand-orange/30' : 'border-white/5'
+        } hover:border-brand-orange/50 hover:-translate-y-2 shadow-2xl`}
     >
         <div className={`w-14 h-14 flex items-center justify-center rounded-2xl mb-8 transition-all duration-500 ${
-            highlight ? 'bg-gradient-pro text-white shadow-xl shadow-orange-500/20' : 'bg-white/5 text-gray-500 group-hover:bg-gradient-pro group-hover:text-white group-hover:shadow-xl group-hover:shadow-orange-500/20'
+            highlight ? 'bg-gradient-pro text-white shadow-xl shadow-orange-500/20' : 'bg-white/5 text-white/20 group-hover:bg-gradient-pro group-hover:text-white group-hover:shadow-xl group-hover:shadow-orange-500/20'
         }`}>
             {icon}
         </div>
         <h3 className="text-xl font-display font-black text-white italic tracking-tighter uppercase mb-2">{title}</h3>
-        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.15em] leading-relaxed mb-6 italic">{description}</p>
-        <div className="flex items-center text-[9px] font-black uppercase tracking-[0.2em] text-orange-500 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2">
+        <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.15em] leading-relaxed mb-6 italic">{description}</p>
+        <div className="flex items-center text-[9px] font-black uppercase tracking-[0.2em] text-brand-orange opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2">
             ACCÉDER AU FLUX
             <svg className="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path d="M9 5l7 7-7 7" /></svg>
         </div>
@@ -48,7 +47,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                 <h1 className="mb-6 font-display font-black text-white tracking-tighter uppercase italic leading-[0.9]">
                     SALUT, <span className="text-transparent bg-clip-text bg-gradient-pro">{username}</span>
                 </h1>
-                <p className="text-gray-500 text-sm font-bold uppercase tracking-[0.3em] italic">LE NEURAL ENGINE EST ACTIF. 8 SIGNAUX DISPONIBLES.</p>
+                <p className="text-white text-sm font-bold uppercase tracking-[0.3em] italic opacity-40">LE NEURAL ENGINE EST ACTIF. 8 SIGNAUX DISPONIBLES.</p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -84,7 +83,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ username, setActivePage, 
                 <div className="flex flex-col md:flex-row items-center gap-16 relative z-10">
                     <div className="flex-1 text-center md:text-left">
                         <h3 className="text-3xl font-display font-black text-white italic uppercase tracking-tighter mb-4 leading-none">LA RIGUEUR DE 12H00.</h3>
-                        <p className="text-[11px] text-gray-500 font-bold uppercase tracking-[0.2em] leading-relaxed max-w-xl italic">
+                        <p className="text-[11px] text-white/40 font-bold uppercase tracking-[0.2em] leading-relaxed max-w-xl italic">
                             LE SUCCÈS N'EST PAS UN HASARD. EN EXÉCUTANT VOS 8 SIGNAUX CHAQUE MATIN, VOUS CRÉEZ UN AVANTAGE MATHÉMATIQUE IRRÉVERSIBLE.
                         </p>
                     </div>

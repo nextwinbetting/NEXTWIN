@@ -70,10 +70,10 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string
             <div className={`w-16 h-16 rounded-3xl flex items-center justify-center ${color} shadow-2xl transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6`}>
                 {icon}
             </div>
-            <span className="text-[10px] font-black text-gray-700 uppercase tracking-[0.4em] italic">{label}</span>
+            <span className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic opacity-40">{label}</span>
         </div>
         <h3 className="text-3xl font-sans font-black text-white italic uppercase tracking-tighter mb-6">{title}</h3>
-        <p className="text-gray-500 text-sm font-bold uppercase tracking-widest leading-relaxed italic flex-grow">{desc}</p>
+        <p className="text-white text-sm font-bold uppercase tracking-widest leading-relaxed italic flex-grow">{desc}</p>
         <div className="mt-12 pt-8 border-t border-white/5 flex items-center gap-4">
             <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
             <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.3em] italic">Intelligence Artificielle Active</span>
@@ -95,7 +95,7 @@ const TestimonialCard: React.FC<{ name: string; profit: string; text: string; id
                 </div>
             </div>
         </div>
-        <p className="text-lg text-gray-400 font-medium leading-relaxed italic border-l-2 border-white/5 pl-8">"{text}"</p>
+        <p className="text-lg text-white font-medium leading-relaxed italic border-l-2 border-white/10 pl-8">"{text}"</p>
     </div>
 );
 
@@ -123,7 +123,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-violet">VOS GAINS SPORTIFS.</span>
                         </h1>
 
-                        <p className="max-w-xl text-xl text-gray-500 font-bold italic uppercase tracking-tighter leading-snug">
+                        <p className="max-w-xl text-xl text-white font-bold italic uppercase tracking-tighter leading-snug">
                             Nous fusionnons le Big Data mondial et les réseaux neuronaux pour transformer l'incertitude en stratégie mathématique.
                         </p>
 
@@ -154,7 +154,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                     <h2 className="text-5xl md:text-7xl font-sans font-black text-white italic uppercase tracking-tighter leading-none">
                         VOTRE ÉCOSYSTÈME <br/> <span className="text-brand-orange">HAUTE PERFORMANCE.</span>
                     </h2>
-                    <p className="text-gray-600 font-black uppercase tracking-[0.8em] italic text-xs">Ingénierie de Données Appliquée</p>
+                    <p className="text-white font-black uppercase tracking-[0.8em] italic text-xs opacity-40">Ingénierie de Données Appliquée</p>
                 </div>
                 
                 <div className="grid md:grid-cols-3 gap-16">
@@ -186,7 +186,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
             <section className="py-40 border-y border-white/5 bg-brand-surface/20 overflow-hidden relative">
                 <div className="absolute inset-0 bg-brand-violet/5 blur-[150px] rounded-full -translate-x-1/2"></div>
                 <div className="container mx-auto px-6 mb-24 flex items-center justify-between relative z-10">
-                    <h2 className="text-[12px] font-black text-gray-500 uppercase tracking-[0.8em] italic">FLUX CERTIFIÉ • COMMUNAUTÉ NEXTWIN</h2>
+                    <h2 className="text-[12px] font-black text-white uppercase tracking-[0.8em] italic opacity-40">FLUX CERTIFIÉ • COMMUNAUTÉ NEXTWIN</h2>
                     <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] italic animate-pulse">Synchronisation Directe</span>
                 </div>
                 <div className="animate-marquee-slow hover:[animation-play-state:paused] relative z-10">
@@ -205,7 +205,7 @@ const Home: React.FC<{ onNavigate: (page: Page) => void; language: Language }> =
                     <div className="absolute inset-0 bg-gradient-main opacity-5 group-hover:opacity-10 transition-opacity duration-1000"></div>
                     <div className="absolute -top-40 -right-40 w-[700px] h-[700px] bg-brand-orange/10 blur-[200px] group-hover:scale-125 transition-all duration-1000"></div>
                     
-                    <h2 className="text-5xl md:text-8xl font-sans font-black text-white mb-24 uppercase italic tracking-tighter leading-none">
+                    <h2 className="text-6xl md:text-8xl font-sans font-black text-white mb-24 uppercase italic tracking-tighter leading-none">
                         VOTRE NOUVELLE <br/> <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-orange to-brand-violet">ÈRE COMMENCE.</span>
                     </h2>
                     

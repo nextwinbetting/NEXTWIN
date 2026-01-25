@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, isLoggedIn, on
                         <button 
                             key={item.p}
                             onClick={() => onNavigate(item.p)}
-                            className={`text-[11px] font-black uppercase tracking-[0.4em] italic transition-all relative group ${currentPage === item.p ? 'text-white' : 'text-gray-500 hover:text-white'}`}
+                            className={`text-[11px] font-black uppercase tracking-[0.4em] italic transition-all relative group ${currentPage === item.p ? 'text-white' : 'text-white/50 hover:text-white'}`}
                         >
                             {item.l}
                             <span className={`absolute -bottom-2 left-0 h-[2px] bg-brand-orange transition-all duration-500 ${currentPage === item.p ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
