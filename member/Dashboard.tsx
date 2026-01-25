@@ -52,24 +52,72 @@ const Dashboard: React.FC<DashboardProps> = ({ currentUser, language, isSubscrib
 
     const renderContent = () => {
         const pageMapping: { [key in DashboardNav]: React.ReactNode } = {
-            [DashboardNav.DashboardHome]: <DashboardHome username={currentUser.username} setActivePage={setActivePage} language={language} />,
+            [DashboardNav.DashboardHome]: (
+                <DashboardHome 
+                    username={currentUser.username} 
+                    setActivePage={setActivePage} 
+                    language={language} 
+                />
+            ),
             [DashboardNav.Predictions]: isSubscribed ? (
                 currentUser.isAdmin ? (
                     <Predictions language={language} isAdmin={true} />
                 ) : (
                     <PredictionsMember language={language} />
                 )
-            ) : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
-            [DashboardNav.Archives]: isSubscribed ? <Archives archives={archivedAnalyses} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
-            [DashboardNav.Strategy]: isSubscribed ? <Strategy language={language} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            ) : (
+                <LockedFeature 
+                    language={language} 
+                    onNavigate={() => setActivePage(DashboardNav.Subscription)} 
+                />
+            ),
+            [DashboardNav.Archives]: isSubscribed ? (
+                <Archives archives={archivedAnalyses} />
+            ) : (
+                <LockedFeature 
+                    language={language} 
+                    onNavigate={() => setActivePage(DashboardNav.Subscription)} 
+                />
+            ),
+            [DashboardNav.Strategy]: isSubscribed ? (
+                <Strategy language={language} />
+            ) : (
+                <LockedFeature 
+                    language={language} 
+                    onNavigate={() => setActivePage(DashboardNav.Subscription)} 
+                />
+            ),
             [DashboardNav.Bankroll]: <BankrollManagement />,
-            [DashboardNav.Subscription]: <Subscription isSubscribed={isSubscribed} onSubscribe={onSubscribe} onCancel={onCancelSubscription} language={language} onNavigateToFaq={() => onNavigate(Page.FAQ)} />,
+            [DashboardNav.Subscription]: (
+                <Subscription 
+                    isSubscribed={isSubscribed} 
+                    onSubscribe={onSubscribe} 
+                    onCancel={onCancelSubscription} 
+                    language={language} 
+                    onNavigateToFaq={() => onNavigate(Page.FAQ)} 
+                />
+            ),
             [DashboardNav.Profile]: <Profile />,
-            [DashboardNav.Support]: <Support language={language} setActivePage={setActivePage} onNavigateToFaq={() => onNavigate(Page.FAQ)} onNavigateToContact={() => onNavigate(Page.Contact)} />,
-            [DashboardNav.LiveScores]: isSubscribed ? <Analyzer language={language} onNewAnalysis={handleNewAnalysis} /> : <LockedFeature language={language} onNavigate={() => setActivePage(DashboardNav.Subscription)} />,
+            [DashboardNav.Support]: (
+                <Support 
+                    language={language} 
+                    setActivePage={setActivePage} 
+                    onNavigateToFaq={() => onNavigate(Page.FAQ)} 
+                    onNavigateToContact={() => onNavigate(Page.Contact)} 
+                />
+            ),
+            [DashboardNav.LiveScores]: isSubscribed ? (
+                <Analyzer language={language} onNewAnalysis={handleNewAnalysis} />
+            ) : (
+                <LockedFeature 
+                    language={language} 
+                    onNavigate={() => setActivePage(DashboardNav.Subscription)} 
+                />
+            ),
         };
+        
         return pageMapping[activePage] || pageMapping[DashboardNav.DashboardHome];
-    }
+    };
 
     return (
         <div className="flex min-h-screen bg-brand-bg pt-24 lg:pt-32">
